@@ -469,6 +469,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   overflow: auto;
   border: 1px solid var(--ts-card-border);
   border-radius: 1rem;
+  background: var(--ts-card);
   padding: 1rem;
   box-shadow: var(--ts-shadow);
 }
