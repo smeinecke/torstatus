@@ -10,7 +10,7 @@ services:
       - ./nginx/web:/var/www/html
       - ./nginx/web/config_docker.php:/var/www/html/config.php
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./vendor:/var/www/vendor
+      - ./nginx/vendor:/var/www/vendor
     networks:
       - torstatus
     logging:
@@ -33,7 +33,7 @@ services:
     volumes:
       - ./nginx/web:/var/www/html
       - ./nginx/web/config_docker.php:/var/www/html/config.php
-      - ./vendor:/var/www/vendor
+      - ./nginx/vendor:/var/www/vendor
     networks:
       - torstatus
     logging:

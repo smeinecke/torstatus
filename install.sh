@@ -52,6 +52,8 @@ fi
 
 # Install PHP dependencies via Composer
 echo "Installing PHP dependencies..."
+cd nginx
 composer install --no-dev --no-interaction
+cd ..
 
 echo "=== Installation complete ==="

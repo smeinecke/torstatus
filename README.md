@@ -11,7 +11,7 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 ### Steps
  - Clone the repository.
- - Install PHP dependencies with Composer: `composer install --no-dev`.
+ - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
  - Create the Docker network `torstatus` using `docker create network torstatus`.
  - Run `docker compose build` from the root of your repository clone.
  - Run `docker compose up` to start everything.
@@ -84,7 +84,7 @@ Set up MariaDB, create a database with a user, and populate the database using [
 ### Web application
 
  - Copy [nginx/web/config\_template.php](nginx/web/config_template.php) to `config.php` and modify it to your needs.
- - Install PHP dependencies with Composer: `composer install --no-dev`.
+ - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
  - Set up a web server with PHP support (e.g. Apache or nginx with PHP-FPM).
  - You will need the PHP modules `memcached`, `mysqli`, and `gd`.
  - Configure your web server (or a separate vhost) to serve content from `nginx/web`.

@@ -25,11 +25,9 @@ repos:
         entry: php -l
         language: system
         files: \.php$
-        exclude: ^nginx/web/jpgraph/
       - id: phpstan
         name: PHPStan
-        entry: vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
+        entry: nginx/vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
         language: system
         files: \.php$
-        exclude: ^nginx/web/jpgraph/
         pass_filenames: false

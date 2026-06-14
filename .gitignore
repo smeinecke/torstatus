@@ -6,4 +6,5 @@ tor/hidden_services/*
 !tor/hidden_services/.gitkeep
 .venv
 *.pyc
-vendor/
+nginx/vendor/
+nginx/composer.lock

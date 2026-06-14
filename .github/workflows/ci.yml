@@ -63,7 +63,8 @@ jobs:
           extensions: memcached, mysqli, gd
 
       - name: Install Composer dependencies
+        working-directory: nginx
         run: composer install --no-interaction --prefer-dist
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
+        run: nginx/vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
