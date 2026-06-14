@@ -26,7 +26,7 @@
 			<div><dt>Router name</dt><dd>{{ Name|e }}</dd></div>
 			<div><dt>Fingerprint</dt><dd>{{ Fingerprint_formatted|e }}</dd></div>
 			<div><dt>Contact</dt><dd>{% if Contact is not null %}{{ Contact|e }}{% else %}None Given{% endif %}</dd></div>
-			<div><dt>IP address</dt><dd>{% if WHOISPath %}<a href="{{ (WHOISPath ~ IP)|e }}">{{ IP|e }}</a>{% else %}{{ IP|e }}{% endif %}{% for item in ORAddresses %}{% if item.address != IP %}, {% if WHOISPath %}<a href="{{ (WHOISPath ~ item.address)|e }}">{{ item.address|e }}</a>{% else %}{{ item.address|e }}{% endif %}{% endif %}{% endfor %}</dd></div>
+			<div><dt>IP address</dt><dd>{% if WHOISPath %}<a target="_blank" href="{{ (WHOISPath ~ IP)|e }}">{{ IP|e }}</a>{% else %}{{ IP|e }}{% endif %}{% for item in ORAddresses %}{% if item.address != IP %}, {% if WHOISPath %}<a target="_blank" href="{{ (WHOISPath ~ item.address)|e }}">{{ item.address|e }}</a>{% else %}{{ item.address|e }}{% endif %}{% endif %}{% endfor %}</dd></div>
 			<div><dt>Hostname</dt><dd>{{ Hostname|e }}</dd></div>
 			<div><dt>ORPort</dt><dd>{{ ORPort|e }}</dd></div>
 			<div><dt>DirPort</dt><dd>{% if DirPort == 0 %}None{% else %}{{ DirPort|e }}{% endif %}</dd></div>

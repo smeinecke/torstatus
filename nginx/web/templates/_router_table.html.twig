@@ -14,7 +14,7 @@
 {% for router in routers %}
 <tr class="{{ router.row_class }}">
 <td class="{{ router.name_class }}">
-	<span class="ts-country"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}"></span><abbr title="{{ router.country_name|e }}">{{ router.country_code|upper }}</abbr></span>
+	<span class="ts-country"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}" title="{{ router.country_name|e }}"></span></span>
 	<a href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
 </td>
 {% for col in columns_active %}
@@ -42,7 +42,7 @@
 {% elseif col == 'ORPort' or col == 'DirPort' %}
 <td class="{{ cell.class }}">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<strong>{{ cell.value }}</strong>{% else %}{{ cell.value }}{% endif %}</td>
 {% elseif col == 'IP' %}
-<td class="{{ cell.class|default('TDS') }}">{% if WHOISPath %}<a class="who" href="{{ (WHOISPath ~ cell.value)|e }}">{{ cell.value|e }}</a>{% else %}{{ cell.value|e }}{% endif %}</td>
+<td class="{{ cell.class|default('TDS') }}">{% if WHOISPath %}<a class="who" target="_blank" href="{{ (WHOISPath ~ cell.value)|e }}">{{ cell.value|e }}</a>{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'BadDir' or col == 'BadExit' %}
 <td class="F{{ cell.value }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
 {% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'Hibernating'] %}
