@@ -3,7 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 $HeaderRowString = "";
 
@@ -2053,172 +2053,22 @@ if(!$result) {
 	die_503('Query failed: ' . $mysqli->error);
 }
 
-fetch_mirrors();
-
-if(!$onion_service) {
-	header("onion-location: $Hidden_Service_URL");
-}
-
-?><!DOCTYPE html
-     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
-<head>
-	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-	<title>TorStatus - Tor Network Status</title>
-	<link rel="stylesheet" type="text/css" href="css/main.css" />
-	<link rel="stylesheet" type="text/css" href="css/sprites.css" />
-</head>
-
-<body>
-<div class="topbar" id="topbar"><br/>
-<table width="100%"><tr><td style="vertical-align: bottom;">
-<a href="/?CSInput=" class="logoimage"><img src="img/logo.png" alt="TorStatus" class="topbarlogo"/></a>
-<?php connection_information(); ?>
-</td><td style="vertical-align: bottom; text-align: right;">
-<form action="<?php echo $Self; ?>" method="post" name="search">
-<input type="hidden" name="CSMod" value="Contains" />
-<input type="hidden" name="CSField" value="Name" />
-<input type="text" class="searchbox" value="<?php echo ($CSInput)?htmlspecialchars($CSInput, ENT_QUOTES):"search for a router";?>" onfocus="javascript:if(this.value=='search for a router') { this.style.color = 'black';this.value=''; }" id="searchbox" name="CSInput"/><a href="javascript:document.search.submit();" class="searchbox"><img class="searchbox" alt="Search" src="/img/blank.gif" /></a><noscript><input type="submit" value="Search"/></noscript>
-</form>
-</td></tr></table>
-<?php if (!$CSInput) { ?>
-<script type="text/javascript">
-	document.getElementById('searchbox').style.color = 'gray';
-</script>
-<?php } ?>
-</div>
-<div class="separator"></div>
-<div class="mirrorbar">
-<div style="width: 100%; text-align: right;" id="expandcollapse">
-<script type="text/javascript">
-<!--
-document.write('<a href="javascript:;" onclick="javascript:expand_infobar();"><img src="/img/infobarexpand.png" class="infobarbutton"/></a> <a href="javascript:;" onclick="javascript:expand_infobar();" class="plain">Show Advanced Options</a>');
-// -->
-</script>
-<noscript>
-Good job, you do not have JavaScript enabled!
-</noscript>
-</div>
-</td></tr></table>
-</div>
-<div class="infobar" id="infobar">
-<a class="plain" href="tor_exit_query.php">Tor Exit Node Query</a> |
-<a class='plain' href='#AppServer' onclick='javascript:asdToggle = 0;toggleASD();'>TorStatus Server Details</a> |
-<a class='plain' href='#TorServer' onclick='javascript:nsosToggle = 0;toggleNSOS();'>Opinion Source</a> |
-<a class='plain' href='#CustomQuery' onclick='javascript:caqoToggle = 0;toggleCAQO();'>Advanced Query Options</a> |
-<a class='plain' href='column_set.php'>Advanced Display Options</a> |
-<a class='plain' href='#Stats' onclick='javascript:anssToggle = 0;toggleANSS();'>Network Statistic Summary</a> |
-<a class='plain' href='network_detail.php'>Network Statistic Graphs</a><br/>
-<a class='plain' href='query_export.php/Tor_query_EXPORT.csv'>CSV List of Current Result Set</a> |
-<a class='plain' href='ip_list_all.php/Tor_ip_list_ALL.csv'>CSV List of All Current Tor Server IP Addresses</a> |
-<a class='plain' href='ip_list_exit.php/Tor_ip_list_EXIT.csv'>CSV List of All Current Tor Server Exit Node IP Addresses</a>
-</div>
-<script type="text/javascript">
-	<!--
-	var closetextstart = '<div class="infobar" style="display: none;" id="expandcollapse">';
-	var closetexthide = '<a href="javascript:;" onclick="javascript:collapse_infobar();"><img src="/img/infobarcollapse.png" class="infobarbutton"/></a> <a href="javascript:;" onclick="javascript:collapse_infobar();" class="plain">Hide Advanced Options</a>';
-	var closetextshow = '<a href="javascript:;" onclick="javascript:expand_infobar();"><img src="/img/infobarexpand.png" class="infobarbutton"/></a> <a href="javascript:;" onclick="javascript:expand_infobar();" class="plain">Show Advanced Options</a>';
-	var closetextend = '</div>';
-	document.write(closetextstart + closetextshow + closetextend);
-	function expand_infobar()
-	{
-		document.getElementById('infobar').style.display="block";
-		document.getElementById('expandcollapse').innerHTML = closetexthide;
-	}
-	function collapse_infobar()
-	{
-		document.getElementById('infobar').style.display="none";
-		document.getElementById('expandcollapse').innerHTML = closetextshow;
-	}
-	collapse_infobar();
-	// -->
-</script>
-
-<div class="content">
-
-<br/><br/>
-
-<div class="dropcontainer">
-<div class="dropshadow2">
-<div class="innerbox">
-
-<table class="torcheck" cellpadding="0" cellspacing="0">
 
 
-<?php
+$pageTitle = "Tor Network Status";
 
-if($onion_service)
-{
-	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
-	echo '<span class="usingTor">You appear to be accessing this server through the Tor network as an Onion service.</span>';
-	echo '</td></tr>';
-}
-else if ($PositiveMatch_IP == 1)
-{
-	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
-	echo "<span class='usingTor'>It appears that you are using the Tor network</span><br/>Your OR is: " . htmlspecialchars($RemoteIP, ENT_QUOTES) . "<br/>";
-	for($i=1 ; $i < ($Count + 1) ; $i++)
-	{
-		echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
-		if ($PositiveMatch_ExitPolicy[$i] == 1)
-		{
-			echo "<span class='usingTor'>This Tor server would allow exiting to this page</span><br />";
-		}
-		else
-		{
-			echo "<span class='notUsingTor'>This Tor server would NOT allow exiting to this page</span><br />";
-		}
-	}
-	echo '</td></tr>';
-}
-else
-{
-	echo "<tr><td class='tab'>";
-	echo "<img alt='You are not using Tor' src='/img/notusingtor.png'/>";
-	echo "</td><td class='content' style='text-align: center;'>";
-	echo "<span class='notUsingTor'>You do not appear to be using Tor</span><br/>Your IP Address is: " . htmlspecialchars($RemoteIP, ENT_QUOTES);
-	echo "</td></tr>";
-}
-
-if($Hidden_Service_URL != null)
-{
-	echo "<tr>\n";
-	echo "<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />";
-	echo "<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='$Hidden_Service_URL'>$Hidden_Service_URL</a><br/><br/>";
-	echo "</td>\n";
-	echo "</tr>\n";
-}
+// Router table block
+ob_start();
 ?>
-
-</table>
-
-</div></div></div>
-
-<table cellspacing="2" cellpadding="2" class="body">
-
-<tr>
-<td>
-
-<a href="#Legend" onclick="lgndToggle = 0;javascript:toggleLGND();" class="LegendLink">View the Legend</a>
-
 <table width='100%' cellspacing='0' cellpadding='0' border='0' align='center' class='displayTable'>
-
 <?php
-
-// Generate header row
 GenerateHeaderRow();
-
-// Display header row
 echo $HeaderRowString;
 
-// Loop through and display all routers returned by query
 while ($record = $result->fetch_assoc())
 {
-
 	if ($RowCounter < $ColumnHeaderInterval)
 	{
-		// Display router row
 		DisplayRouterRow();
 
 		$CurrentResultSet++;
@@ -2226,10 +2076,7 @@ while ($record = $result->fetch_assoc())
 	}
 	else
 	{
-		// Display header row
 		echo $HeaderRowString;
-
-		// Display router row
 		DisplayRouterRow();
 
 		$CurrentResultSet++;
@@ -2239,19 +2086,13 @@ while ($record = $result->fetch_assoc())
 $result->free();
 ?>
 </table>
-</td>
-</tr>
+<?php
+$routerTableHtml = ob_get_clean();
+$router_table_block = $routerTableHtml;
 
-<tr>
-<td><br/></td>
-</tr>
-<tr><td>
-
-<a name="Stats"></a>
-
-<a href="javascript:toggleANSS();" class="LegendLink" id='anssTableLink'>Aggregate Network Statistic Summary</a>
-
-
+// stats block
+ob_start();
+?>
 <table width='40%' cellspacing='0' cellpadding='0' class='displayTable' id='anssTable'>
 <tr>
 <td class='HRN' colspan='3'>Aggregate Network Statistic Summary | <a href='network_detail.php'>Graphs / Details</a></td>
@@ -2395,36 +2236,12 @@ echo "</tr>\n";
 ?>
 </table>
 
-<script type='text/javascript'>
-<!--
-var anssToggle = 1;
-toggleANSS();
-function toggleANSS()
-{
-	if (anssToggle == 0)
-	{
-		document.getElementById('anssTable').style.display='table';
-		document.getElementById('anssTableLink').innerHTML='Hide Aggregate Network Statistic Summary  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-		anssToggle = 1;
-	}
-	else
-	{
-		document.getElementById('anssTable').style.display='none';
-		document.getElementById('anssTableLink').innerHTML='Show Aggregate Network Statistic Summary  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		anssToggle = 0;
-	}
-}
-// -->
-</script>
+<?php
+$stats_block = ob_get_clean();
 
-
-
-<br/>
-
-<a name='TorServer'></a>
-
-<a href="javascript:toggleNSOS();" class="LegendLink" id='nsosTableLink'>Network Status Opinion Source</a>
-
+// nsos block
+ob_start();
+?>
 <table width='*' cellspacing='0' cellpadding='0' class='displayTable' id='nsosTable'>
 <tr>
 <td class='HRN'>Network Status Opinion Source</td>
@@ -2457,38 +2274,12 @@ else {
 </tr>
 </table>
 
-<script type='text/javascript'>
-<!--
-var nsosToggle = 1;
-toggleNSOS();
-function toggleNSOS()
-{
-	if (nsosToggle == 0)
-	{
-		document.getElementById('nsosTable').style.display='table';
-		document.getElementById('nsosTableLink').innerHTML='Hide Network Status Opinion Source  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-		nsosToggle = 1;
-	}
-	else
-	{
-		document.getElementById('nsosTable').style.display='none';
-		document.getElementById('nsosTableLink').innerHTML='Show Network Status Opinion Source  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		nsosToggle = 0;
-	}
-}
-// -->
-</script>
+<?php
+$nsos_block = ob_get_clean();
 
-<br/>
-
-<a name='CustomDisplay' href="column_set.php" class="LegendLink">Custom / Advanced Display Options</a>
-
-<br/>
-
-<a name='CustomQuery'></a>
-
-<a href="javascript:toggleCAQO();" class="LegendLink" id='caqoTableLink'>Custom / Advanced Query Options</a>
-
+// query block
+ob_start();
+?>
 <table width='*' cellspacing='0' cellpadding='0' class='displayTable' id='caqoTable'>
 <tr>
 <td class='HRN'>Custom / Advanced Query Options</td>
@@ -2670,35 +2461,12 @@ echo "</form>\n";
 </tr>
 </table>
 
-<script type='text/javascript'>
-<!--
-var caqoToggle = 1;
-toggleCAQO();
-function toggleCAQO()
-{
-	if (caqoToggle == 0)
-	{
-		document.getElementById('caqoTable').style.display='table';
-		document.getElementById('caqoTableLink').innerHTML='Hide Custom / Advanced Query Options  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-		caqoToggle = 1;
-	}
-	else
-	{
-		document.getElementById('caqoTable').style.display='none';
-		document.getElementById('caqoTableLink').innerHTML='Show Custom / Advanced Query Options  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		caqoToggle = 0;
-	}
-}
-// -->
-</script>
+<?php
+$query_block = ob_get_clean();
 
-<br/>
-
-<a name="Legend"></a>
-
-<a href="javascript:toggleLGND();" class="LegendLink" id='lgndTableLink'>Table Legend</a>
-
-
+// legend block
+ob_start();
+?>
 <table width='300px' cellspacing='0' cellpadding='0' class='displayTable' id='lgndTable'>
 <tr><td class='HRN'>Legend:</td></tr>
 <tr class='r'><td style='padding: 1px;'>Router is okay</td></tr>
@@ -2707,36 +2475,12 @@ function toggleCAQO()
 <tr class='B'><td style='padding: 1px;'>Router is a bad exit node</td></tr>
 </table>
 
-<script type='text/javascript'>
-<!--
-var lgndToggle = 1;
-toggleLGND();
-function toggleLGND()
-{
-	if (lgndToggle == 0)
-	{
-		document.getElementById('lgndTable').style.display='table';
-		document.getElementById('lgndTableLink').innerHTML='Hide Table Legend  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-		lgndToggle = 1;
-	}
-	else
-	{
-		document.getElementById('lgndTable').style.display='none';
-		document.getElementById('lgndTableLink').innerHTML='Show Table Legend  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		lgndToggle = 0;
-	}
-}
-// -->
-</script>
+<?php
+$legend_block = ob_get_clean();
 
-<br/>
-
-<a name="AppServer"></a>
-
-<a href="javascript:toggleASD();" class="LegendLink" id='asdTableLink'>Application Server Details</a>
-
-<br/>
-
+// appserver block
+ob_start();
+?>
 <table cellspacing='0' cellpadding='0' class='displayTable' width='500px' id='asdTable'>
 <tr>
 <td class='HRN' colspan='2'>Application Server Details</td>
@@ -2775,49 +2519,53 @@ echo "</tr>\n";
 ?>
 </table>
 
-<script type='text/javascript'>
-<!--
-var asdToggle = 1;
-toggleASD();
-function toggleASD()
-{
-	if (asdToggle == 0)
-	{
-		document.getElementById('asdTable').style.display='table';
-		document.getElementById('asdTableLink').innerHTML='Hide Application Server Details  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-		asdToggle = 1;
-	}
-	else
-	{
-		document.getElementById('asdTable').style.display='none';
-		document.getElementById('asdTableLink').innerHTML='Show Application Server Details  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		asdToggle = 0;
-	}
-}
-// -->
-</script>
-
-</td></tr>
-</table>
-
-<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
-<tr>
-<td class='TRC'><?php echo $footerText; ?></td>
-</tr>
-</table>
-</div>
-</body>
-</html>
-
 <?php
+$appserver_block = ob_get_clean();
+
+$context = [
+	'router_table_block' => $router_table_block,
+	'stats_block' => $stats_block,
+	'nsos_block' => $nsos_block,
+	'query_block' => $query_block,
+	'legend_block' => $legend_block,
+	'appserver_block' => $appserver_block,
+	'onion_service' => $onion_service,
+	'PositiveMatch_IP' => $PositiveMatch_IP,
+	'RemoteIP' => $RemoteIP,
+	'Count' => $Count,
+	'TorNodeName' => $TorNodeName ?? [],
+	'TorNodeFP' => $TorNodeFP ?? [],
+	'PositiveMatch_ExitPolicy' => $PositiveMatch_ExitPolicy ?? [],
+	'Hidden_Service_URL' => $Hidden_Service_URL,
+	'SourceFingerprint' => $Fingerprint,
+	'SourceName' => $Name,
+	'SourceCountryCode' => $CountryCode,
+	'SourceContact' => $Contact,
+	'SourcePlatform' => $Platform,
+	'SourceIP' => $IP,
+	'SourceHostname' => $Hostname,
+	'SourceORPort' => $ORPort,
+	'SourceDirPort' => $DirPort,
+	'SourceLastDescriptorPublished' => $LastDescriptorPublished,
+	'SourceOnionKey' => $OnionKey,
+	'SourceSigningKey' => $SigningKey,
+	'SourceDescriptorSignature' => $DescriptorSignature,
+	'SourceFingerprint_formatted' => chunk_split(strtoupper($Fingerprint), 4, " "),
+	'LastUpdate' => $LastUpdate,
+	'LocalTimeZone' => $LocalTimeZone,
+	'LastUpdateElapsed' => $LastUpdateElapsed,
+	'RouterCount' => $RouterCount,
+	'DescriptorCount' => $DescriptorCount,
+	'page_generation_time' => round((microtime(true) - $TimeStart), 4),
+];
+
+render('index.html.twig', $context);
 
 // Close connection
 $mysqli->close();
 
-// Register session variable to mark that this page has been loaded
+// Register session variable
 if (!isset($_SESSION['IndexVisited']))
 {
 	$_SESSION['IndexVisited'] = 1;
 }
-
-?>

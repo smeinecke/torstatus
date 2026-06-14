@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 if(!($output = $memcached->get("torstatus_ip_list_exit_csv"))) {
 	// Get data from database
@@ -14,7 +14,7 @@ if(!($output = $memcached->get("torstatus_ip_list_exit_csv"))) {
 	}
 
 	$output = '';
-	while ($record = $result->fetch_assoc()) 
+	while ($record = $result->fetch_assoc())
 	{
 		$output .= "{$record['IP']}\n";
 	}
@@ -32,4 +32,3 @@ header('Content-type: application/force-download');
 header('Content-disposition: inline; filename=Tor_ip_list_EXIT.csv');
 
 print($output);
-

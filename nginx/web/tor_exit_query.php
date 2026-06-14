@@ -3,7 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 $Self = $_SERVER['PHP_SELF'];
 
@@ -295,126 +295,20 @@ if ($QueryIP != null)
 }
 
 $pageTitle = "Tor Exit Query";
-include("header.php");
 
-?>
+$context = [
+	'Self' => $Self,
+	'QueryIP' => $QueryIP,
+	'DestinationIP' => $DestinationIP,
+	'DestinationPort' => $DestinationPort,
+	'PositiveMatch_IP' => $PositiveMatch_IP,
+	'PositiveMatch_ExitPolicy' => $PositiveMatch_ExitPolicy ?? [],
+	'TorNodeName' => $TorNodeName ?? [],
+	'TorNodeFP' => $TorNodeFP ?? [],
+	'Count' => $Count,
+];
 
-<table width='100%' cellspacing='2' cellpadding='2'>
-<tr>
-<td>
-
-<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
-
-<tr>
-<td class="HRN">Tor Exit Query</td>
-</tr>
-
-<tr>
-<td style="white-space: normal;" class='TRS'><div><br/><br/><b>You can use this page to determine if an IP
-address is an active Tor server, and optionally see if that Tor server's Exit
-Policy would permit it to exit to a certain destination IP address and port.</b><br/></div></td>
-</tr>
-
-<?php
-	echo "<tr>\n";
-	echo "<td class='TRS' style='text-align: center;'><br/><br/><b>";
-
-	// No Query IP entered, or bogus information entered
-	if ($QueryIP == null)
-	{
-		echo "<font color='#ff0000'>-You must enter a Query IP, at minimum-</font><br/><br/>";
-	}
-
-	// Query IP entered, but either the DestinationIP or DestinationPort is empty or bogus
-	else if ($DestinationIP == null || $DestinationPort == null)
-	{
-		if ($PositiveMatch_IP == 1)
-		{
-			echo "<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>";
-			for($i=1 ; $i < ($Count + 1) ; $i++)
-			{
-				echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
-			}
-			echo "<br/>";
-		}
-		else
-		{
-			echo "<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>";
-		}
-	}
-
-	// Query IP, DestinationIP, and DestinationPort entered
-	else
-	{
-		if ($PositiveMatch_IP == 1)
-		{
-			echo "<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>";
-			for($i=1 ; $i < ($Count + 1) ; $i++)
-			{
-				echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
-				if ($PositiveMatch_ExitPolicy[$i] == 1)
-				{
-					echo "<font color='#00dd00'>-This Tor server would allow exiting to your destination-</font><br/><br/>";
-				}
-				else
-				{
-					echo "<font color='#ff0000'>-This Tor server would NOT allow exiting to your destination-</font><br/><br/>";
-				}
-			}
-		}
-		else
-		{
-			echo "<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>";
-		}
-	}
-
-	echo "</b></td>\n";
-	echo "</tr>\n";
-?>
-
-<tr>
-<td class='TRSCN'><br/>
-
-<table width='20%' cellpadding='8' cellspacing='2' border='1' align='center'>
-<tr>
-<td class='TRSCN'>
-<br/>
-
-<?php
-	echo "<form action='$Self' method='post'>\n";
-	echo "<b>IP Address to Query:<br/><span class='TRSM'>(Required)</span></b><br/>\n";
-	echo "<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($QueryIP ? $QueryIP : '', ENT_QUOTES) . "' /><br/><br/><br/>\n";
-	echo "<b>Destination IP Address:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
-	echo "<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($DestinationIP ? $DestinationIP : '', ENT_QUOTES) . "' /><br/><br/>\n";
-	echo "<b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
-	echo "<input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='" . htmlspecialchars($DestinationPort ? $DestinationPort : '', ENT_QUOTES) . "' /><br/><br/><br/>\n";
-	echo "<input type='submit' value='Submit Query' /><br/><br/>\n";
-	echo "</form>\n";
-?>
-
-</td>
-</tr>
-</table>
-
-<br/><br/>
-</td>
-</tr>
-
-</table>
-
-</td></tr></table>
-
-<br/>
-
-<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
-<tr>
-<td class='TRC'><?php echo $footerText; ?></td>
-</tr>
-</table>
-</body>
-</html>
-
-<?php
+render('tor_exit_query.html.twig', $context);
 
 // Close connection
 $mysqli->close();

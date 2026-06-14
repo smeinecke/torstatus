@@ -1,45 +1,41 @@
-<?php
-
-// Header file
-
-$Self = $_SERVER['PHP_SELF'];
-
-fetch_mirrors();
-
-if(!$onion_service) {
-	header("onion-location: $Hidden_Service_URL" . mb_substr($_SERVER['REQUEST_URI'], 1));
-}
-
-?><!DOCTYPE html 
+<!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
-<?php if(isset($noindex) && $noindex): ?>
+{% if noindex|default(false) %}
 	<meta name="robots" content="noindex" />
-<?php endif; ?>
-	<title>TorStatus - <?php echo $pageTitle; ?></title>
+{% endif %}
+	<title>TorStatus - {{ pageTitle }}</title>
 	<link rel="stylesheet" type="text/css" href="css/main.css" />
+{% block extra_css %}{% endblock %}
 </head>
 
 <body>
 <div class="topbar" id="topbar"><br/>
 <table width="100%"><tr><td style="vertical-align: bottom;">
 <a href="/?CSInput=" class="logoimage"><img src="img/logo.png" alt="TorStatus" class="topbarlogo"/></a>
-<?php connection_information(); ?>
+<span class="logotext">
+	{{ version }}
+{% if onion_service|default(false) %}
+	- Connection via onion service
+{% else %}
+	- Encrypted connection
+{% endif %}
+</span>
 </td><td style="vertical-align: bottom; text-align: right;">
 <form action="/index.php" method="post" name="search">
 <input type="hidden" name="CSMod" value="Contains" />
 <input type="hidden" name="CSField" value="Name" />
-<input type="text" class="searchbox" value="<?php echo (isset($CSInput) && $CSInput)?htmlspecialchars($CSInput, ENT_QUOTES):"search for a router";?>" onfocus="javascript:if(this.value=='search for a router') { this.style.color = 'black';this.value=''; }" id="searchbox" name="CSInput"/><a href="javascript:document.search.submit();" class="searchbox"><img class="searchbox" alt="Search" src="/img/blank.gif" /></a><noscript><input type="submit" value="Search"/></noscript>
+<input type="text" class="searchbox" value="{% if CSInput|default('') %}{{ CSInput|e }}{% else %}search for a router{% endif %}" onfocus="javascript:if(this.value=='search for a router') { this.style.color = 'black';this.value=''; }" id="searchbox" name="CSInput"/><a href="javascript:document.search.submit();" class="searchbox"><img class="searchbox" alt="Search" src="/img/blank.gif" /></a><noscript><input type="submit" value="Search"/></noscript>
 </form>
 </td></tr></table>
-<?php if (!isset($CSInput) || !$CSInput) { ?>
+{% if not CSInput|default('') %}
 <script type="text/javascript">
 	document.getElementById('searchbox').style.color = 'gray';
 </script>
-<?php } ?>
+{% endif %}
 </div>
 <div class="separator"></div>
 <div class="mirrorbar">
@@ -89,14 +85,20 @@ Good job, you do not have JavaScript enabled!
 	collapse_infobar();
 	// -->
 </script>
-<?php
-//<script type="text/javascript">
-//expand_infobar();
-//</script>
-?>
 
 <div class="content">
 
 <br/><br/>
 
+{% block content %}{% endblock %}
 
+<br/>
+
+<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
+<tr>
+<td class='TRC'>{{ footerText|default('')|raw }}</td>
+</tr>
+</table>
+</div>
+</body>
+</html>

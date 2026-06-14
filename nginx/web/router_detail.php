@@ -3,7 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 $Name = null;
 $IP = null;
@@ -39,25 +39,25 @@ $CountryCode = null;
 // Read in submitted variables
 if (isset($_GET["FP"]))
 {
-	$Fingerprint = $_GET["FP"];
+$Fingerprint = $_GET["FP"];
 }
 else {
-	http_response_code(400);
-	echo('Parameter FP missing');
-	die();
+http_response_code(400);
+echo('Parameter FP missing');
+die();
 }
 
 // Perform variable scrubbing
 $Fingerprint = strip_tags($Fingerprint);
 if (!preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 {
-	http_response_code(400);
-	echo('Invalid fingerprint');
-	die();
+http_response_code(400);
+echo('Invalid fingerprint');
+die();
 }
 
 // Populate variables from database
-$query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) AS SIGNED) + $OffsetFromGMT + CAST($ActiveDescriptorTable.Uptime AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.WriteHistoryLAST, $ActiveDescriptorTable.WriteHistoryINC, $ActiveDescriptorTable.WriteHistorySERDATA, $ActiveDescriptorTable.ReadHistoryLAST, $ActiveDescriptorTable.ReadHistoryINC, $ActiveDescriptorTable.ReadHistorySERDATA, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = ?";
+$query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) AS SIGNED) + $OffsetFromGMT + CAST($ActiveDescriptorTable.Uptime AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = ?";
 $stmt = $mysqli->prepare($query);
 $stmt->bind_param('s', $Fingerprint);
 $stmt->execute();
@@ -66,13 +66,11 @@ $record = $result->fetch_assoc();
 $stmt->close();
 
 if(!$record) {
-	http_response_code(404);
-	echo("Unknown fingerprint");
-	die();
+http_response_code(404);
+echo("Unknown fingerprint");
+die();
 }
-#echo "<!-- \n";
-#print_r($record);
-#echo "\n -->";
+
 $Name = $record['Name'];
 $LastDescriptorPublished = $record['LastDescriptorPublished'];
 $IP = $record['IP'];
@@ -104,298 +102,57 @@ $FValid = $record['FValid'];
 $FV2Dir = $record['FV2Dir'];
 
 $noindex = true;
+$pageTitle = "Router Detail";
 
 // Handle no descriptor available situation
 if ($Name == null)
 {
-	$pageTitle = "Router Detail";
-	include("header.php");
-	echo "<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>\n";
-	echo "<tr>\n";
-	echo "<td class='TRSC'><br/><b>ERROR -- No Descriptor Available</b><br/><br/></td>\n";
-	echo "</tr>\n";
-	echo "</table>\n";
-	echo "</body>\n";
-	echo "</html>\n";
-
-	// Close connection
-	$mysqli->close();
-
-	exit;
+render('router_detail.html.twig', [
+'error' => 'No Descriptor Available',
+]);
+$mysqli->close();
+exit;
 }
 
-$pageTitle = "Router Detail";
-include("header.php");
+$context = [
+'Name' => $Name,
+'Fingerprint' => $Fingerprint,
+'Fingerprint_formatted' => chunk_split(strtoupper($Fingerprint), 4, " "),
+'IP' => $IP,
+'Hostname' => $Hostname,
+'ORPort' => $ORPort,
+'DirPort' => $DirPort,
+'Platform' => $Platform,
+'Contact' => $Contact,
+'LastDescriptorPublished' => $LastDescriptorPublished,
+'Uptime' => $Uptime,
+'uptime_days' => floor($Uptime / 86400),
+'uptime_hours' => floor(($Uptime % 86400) / 3600),
+'uptime_minutes' => floor(($Uptime % 3600) / 60),
+'uptime_seconds' => $Uptime % 60,
+'Bandwidth_MAX' => $Bandwidth_MAX,
+'Bandwidth_BURST' => $Bandwidth_BURST,
+'Bandwidth_OBSERVED' => $Bandwidth_OBSERVED,
+'OnionKey' => $OnionKey,
+'SigningKey' => $SigningKey,
+'ExitPolicy_DATA_ARRAY' => $ExitPolicy_DATA_ARRAY ?? [],
+'Family_DATA_ARRAY' => $Family_DATA_ARRAY ?? [],
+'CountryCode' => $CountryCode,
+'FAuthority' => $FAuthority,
+'FBadDirectory' => $FBadDirectory,
+'FBadExit' => $FBadExit,
+'FExit' => $FExit,
+'FFast' => $FFast,
+'FGuard' => $FGuard,
+'FHibernating' => $FHibernating,
+'FNamed' => $FNamed,
+'FStable' => $FStable,
+'FRunning' => $FRunning,
+'FValid' => $FValid,
+'FV2Dir' => $FV2Dir,
+];
 
-?>
-
-<table width='100%' cellspacing='2' cellpadding='2'>
-<tr>
-<td>
-
-<table class="displayTable" cellspacing="0" cellpadding="0" width='100%' align='center'>
-<tr>
-<td class='HRN' colspan='2'>General Information</td>
-<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Exit Policy Information</td>
-</tr>
-<tr>
-<td class="TRS" colspan='2' style="vertical-align: top;" rowspan="1">
-<table>
-<?php
-
-	// Display router name
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Router Name:</b></td>\n";
-	echo "<td class='TRSB'>" . htmlspecialchars($Name, ENT_QUOTES) . "</td>\n";
-	echo "</tr>\n";
-
-	// Display router Fingerprint
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Fingerprint:</b></td>\n";
-	echo "<td class='TRSB'>" . chunk_split(strtoupper(htmlspecialchars($Fingerprint, ENT_QUOTES)), 4, " ") . "</td>\n";
-	echo "</tr>\n";
-
-	// Display router Contact
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Contact:</b></td>\n";
-	echo "<td class='TRSB'>"; if($Contact == null){echo "None Given";} else{echo htmlspecialchars($Contact, ENT_QUOTES);} echo "</td>\n";
-	echo "</tr>\n";
-
-	// Display router IP
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>IP Address:</b></td>\n";
-	echo "<td class='TRSB'>" . htmlspecialchars($IP, ENT_QUOTES) . "</td>\n";
-	echo "</tr>\n";
-
-	// Display router Hostname
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Hostname:</b></td>\n";
-	echo "<td class='TRSB'>"; if($Hostname == $IP){echo "Unavailable";} else{echo htmlspecialchars($Hostname, ENT_QUOTES);} echo "</td>\n";
-	echo "</tr>\n";
-
-	// Display ORPort
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Onion Router Port:</b></td>\n";
-	echo "<td class='TRSB'>" . htmlspecialchars($ORPort, ENT_QUOTES) . "</td>\n";
-	echo "</tr>\n";
-
-	// Display DirPort
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Directory Server Port:</b></td>\n";
-	echo "<td class='TRSB'>"; if($DirPort == 0){echo "None";} else{echo htmlspecialchars($DirPort, ENT_QUOTES);} echo "</td>\n";
-	echo "</tr>\n";
-
-	// Display CountryCode
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Country Code:</b></td>\n";
-	echo "<td class='TRSB'>"; if($CountryCode == null){echo "Unknown";} else{echo htmlspecialchars($CountryCode, ENT_QUOTES);} echo "</td>\n";
-	echo "</tr>\n";
-
-	// Display Platform
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Platform / Version:</b></td>\n";
-	echo "<td class='TRSB'>" . htmlspecialchars($Platform, ENT_QUOTES) . "</td>\n";
-	echo "</tr>\n";
-
-	// Display LastDescriptorPublished
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Last Descriptor Published (GMT):</b></td>\n";
-	echo "<td class='TRSB'>" . htmlspecialchars($LastDescriptorPublished, ENT_QUOTES) . "</td>\n";
-	echo "</tr>\n";
-
-	if ($Uptime > -1)
-	{
-		// Display Current Uptime
-		$days = floor($Uptime/86400);
-		$Uptime = $Uptime - ($days*86400);
-		$hours = floor($Uptime/3600);
-		$Uptime = $Uptime - ($hours*3600);
-		$minutes = floor($Uptime/60);
-		$Uptime = $Uptime - ($minutes*60);
-		$seconds = $Uptime;
-
-		echo "<tr>\n";
-		echo "<td class='TRAR'><b>Current Uptime:</b></td>\n";
-		echo "<td class='TRSB'>$days Day(s), $hours Hour(s), $minutes Minute(s), $seconds Second(s)</td>\n";
-		echo "</tr>\n";
-	}
-	else
-	{
-		echo "<tr>\n";
-		echo "<td class='TRAR'><b>Current Uptime:</b></td>\n";
-		echo "<td class='TRSB'>Not Available</td>\n";
-		echo "</tr>\n";
-	}
-
-	// Display Bandwidth stats
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Bandwidth (Max/Burst/Observed - In Bps):</b></td>\n";
-	echo "<td class='TRSB'>$Bandwidth_MAX&nbsp;/&nbsp;$Bandwidth_BURST&nbsp;/&nbsp;$Bandwidth_OBSERVED</td>\n";
-	echo "</tr>\n";
-
-	// Display Family info
-	echo "<tr>\n";
-	echo "<td class='TRAR'><b>Family:</b></td>\n";
-	echo "<td class='TRSB'>";
-	if ($Family_DATA_ARRAY == null) {echo "No Info Given";}
-	else
-	{
-		for ($i=0 ; $i < count($Family_DATA_ARRAY) ; $i++)
-		{
-			echo htmlspecialchars($Family_DATA_ARRAY[$i], ENT_QUOTES) . "<br/>";
-		}
-	}
-	echo "</td>\n";
-	echo "</tr>\n";
-
-?>
-</table>
-
-</td>
-
-<td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'><b>
-<?php
-
-
-	for ($i=0 ; $i<count($ExitPolicy_DATA_ARRAY) ; $i++)
-	{
-		echo htmlspecialchars($ExitPolicy_DATA_ARRAY[$i], ENT_QUOTES) . "<br/>\n";
-	}
-
-	echo "<br/>\n";
-?>
-</b>
-</td>
-
-
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Bandwidth</td>
-<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Router Flags</td>
-</tr>
-<tr>
-<td class='TRS' style="text-align: center;">
-<img src='bandwidth_history_graph.php?MODE=WriteHistory&amp;FP=<?php echo $Fingerprint; ?>' />
-</td>
-<td class='TRSB' style="text-align: center;">
-<img src='bandwidth_history_graph.php?MODE=ReadHistory&amp;FP=<?php echo $Fingerprint; ?>' />
-</td>
-<td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'>
-<table cellspacing='0' cellpadding='0'>
-<?php
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Authority:</b></td>\n";
-	echo "<td class='F$FAuthority'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Bad Directory:</b></td>\n";
-	echo "<td class='F$FBadDirectory'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Bad Exit:</b></td>\n";
-	echo "<td class='F$FBadExit'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Exit:</b></td>\n";
-	echo "<td class='F$FExit'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Fast:</b></td>\n";
-	echo "<td class='F$FFast'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Guard:</b></td>\n";
-	echo "<td class='F$FGuard'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Hibernating:</b></td>\n";
-	echo "<td class='F$FHibernating'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Named:</b></td>\n";
-	echo "<td class='F$FNamed'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Stable:</b></td>\n";
-	echo "<td class='F$FStable'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Running:</b></td>\n";
-	echo "<td class='F$FRunning'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>Valid:</b></td>\n";
-	echo "<td class='F$FValid'>";
-	echo "</td>\n";
-	echo "</tr>\n";
-
-	echo "<tr class='nr'>\n";
-	echo "<td class='TRAR'><b>V2Dir:</b></td>\n";
-	echo "<td class='F$FV2Dir'>";
-
-	echo "</td>\n";
-	echo "</tr>\n";
-
-?>
-</table>
-</td>
-</tr>
-
-<tr>
-<td class='HRN' colspan='3'>Router Keys</td>
-</tr>
-<tr>
-<td class='TRS' colspan='3'>
-<?php
-
-	echo "<br/>\n";
-	echo "<b>Onion Key:</b><pre>" . htmlspecialchars($OnionKey, ENT_QUOTES) . "</pre>\n";
-	echo "<b>Signing Key:</b><pre>" . htmlspecialchars($SigningKey, ENT_QUOTES) . "</pre><br/>\n";
-?>
-</td>
-</tr>
-</table>
-
-</td>
-</tr>
-</table>
-
-
-<br/>
-
-<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
-<tr>
-<td class='TRC'><?php echo $footerText; ?></td>
-</tr>
-</table>
-</div>
-</body>
-</html>
-
-<?php
+render('router_detail.html.twig', $context);
 
 // Close connection
 $mysqli->close();
-
-?>

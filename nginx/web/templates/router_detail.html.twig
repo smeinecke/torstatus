@@ -1,0 +1,149 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+{% if error|default('') %}
+<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
+<tr>
+<td class='TRSC'><br/><b>ERROR -- {{ error|e }}</b><br/><br/></td>
+</tr>
+</table>
+{% else %}
+
+<table width='100%' cellspacing='2' cellpadding='2'>
+<tr>
+<td>
+
+<table class="displayTable" cellspacing="0" cellpadding="0" width='100%' align='center'>
+<tr>
+<td class='HRN' colspan='2'>General Information</td>
+<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Exit Policy Information</td>
+</tr>
+<tr>
+<td class="TRS" colspan='2' style="vertical-align: top;" rowspan="1">
+<table>
+	<tr>
+		<td class='TRAR'><b>Router Name:</b></td>
+		<td class='TRSB'>{{ Name|e }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Fingerprint:</b></td>
+		<td class='TRSB'>{{ Fingerprint_formatted|e }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Contact:</b></td>
+		<td class='TRSB'>{% if Contact is not null %}{{ Contact|e }}{% else %}None Given{% endif %}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>IP Address:</b></td>
+		<td class='TRSB'>{{ IP|e }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Hostname:</b></td>
+		<td class='TRSB'>{% if Hostname == IP %}Unavailable{% else %}{{ Hostname|e }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Onion Router Port:</b></td>
+		<td class='TRSB'>{{ ORPort|e }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Directory Server Port:</b></td>
+		<td class='TRSB'>{% if DirPort == 0 %}None{% else %}{{ DirPort|e }}{% endif %}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Country Code:</b></td>
+		<td class='TRSB'>{% if CountryCode is not null %}{{ CountryCode|e }}{% else %}Unknown{% endif %}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Platform / Version:</b></td>
+		<td class='TRSB'>{{ Platform|e }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Last Descriptor Published (GMT):</b></td>
+		<td class='TRSB'>{{ LastDescriptorPublished|e }}</td>
+	</tr>
+	{% if Uptime > -1 %}
+	<tr>
+		<td class='TRAR'><b>Current Uptime:</b></td>
+		<td class='TRSB'>{{ uptime_days }} Day(s), {{ uptime_hours }} Hour(s), {{ uptime_minutes }} Minute(s), {{ uptime_seconds }} Second(s)</td>
+	</tr>
+	{% else %}
+	<tr>
+		<td class='TRAR'><b>Current Uptime:</b></td>
+		<td class='TRSB'>Not Available</td>
+	</tr>
+	{% endif %}
+	<tr>
+		<td class='TRAR'><b>Bandwidth (Max/Burst/Observed - In Bps):</b></td>
+		<td class='TRSB'>{{ Bandwidth_MAX }}&nbsp;/&nbsp;{{ Bandwidth_BURST }}&nbsp;/&nbsp;{{ Bandwidth_OBSERVED }}</td>
+	</tr>
+	<tr>
+		<td class='TRAR'><b>Family:</b></td>
+		<td class='TRSB'>
+		{% if Family_DATA_ARRAY is empty %}No Info Given{% else %}
+			{% for member in Family_DATA_ARRAY %}
+				{{ member|e }}<br/>
+			{% endfor %}
+		{% endif %}
+		</td>
+	</tr>
+</table>
+
+</td>
+
+<td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'><b>
+{% for policy in ExitPolicy_DATA_ARRAY %}
+	{{ policy|e }}<br/>
+{% endfor %}
+<br/>
+</b>
+</td>
+
+</tr>
+<tr>
+<td class='HRN' colspan='2'>Bandwidth</td>
+<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Router Flags</td>
+</tr>
+<tr>
+<td class='TRS' style="text-align: center;">
+<img src='bandwidth_history_graph.php?MODE=WriteHistory&amp;FP={{ Fingerprint|e }}' />
+</td>
+<td class='TRSB' style="text-align: center;">
+<img src='bandwidth_history_graph.php?MODE=ReadHistory&amp;FP={{ Fingerprint|e }}' />
+</td>
+<td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'>
+<table cellspacing='0' cellpadding='0'>
+	<tr class='nr'><td class='TRAR'><b>Authority:</b></td><td class='F{{ FAuthority }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Bad Directory:</b></td><td class='F{{ FBadDirectory }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Bad Exit:</b></td><td class='F{{ FBadExit }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Exit:</b></td><td class='F{{ FExit }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Fast:</b></td><td class='F{{ FFast }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Guard:</b></td><td class='F{{ FGuard }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Hibernating:</b></td><td class='F{{ FHibernating }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Named:</b></td><td class='F{{ FNamed }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Stable:</b></td><td class='F{{ FStable }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Running:</b></td><td class='F{{ FRunning }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>Valid:</b></td><td class='F{{ FValid }}'></td></tr>
+	<tr class='nr'><td class='TRAR'><b>V2Dir:</b></td><td class='F{{ FV2Dir }}'></td></tr>
+</table>
+</td>
+</tr>
+
+<tr>
+<td class='HRN' colspan='3'>Router Keys</td>
+</tr>
+<tr>
+<td class='TRS' colspan='3'>
+<br/>
+<b>Onion Key:</b><pre>{{ OnionKey|e }}</pre>
+<b>Signing Key:</b><pre>{{ SigningKey|e }}</pre><br/>
+</td>
+</tr>
+</table>
+
+</td>
+</tr>
+</table>
+{% endif %}
+
+{% endblock %}

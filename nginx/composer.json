@@ -4,7 +4,8 @@
     "type": "project",
     "license": "MIT",
     "require": {
-        "mitoteam/jpgraph": "^10.0"
+        "mitoteam/jpgraph": "^10.0",
+        "twig/twig": "^3.0"
     },
     "require-dev": {
         "phpstan/phpstan": "^2.0"

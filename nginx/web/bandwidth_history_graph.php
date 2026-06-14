@@ -3,10 +3,9 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 // Include JPGraph items
-require_once '../vendor/autoload.php';
 use mitoteam\jpgraph\MtJpGraph;
 MtJpGraph::load(['line', 'date']);
 
@@ -133,5 +132,3 @@ if ($MODE == "ReadHistory")
 	$graph_read->Add($line_read);
 	$graph_read->Stroke();
 }
-
-?>

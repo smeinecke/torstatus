@@ -67,5 +67,3 @@ $bar->value->Show();
 $bar->value->SetFormat('%d');
 $graph->Add($bar);
 $graph->Stroke();
-
-?>

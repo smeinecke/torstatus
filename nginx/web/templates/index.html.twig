@@ -1,0 +1,221 @@
+{% extends "base.html.twig" %}
+
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="css/sprites.css" />
+{% endblock %}
+
+{% block content %}
+
+<div class="dropcontainer">
+<div class="dropshadow2">
+<div class="innerbox">
+
+<table class="torcheck" cellpadding="0" cellspacing="0">
+
+{% if onion_service|default(false) %}
+<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">
+<span class="usingTor">You appear to be accessing this server through the Tor network as an Onion service.</span>
+</td></tr>
+{% elseif PositiveMatch_IP == 1 %}
+<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">
+<span class='usingTor'>It appears that you are using the Tor network</span><br/>Your OR is: {{ RemoteIP|e }}<br/>
+{% if Count > 0 %}
+{% for i in 1..Count %}
+Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ TorNodeName[i]|e }}</a><br/>
+{% if PositiveMatch_ExitPolicy[i] == 1 %}
+<span class='usingTor'>This Tor server would allow exiting to this page</span><br />
+{% elseif PositiveMatch_ExitPolicy[i] == 0 %}
+<span class='notUsingTor'>This Tor server would NOT allow exiting to this page</span><br />
+{% endif %}
+{% endfor %}
+{% endif %}
+</td></tr>
+{% else %}
+<tr><td class='tab'>
+<img alt='You are not using Tor' src='/img/notusingtor.png'/>
+</td><td class='content' style='text-align: center;'>
+<span class='notUsingTor'>You do not appear to be using Tor</span><br/>Your IP Address is: {{ RemoteIP|e }}
+</td></tr>
+{% endif %}
+
+{% if Hidden_Service_URL %}
+<tr>
+<td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />
+<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='{{ Hidden_Service_URL|e }}'>{{ Hidden_Service_URL|e }}</a><br/><br/>
+</td>
+</tr>
+{% endif %}
+
+</table>
+
+</div></div></div>
+
+<table cellspacing="2" cellpadding="2" class="body">
+
+<tr>
+<td>
+
+<a href="#Legend" onclick="lgndToggle = 0;javascript:toggleLGND();" class="LegendLink">View the Legend</a>
+
+{{ router_table_block|raw }}
+
+</td>
+</tr>
+
+<tr>
+<td><br/></td>
+</tr>
+<tr><td>
+
+<a href="javascript:toggleANSS();" class="LegendLink" id='anssTableLink'>Aggregate Network Statistic Summary</a>
+
+{{ stats_block|raw }}
+
+<script type='text/javascript'>
+<!--
+var anssToggle = 1;
+toggleANSS();
+function toggleANSS()
+{
+if (anssToggle == 0)
+{
+document.getElementById('anssTable').style.display='table';
+document.getElementById('anssTableLink').innerHTML='Hide Aggregate Network Statistic Summary  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
+anssToggle = 1;
+}
+else
+{
+document.getElementById('anssTable').style.display='none';
+document.getElementById('anssTableLink').innerHTML='Show Aggregate Network Statistic Summary  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
+anssToggle = 0;
+}
+}
+// -->
+</script>
+
+<br/>
+
+<a href="javascript:toggleNSOS();" class="LegendLink" id='nsosTableLink'>Network Status Opinion Source</a>
+
+{{ nsos_block|raw }}
+
+<script type='text/javascript'>
+<!--
+var nsosToggle = 1;
+toggleNSOS();
+function toggleNSOS()
+{
+if (nsosToggle == 0)
+{
+document.getElementById('nsosTable').style.display='table';
+document.getElementById('nsosTableLink').innerHTML='Hide Network Status Opinion Source  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
+nsosToggle = 1;
+}
+else
+{
+document.getElementById('nsosTable').style.display='none';
+document.getElementById('nsosTableLink').innerHTML='Show Network Status Opinion Source  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
+nsosToggle = 0;
+}
+}
+// -->
+</script>
+
+<br/>
+
+<a name='CustomDisplay' href="column_set.php" class="LegendLink">Custom / Advanced Display Options</a>
+
+<br/>
+
+<a href="javascript:toggleCAQO();" class="LegendLink" id='caqoTableLink'>Custom / Advanced Query Options</a>
+
+{{ query_block|raw }}
+
+<script type='text/javascript'>
+<!--
+var caqoToggle = 1;
+toggleCAQO();
+function toggleCAQO()
+{
+if (caqoToggle == 0)
+{
+document.getElementById('caqoTable').style.display='table';
+document.getElementById('caqoTableLink').innerHTML='Hide Custom / Advanced Query Options  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
+caqoToggle = 1;
+}
+else
+{
+document.getElementById('caqoTable').style.display='none';
+document.getElementById('caqoTableLink').innerHTML='Show Custom / Advanced Query Options  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
+caqoToggle = 0;
+}
+}
+// -->
+</script>
+
+<br/>
+
+<a name="Legend"></a>
+
+<a href="javascript:toggleLGND();" class="LegendLink" id='lgndTableLink'>Table Legend</a>
+
+{{ legend_block|raw }}
+
+<script type='text/javascript'>
+<!--
+var lgndToggle = 1;
+toggleLGND();
+function toggleLGND()
+{
+if (lgndToggle == 0)
+{
+document.getElementById('lgndTable').style.display='table';
+document.getElementById('lgndTableLink').innerHTML='Hide Table Legend  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
+lgndToggle = 1;
+}
+else
+{
+document.getElementById('lgndTable').style.display='none';
+document.getElementById('lgndTableLink').innerHTML='Show Table Legend  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
+lgndToggle = 0;
+}
+}
+// -->
+</script>
+
+<br/>
+
+<a name="AppServer"></a>
+
+<a href="javascript:toggleASD();" class="LegendLink" id='asdTableLink'>Application Server Details</a>
+
+<br/>
+
+{{ appserver_block|raw }}
+
+<script type='text/javascript'>
+<!--
+var asdToggle = 1;
+toggleASD();
+function toggleASD()
+{
+if (asdToggle == 0)
+{
+document.getElementById('asdTable').style.display='table';
+document.getElementById('asdTableLink').innerHTML='Hide Application Server Details  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
+asdToggle = 1;
+}
+else
+{
+document.getElementById('asdTable').style.display='none';
+document.getElementById('asdTableLink').innerHTML='Show Application Server Details  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
+asdToggle = 0;
+}
+}
+// -->
+</script>
+
+</td></tr>
+</table>
+
+{% endblock %}

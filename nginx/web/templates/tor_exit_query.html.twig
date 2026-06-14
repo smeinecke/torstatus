@@ -1,0 +1,87 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+<table width='100%' cellspacing='2' cellpadding='2'>
+<tr>
+<td>
+
+<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
+
+<tr>
+<td class="HRN">Tor Exit Query</td>
+</tr>
+
+<tr>
+<td style="white-space: normal;" class='TRS'><div><br/><br/><b>You can use this page to determine if an IP
+address is an active Tor server, and optionally see if that Tor server's Exit
+Policy would permit it to exit to a certain destination IP address and port.</b><br/></div></td>
+</tr>
+
+<tr>
+<td class='TRS' style='text-align: center;'><br/><br/><b>
+{% if QueryIP is null %}
+<font color='#ff0000'>-You must enter a Query IP, at minimum-</font><br/><br/>
+{% elseif DestinationIP is null or DestinationPort is null %}
+{% if PositiveMatch_IP == 1 %}
+<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>
+{% if Count > 0 %}
+{% for i in 1..Count %}
+Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ TorNodeName[i]|e }}</a><br/>
+{% endfor %}
+{% endif %}
+<br/>
+{% else %}
+<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>
+{% endif %}
+{% else %}
+{% if PositiveMatch_IP == 1 %}
+<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>
+{% if Count > 0 %}
+{% for i in 1..Count %}
+Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ TorNodeName[i]|e }}</a><br/>
+{% if PositiveMatch_ExitPolicy[i] == 1 %}
+<font color='#00dd00'>-This Tor server would allow exiting to your destination-</font><br/><br/>
+{% elseif PositiveMatch_ExitPolicy[i] == 0 %}
+<font color='#ff0000'>-This Tor server would NOT allow exiting to your destination-</font><br/><br/>
+{% endif %}
+{% endfor %}
+{% endif %}
+{% else %}
+<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>
+{% endif %}
+{% endif %}
+</b></td>
+</tr>
+
+<tr>
+<td class='TRSCN'><br/>
+
+<table width='20%' cellpadding='8' cellspacing='2' border='1' align='center'>
+<tr>
+<td class='TRSCN'>
+<br/>
+
+<form action='{{ Self|e }}' method='post'>
+<b>IP Address to Query:<br/><span class='TRSM'>(Required)</span></b><br/>
+<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='{{ QueryIP|default('')|e }}' /><br/><br/><br/>
+<b>Destination IP Address:<br/><span class='TRSM'>(Optional)</span></b><br/>
+<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='{{ DestinationIP|default('')|e }}' /><br/><br/>
+<b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>
+<input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='{{ DestinationPort|default('')|e }}' /><br/><br/><br/>
+<input type='submit' value='Submit Query' /><br/><br/>
+</form>
+
+</td>
+</tr>
+</table>
+
+<br/><br/>
+</td>
+</tr>
+
+</table>
+
+</td></tr></table>
+
+{% endblock %}

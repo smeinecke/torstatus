@@ -94,5 +94,3 @@ if (isset($argv) && isset($argv[1]) && $argv[1] == 'printthefooter')
 }
 
 // }}}
-
-?>

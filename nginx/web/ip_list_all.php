@@ -3,7 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 if(!($output = $memcached->get("torstatus_ip_list_all_csv"))) {
 	// Get data from database
@@ -32,4 +32,3 @@ header('Content-type: application/force-download');
 header('Content-disposition: inline; filename=Tor_ip_list_ALL.csv');
 
 print($output);
-

@@ -8,3 +8,4 @@ tor/hidden_services/*
 *.pyc
 nginx/vendor/
 nginx/composer.lock
+/.ruff_cache

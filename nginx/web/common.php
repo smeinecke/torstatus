@@ -51,26 +51,9 @@ function fetch_mirrors() {
 	$mirrorList = $mirrorListRow['mirrors'];
 }
 
-function connection_information() {
-	global $TorNetworkStatus_Version, $onion_service, $Self;
-?>
-<span class="logotext">
-	4.0
-	<?php if($onion_service): ?>
-		- Connection via onion service
-	<?php else: ?>
-		- Encrypted connection
-	<?php endif; ?>
-</span>
-<?php
-}
-
 // Start new session
 @session_start() or die_400();
 
-// Include configuration settings
-// @phpstan-ignore-next-line (runtime-generated from config_template.php)
-require_once("config.php");
 
 $memcached = new Memcached();
 $memcached->addServer($memcached_host, 11211);

@@ -3,7 +3,7 @@
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 $HeaderRowString = "";
 
@@ -983,4 +983,3 @@ while ($record = $result->fetch_assoc())
 $result->free();
 
 $mysqli->close();
-

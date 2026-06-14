@@ -1,9 +1,9 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
-require_once('common.php');
+require_once('init.php');
 
 $RouterCount = 0;
 
@@ -70,7 +70,7 @@ while ($record = $result->fetch_assoc()) {
 	{
 		$CountryCode_LABEL_ARRAY[$count] = 'N/A';
 	}
-	
+
 	$count++;
 }
 $result->free();
@@ -78,40 +78,40 @@ $result->free();
 // The label array
 
 // Register CountryCode variables in session
-if (!isset($_SESSION['CCGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['CCGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['CCGraph_DATA_ARRAY_SERIALIZED'] = serialize($CountryCode_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['CCGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['CCGraph_DATA_ARRAY_SERIALIZED'] = serialize($CountryCode_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['CCGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['CCGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['CCGraph_LABEL_ARRAY_SERIALIZED'] = serialize($CountryCode_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['CCGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['CCGraph_LABEL_ARRAY_SERIALIZED'] = serialize($CountryCode_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['CCGraph_Title'])) 
+if (!isset($_SESSION['CCGraph_Title']))
 {
 	$_SESSION['CCGraph_Title'] = $CountryCode_Title;
-} 
+}
 else
 {
 	unset($_SESSION['CCGraph_Title']);
 	$_SESSION['CCGraph_Title'] = $CountryCode_Title;
 }
 
-if (!isset($_SESSION['CCGraph_Legend'])) 
+if (!isset($_SESSION['CCGraph_Legend']))
 {
 	$_SESSION['CCGraph_Legend'] = $CountryCode_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['CCGraph_Legend']);
@@ -136,46 +136,46 @@ while ($record = $result->fetch_assoc()) {
 	{
 		$CountryCodeExit_LABEL_ARRAY[$count] = 'N/A';
 	}
-	
+
 	$count++;
 }
 $result->free();
 
 // Register CountryCodeExit variables in session
-if (!isset($_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED'] = serialize($CountryCodeExit_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['CCExitGraph_DATA_ARRAY_SERIALIZED'] = serialize($CountryCodeExit_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED'] = serialize($CountryCodeExit_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['CCExitGraph_LABEL_ARRAY_SERIALIZED'] = serialize($CountryCodeExit_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['CCExitGraph_Title'])) 
+if (!isset($_SESSION['CCExitGraph_Title']))
 {
 	$_SESSION['CCExitGraph_Title'] = $CountryCodeExit_Title;
-} 
+}
 else
 {
 	unset($_SESSION['CCExitGraph_Title']);
 	$_SESSION['CCExitGraph_Title'] = $CountryCodeExit_Title;
 }
 
-if (!isset($_SESSION['CCExitGraph_Legend'])) 
+if (!isset($_SESSION['CCExitGraph_Legend']))
 {
 	$_SESSION['CCExitGraph_Legend'] = $CountryCodeExit_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['CCExitGraph_Legend']);
@@ -197,47 +197,47 @@ while ($record = $result->fetch_assoc()) {
 	{
 		$Uptime_LABEL_ARRAY[$count] = $record['WeeksRunning'];
 		$Uptime_DATA_ARRAY[$count] = $record['Count'];
-		
+
 		$count++;
 	}
 }
 $result->free();
 
 // Register Uptime variables in session
-if (!isset($_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED'] = serialize($Uptime_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED'] = serialize($Uptime_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Uptime_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Uptime_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['UptimeGraph_Title'])) 
+if (!isset($_SESSION['UptimeGraph_Title']))
 {
 	$_SESSION['UptimeGraph_Title'] = $Uptime_Title;
-} 
+}
 else
 {
 	unset($_SESSION['UptimeGraph_Title']);
 	$_SESSION['UptimeGraph_Title'] = $Uptime_Title;
 }
 
-if (!isset($_SESSION['UptimeGraph_Legend'])) 
+if (!isset($_SESSION['UptimeGraph_Legend']))
 {
 	$_SESSION['UptimeGraph_Legend'] = $Uptime_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['UptimeGraph_Legend']);
@@ -301,40 +301,40 @@ $result->free();
 $Bandwidth_DATA_ARRAY = array($Bandwidth_Bucket_0_10,$Bandwidth_Bucket_11_20,$Bandwidth_Bucket_21_50,$Bandwidth_Bucket_51_100,$Bandwidth_Bucket_101_500,$Bandwidth_Bucket_501_1000,$Bandwidth_Bucket_1001_2000,$Bandwidth_Bucket_2001_3000,$Bandwidth_Bucket_3001_5000,$Bandwidth_Bucket_5001plus);
 
 // Register Bandwidth variables in session
-if (!isset($_SESSION['BWGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['BWGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['BWGraph_DATA_ARRAY_SERIALIZED'] = serialize($Bandwidth_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['BWGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['BWGraph_DATA_ARRAY_SERIALIZED'] = serialize($Bandwidth_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Bandwidth_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['BWGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Bandwidth_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['BWGraph_Title'])) 
+if (!isset($_SESSION['BWGraph_Title']))
 {
 	$_SESSION['BWGraph_Title'] = $Bandwidth_Title;
-} 
+}
 else
 {
 	unset($_SESSION['BWGraph_Title']);
 	$_SESSION['BWGraph_Title'] = $Bandwidth_Title;
 }
 
-if (!isset($_SESSION['BWGraph_Legend'])) 
+if (!isset($_SESSION['BWGraph_Legend']))
 {
 	$_SESSION['BWGraph_Legend'] = $Bandwidth_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['BWGraph_Legend']);
@@ -380,40 +380,40 @@ $count += $Platform_DATA_ARRAY[7];
 $Platform_DATA_ARRAY[0] = ($RouterCount - $count);
 
 // Register Platform variables in session
-if (!isset($_SESSION['PlatformGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['PlatformGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['PlatformGraph_DATA_ARRAY_SERIALIZED'] = serialize($Platform_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['PlatformGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['PlatformGraph_DATA_ARRAY_SERIALIZED'] = serialize($Platform_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['PlatformGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['PlatformGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['PlatformGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Platform_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['PlatformGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['PlatformGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Platform_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['PlatformGraph_Title'])) 
+if (!isset($_SESSION['PlatformGraph_Title']))
 {
 	$_SESSION['PlatformGraph_Title'] = $Platform_Title;
-} 
+}
 else
 {
 	unset($_SESSION['PlatformGraph_Title']);
 	$_SESSION['PlatformGraph_Title'] = $Platform_Title;
 }
 
-if (!isset($_SESSION['PlatformGraph_Legend'])) 
+if (!isset($_SESSION['PlatformGraph_Legend']))
 {
 	$_SESSION['PlatformGraph_Legend'] = $Platform_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['PlatformGraph_Legend']);
@@ -458,40 +458,40 @@ $Summary_DATA_ARRAY[12] = $record['V2Dir'];
 $Summary_DATA_ARRAY[13] = $record['DirMirror'];
 
 // Register Summary variables in session
-if (!isset($_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED']))
 {
 	$_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED'] = serialize($Summary_DATA_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED']);
 	$_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED'] = serialize($Summary_DATA_ARRAY);
 }
 
-if (!isset($_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED'])) 
+if (!isset($_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED']))
 {
 	$_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Summary_LABEL_ARRAY);
-} 
+}
 else
 {
 	unset($_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED']);
 	$_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED'] = serialize($Summary_LABEL_ARRAY);
 }
 
-if (!isset($_SESSION['SummaryGraph_Title'])) 
+if (!isset($_SESSION['SummaryGraph_Title']))
 {
 	$_SESSION['SummaryGraph_Title'] = $Summary_Title;
-} 
+}
 else
 {
 	unset($_SESSION['SummaryGraph_Title']);
 	$_SESSION['SummaryGraph_Title'] = $Summary_Title;
 }
 
-if (!isset($_SESSION['SummaryGraph_Legend'])) 
+if (!isset($_SESSION['SummaryGraph_Legend']))
 {
 	$_SESSION['SummaryGraph_Legend'] = $Summary_Legend;
-} 
+}
 else
 {
 	unset($_SESSION['SummaryGraph_Legend']);
@@ -499,80 +499,8 @@ else
 }
 
 $pageTitle = "Network Detail";
-include("header.php");
 
-?>
-
-
-<table width='100%' cellspacing='2' cellpadding='2'>
-<tr>
-<td>
-
-<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers by Country Code</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/cc_graph.php" alt="Number of Routers by Country Code" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Exit Routers by Country Code</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers by Uptime</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/uptime_graph.php" alt="Number of Routeres by Uptime" />
-</td>
-</tr>
-<tr>
-<td class='HRN'>Number of Routers by Observed Bandwidth</td>
-<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Number of Routers by Platform</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='1' align='center'>
-<img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth" />
-</td>
-<td class='TRSBcenter' colspan='1' align='center' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px;'>
-<img src="/platform_graph.php" alt="Number of Routers by Platform" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers Matching Specified Criteria</td>
-</tr>
-
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/summary_graph.php" alt="Summary Graph" />
-
-
-</td>
-</tr>
-</table>
-
-</td></tr></table>
-
-<br/>
-
-<table width='70%' cellspacing='2' cellpadding='2' border='0' align='center'>
-<tr>
-<td class='TRC'><?php echo $footerText; ?></td>
-</tr>
-</table>
-</body>
-</html>
-
-<?php
+render('network_detail.html.twig');
 
 // Close connection
 $mysqli->close();
-
-?>

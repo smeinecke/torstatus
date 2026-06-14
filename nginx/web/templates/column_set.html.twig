@@ -1,0 +1,69 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+<table width='100%' cellspacing='2' cellpadding='2'>
+<tr>
+<td>
+
+<table class='displayTable' width='100%' cellspacing='0' cellpadding='0' align='center'>
+<tr>
+<td class='HRN'>Column Display Preferences Detail</td>
+</tr>
+<tr>
+<td class='TRSCN'>
+
+<form action='{{ Self|e }}' method='post'>
+<table border='0' align='center' cellpadding='10' cellspacing='8'>
+<tr>
+<td align='center'>
+<table border='0' align='center'>
+<tr>
+<td class='TRSCN' align='center'>
+<input class='BTNCOLSEL' name='Remove' type='submit' value='Remove Column >>' />
+<br/>
+<select name='CR_ACTIVE' size='20' class='BOXCOLSEL'>
+{% for value in ColumnList_ACTIVE %}
+{% if ((CR_Up is not null or CR_Down is not null) and CR_ACTIVE == value) or (CR_Add is not null and CR_INACTIVE == value) %}
+<option value='{{ value }}' selected>{{ value }}</option>
+{% else %}
+<option value='{{ value }}'>{{ value }}</option>
+{% endif %}
+{% endfor %}
+</select>
+<br/><b>Currently Selected Columns</b>
+</td>
+<td align='left'>
+<input class='BTNUPDOWN' name='Up' type='submit' value='Up' /><br/><input class='BTNUPDOWN' name='Down' type='submit' value='Down' />
+</td>
+</tr>
+</table>
+</td>
+<td class='TRSCN' align='center'>
+<input class='BTNCOLSEL' name='Add' type='submit' value='<< Add Column' />
+<br/>
+<select name='CR_INACTIVE' size='20' class='BOXCOLSEL'>
+{% for value in ColumnList_INACTIVE %}
+{% if CR_Remove is not null and CR_ACTIVE == value %}
+<option value='{{ value }}' selected>{{ value }}</option>
+{% else %}
+<option value='{{ value }}'>{{ value }}</option>
+{% endif %}
+{% endfor %}
+</select>
+<br/><b>Available Columns</b>
+</td>
+</tr>
+</table>
+</form>
+
+<a class='tab' href='index.php'><b>Done / Return to Main Page</b></a>
+<br/><br/>
+
+</td>
+</tr>
+</table>
+
+</td></tr></table>
+
+{% endblock %}

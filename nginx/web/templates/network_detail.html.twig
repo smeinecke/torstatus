@@ -1,0 +1,61 @@
+{% extends "base.html.twig" %}
+
+{% block content %}
+
+<table width='100%' cellspacing='2' cellpadding='2'>
+<tr>
+<td>
+
+<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
+<tr>
+<td class='HRN' colspan='2'>Number of Routers by Country Code</td>
+</tr>
+<tr>
+<td class='TRSBcenter' colspan='2' align='center'>
+<img src="/cc_graph.php" alt="Number of Routers by Country Code" />
+</td>
+</tr>
+<tr>
+<td class='HRN' colspan='2'>Number of Exit Routers by Country Code</td>
+</tr>
+<tr>
+<td class='TRSBcenter' colspan='2' align='center'>
+<img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code" />
+</td>
+</tr>
+<tr>
+<td class='HRN' colspan='2'>Number of Routers by Uptime</td>
+</tr>
+<tr>
+<td class='TRSBcenter' colspan='2' align='center'>
+<img src="/uptime_graph.php" alt="Number of Routeres by Uptime" />
+</td>
+</tr>
+<tr>
+<td class='HRN'>Number of Routers by Observed Bandwidth</td>
+<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Number of Routers by Platform</td>
+</tr>
+<tr>
+<td class='TRSBcenter' colspan='1' align='center'>
+<img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth" />
+</td>
+<td class='TRSBcenter' colspan='1' align='center' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px;'>
+<img src="/platform_graph.php" alt="Number of Routers by Platform" />
+</td>
+</tr>
+<tr>
+<td class='HRN' colspan='2'>Number of Routers Matching Specified Criteria</td>
+</tr>
+
+<tr>
+<td class='TRSBcenter' colspan='2' align='center'>
+<img src="/summary_graph.php" alt="Summary Graph" />
+
+
+</td>
+</tr>
+</table>
+
+</td></tr></table>
+
+{% endblock %}
