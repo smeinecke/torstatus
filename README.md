@@ -48,7 +48,7 @@ $redis_uri = '';
 $memcached_host = 'memcached';
 ```
 
-The Compose file starts both `memcached` and `valkey` so deployments can switch the cache backend without changing service definitions.
+The Compose file only starts `valkey`. To use Memcached instead, change `$redis_uri` to empty in `config_docker.php`.
 
 ### Public web root
 
@@ -147,7 +147,7 @@ php nginx/web/apply_migration.php --skip migration_20250614_add_missing_indexes.
 - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
 - Set up a web server with PHP support.
 - Configure the web server document root to `nginx/web/public`.
-- Install PHP modules: `mysqli`, `gd`, and either `memcached` or `redis` depending on the selected cache backend. Install both when you want runtime-switchable cache backends.
+- Install PHP modules: `mysqli`, `gd`, and `redis` (or `memcached` if you prefer Memcached).
 
 ### Updater
 
