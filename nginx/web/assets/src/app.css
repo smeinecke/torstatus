@@ -902,9 +902,9 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
   display: inline-block;
   border: 1px solid var(--ts-legend-dot-border);
 }
-.ts-legend-yes { background: var(--ts-pill-green-bg); border-color: var(--ts-pill-green-text); }
-.ts-legend-no { background: var(--ts-pill-red-bg); border-color: var(--ts-pill-red-text); }
-.ts-legend-unknown { background: var(--ts-table-header-bg); border-color: var(--ts-legend-dot-border); }
+.ts-legend-yes { background: var(--ts-green); border-color: var(--ts-green); }
+.ts-legend-no { background: var(--ts-pill-red-text); border-color: var(--ts-pill-red-text); }
+.ts-legend-unknown { background: var(--ts-muted); border-color: var(--ts-muted); }
 .ts-legend-flags { color: var(--ts-muted); font-size: .85rem; margin: .25rem 0 0; }
 .ts-mini-table { width: 100%; border-collapse: collapse; margin-top: .75rem; }
 .ts-mini-table th,
