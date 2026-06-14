@@ -54,7 +54,16 @@ function setupAutoSubmit() {
   });
 }
 
+function setupAutoOpenDialogs() {
+  document.querySelectorAll('dialog[data-auto-open="true"]').forEach((dialog) => {
+    if (typeof dialog.showModal === 'function' && !dialog.open) {
+      dialog.showModal();
+    }
+  });
+}
+
 setupThemeToggle();
 setupDialogs();
 setupAutoSubmit();
+setupAutoOpenDialogs();
 initCharts();

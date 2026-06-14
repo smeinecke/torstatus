@@ -60,6 +60,9 @@
 			<p>{{ total_results }} result{% if total_results != 1 %}s{% endif %}, page {{ pagination.page }} of {{ pagination.total_pages }}</p>
 		</div>
 		<div class="ts-table-actions">
+			<button type="button" class="ts-button ts-button-secondary" data-dialog-open="columns-dialog" title="Choose which columns are shown in the router table">
+				<i class="ti ti-columns-3" aria-hidden="true"></i>Columns
+			</button>
 			<form action="{{ Self|e }}" method="get" class="ts-inline-form">
 {% for name, value in query_hidden_inputs %}
 				<input type="hidden" name="{{ name|e }}" value="{{ value|e }}">
@@ -182,6 +185,45 @@
 		<div class="ts-form-actions">
 			<a href="{{ Self|e }}" class="ts-button ts-button-secondary">Reset</a>
 			<button type="submit" class="ts-button ts-button-primary"><i class="ti ti-check" aria-hidden="true"></i>Apply filters</button>
+		</div>
+	</form>
+</dialog>
+
+<dialog class="ts-dialog ts-dialog-wide" id="columns-dialog"{% if column_dialog_open|default(false) %} data-auto-open="true"{% endif %}>
+	<form method="dialog" class="ts-dialog-close-form">
+		<button class="ts-icon-button" aria-label="Close columns"><i class="ti ti-x" aria-hidden="true"></i></button>
+	</form>
+	<div class="ts-dialog-header">
+		<i class="ti ti-columns-3" aria-hidden="true"></i>
+		<div>
+			<h2>Columns</h2>
+			<p>Choose which router table columns are visible and adjust their order.</p>
+		</div>
+	</div>
+	<form action="index.php" method="post" class="ts-column-editor">
+		<div class="ts-column-pane">
+			<h2>Visible columns</h2>
+			<select name="CR_ACTIVE" size="20" class="BOXCOLSEL">
+{% for value in ColumnList_ACTIVE %}
+				<option value="{{ value }}"{% if ((CR_Up is not null or CR_Down is not null) and CR_ACTIVE == value) or (CR_Add is not null and CR_INACTIVE == value) %} selected{% endif %}>{{ value }}</option>
+{% endfor %}
+			</select>
+			<div class="ts-form-actions ts-form-actions-left">
+				<button class="ts-button ts-button-secondary" name="Up" type="submit" value="1"><i class="ti ti-arrow-up" aria-hidden="true"></i>Up</button>
+				<button class="ts-button ts-button-secondary" name="Down" type="submit" value="1"><i class="ti ti-arrow-down" aria-hidden="true"></i>Down</button>
+				<button class="ts-button ts-button-secondary" name="Remove" type="submit" value="1"><i class="ti ti-arrow-right" aria-hidden="true"></i>Remove</button>
+			</div>
+		</div>
+		<div class="ts-column-pane">
+			<h2>Available columns</h2>
+			<select name="CR_INACTIVE" size="20" class="BOXCOLSEL">
+{% for value in ColumnList_INACTIVE %}
+				<option value="{{ value }}"{% if CR_Remove is not null and CR_ACTIVE == value %} selected{% endif %}>{{ value }}</option>
+{% endfor %}
+			</select>
+			<div class="ts-form-actions ts-form-actions-left">
+				<button class="ts-button ts-button-primary" name="Add" type="submit" value="1"><i class="ti ti-arrow-left" aria-hidden="true"></i>Add column</button>
+			</div>
 		</div>
 	</form>
 </dialog>

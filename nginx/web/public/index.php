@@ -7,6 +7,8 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../init.php';
 
+use TorStatus\ColumnSet\ColumnPreferences;
+use TorStatus\ColumnSet\ColumnSetAction;
 use TorStatus\Index\ClientContext;
 use TorStatus\Index\CountryCodes;
 use TorStatus\Index\ExitPolicyMatcher;
@@ -19,6 +21,19 @@ use TorStatus\Index\TorUsageService;
 
 $pageTitle = 'Tor Network Status';
 $Self = 'index.php';
+
+$columnDialogOpen = false;
+$method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+if ($method === 'POST' && isset($_POST['CR_ACTIVE'])) {
+    $columnDialogOpen = true;
+    $preferences = ColumnPreferences::fromSession(
+        $ColumnList_ACTIVE_DEFAULT,
+        $ColumnList_INACTIVE_DEFAULT,
+        $_SESSION
+    );
+    $preferences->applyPost($_POST);
+    $preferences->persist($_SESSION);
+}
 
 $request = IndexRequest::fromGlobals(
     $ColumnList_ACTIVE_DEFAULT,
@@ -104,6 +119,9 @@ $context = array_merge(
         'RouterCount' => $routerCount,
         'DescriptorCount' => $descriptorCount,
         'page_generation_time' => round((microtime(true) - $TimeStart), 4),
+        'ColumnList_ACTIVE' => $request->columnListActive,
+        'ColumnList_INACTIVE' => $request->columnListInactive,
+        'column_dialog_open' => $columnDialogOpen,
     ]
 );
 

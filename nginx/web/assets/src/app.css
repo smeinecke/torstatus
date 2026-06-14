@@ -715,8 +715,7 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
   gap: 1rem;
 }
 .ts-graph-card h2 { margin: 0 0 .75rem; font-size: 1rem; }
-.ts-graph-card img,
-.ts-graph-card canvas {
+.ts-graph-card img {
   display: block;
   width: 100%;
   max-width: 100%;
@@ -724,7 +723,12 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
   margin: 0 auto;
 }
 .ts-graph-card canvas {
-  min-height: 280px;
+  display: block;
+  width: 100%;
+  height: 280px;
+}
+.ts-graph-card-wide canvas {
+  height: 350px;
 }
 .ts-graph-card-wide { grid-column: 1 / -1; }
 @media (max-width: 900px) { .ts-graph-grid { grid-template-columns: 1fr; } }
