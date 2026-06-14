@@ -22,7 +22,7 @@
 {% if col == 'Hostname' %}
 <td class="TDS">
 	<div class="ts-host-cell">
-		<span>{{ cell.value|e }}{% if cell.ip is not null %}{% if WHOISPath %} <a class="who" href="{{ (WHOISPath ~ cell.ip)|e }}">{{ cell.ip|e }}</a>{% else %} {{ cell.ip|e }}{% endif %}{% endif %}</span>
+		<span>{{ cell.value|e }}</span>
 {% if cell.flags|length > 0 or cell.platform is defined %}
 		<span class="ts-badge-list">
 {% for flag in cell.flags %}
@@ -41,6 +41,8 @@
 <td class="{{ cell.class }}">{% if cell.down is defined and cell.down %}<i class="ti ti-server-off ts-row-icon" aria-hidden="true" title="Router is currently down"></i>{% else %}<span class="ts-row-spacer"></span>{% endif %}{% if cell.days is defined %}{{ cell.days }} d {{ cell.hours }} h{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'ORPort' or col == 'DirPort' %}
 <td class="{{ cell.class }}">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<strong>{{ cell.value }}</strong>{% else %}{{ cell.value }}{% endif %}</td>
+{% elseif col == 'IP' %}
+<td class="{{ cell.class|default('TDS') }}">{% if WHOISPath %}<a class="who" href="{{ (WHOISPath ~ cell.value)|e }}">{{ cell.value|e }}</a>{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'BadDir' or col == 'BadExit' %}
 <td class="F{{ cell.value }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
 {% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'Hibernating'] %}

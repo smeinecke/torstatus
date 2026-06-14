@@ -15,5 +15,5 @@ if ($ip === null) {
     exit;
 }
 
-header('Location: https://lookup.icann.org/whois/en?q=' . rawurlencode($ip), true, 302);
+header('Location: https://https://client.rdap.org/?object=' . rawurlencode($ip), true, 302);
 exit;

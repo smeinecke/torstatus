@@ -44,5 +44,5 @@ $renderer = Common::renderer(__DIR__ . '/templates', [
     'CSInput' => null,
     'Self' => $_SERVER['SCRIPT_NAME'] ?? '',
     'version' => $appVersion,
-    'WHOISPath' => defined('WHOISPath') ? WHOISPath . '?q=' : null,
+    'WHOISPath' => defined('WHOISPath') ? WHOISPath . '?object=' : null,
 ]);
