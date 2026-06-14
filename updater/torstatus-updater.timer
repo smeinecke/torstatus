@@ -1,0 +1,10 @@
+[Unit]
+Description=Run TorStatus updater every 15 minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=15min
+Unit=torstatus-updater.service
+
+[Install]
+WantedBy=timers.target

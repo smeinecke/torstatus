@@ -4,4 +4,6 @@ tor/torrc.d/*
 !tor/torrc.d/.gitkeep
 tor/hidden_services/*
 !tor/hidden_services/.gitkeep
-
+.venv
+*.pyc
+vendor/

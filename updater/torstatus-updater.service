@@ -1,0 +1,15 @@
+[Unit]
+Description=TorStatus Database Updater
+After=network.target
+
+[Service]
+Type=oneshot
+User=updater
+Group=updater
+WorkingDirectory=/opt/torstatus/updater
+ExecStart=/usr/local/bin/uv run python -m torstatus_updater
+Restart=on-failure
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
