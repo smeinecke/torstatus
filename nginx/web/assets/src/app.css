@@ -356,7 +356,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-hero h1,
 .ts-card h2,
-.ts-dialog h2 { margin: 0; letter-spacing: -.03em; }
+.ts-dialog h2 { margin: 0; letter-spacing: -.03em; color: var(--ts-text); }
 .ts-hero h1 { font-size: clamp(1.8rem, 4vw, 3rem); line-height: 1.05; }
 .ts-muted { color: var(--ts-muted); margin: .4rem 0 0; max-width: 54rem; }
 .ts-hero-actions { display: flex; flex-wrap: wrap; gap: .55rem; justify-content: flex-end; }
