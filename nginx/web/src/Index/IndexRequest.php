@@ -152,7 +152,7 @@ final class IndexRequest
 
         $columnListActive = self::arrayOfStrings($session['ColumnList_ACTIVE'] ?? null);
         $columnListInactive = self::arrayOfStrings($session['ColumnList_INACTIVE'] ?? null);
-        if (!isset($session['ColumnSetVisited'], $session['IndexVisited'])) {
+        if (!isset($session['ColumnSetVisited']) && !isset($session['IndexVisited'])) {
             $columnListActive = $defaultActiveColumns;
             $columnListInactive = $defaultInactiveColumns;
         }
