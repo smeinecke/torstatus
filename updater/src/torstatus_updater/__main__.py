@@ -9,9 +9,8 @@ import sys
 import time
 from pathlib import Path
 
-import pymemcache.client.base
-
 from . import geoip
+from .cache import build_cache
 from .config import parse_config
 from .db import Database
 from .tor_client import TorClient
@@ -40,10 +39,8 @@ def main() -> int:
         config_file = "../nginx/web/config.php"
     config = parse_config(config_file)
 
-    # Memcached
-    memcached = pymemcache.client.base.Client(
-        (config.get("memcached_host", "memcached"), 11211),
-    )
+    # Shared cache: memcached by default, or Redis/Valkey when configured.
+    cache = build_cache(config)
 
     # GeoIP
     ip_list = geoip.init_countries()
@@ -85,7 +82,7 @@ def main() -> int:
         database.commit()
 
         # Phase 3: hostname lookups
-        update_hostnames(database, descriptor_table, memcached, router_count)
+        update_hostnames(database, descriptor_table, cache, router_count)
         database.commit()
 
         # Fix future timestamps

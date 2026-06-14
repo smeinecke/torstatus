@@ -74,7 +74,7 @@ CREATE TABLE `Descriptor1` (
   `Fingerprint` varchar(256) DEFAULT NULL,
   `Name` varchar(256) DEFAULT NULL,
   `LastDescriptorPublished` datetime DEFAULT NULL,
-  `IP` varchar(256) DEFAULT NULL,
+  `IP` varchar(45) DEFAULT NULL,
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
   `Platform` varchar(256) DEFAULT NULL,
@@ -108,7 +108,7 @@ CREATE TABLE `Descriptor2` (
   `Fingerprint` varchar(256) DEFAULT NULL,
   `Name` varchar(256) DEFAULT NULL,
   `LastDescriptorPublished` datetime DEFAULT NULL,
-  `IP` varchar(256) DEFAULT NULL,
+  `IP` varchar(45) DEFAULT NULL,
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
   `Platform` varchar(256) DEFAULT NULL,
@@ -139,7 +139,7 @@ CREATE TABLE `Descriptor2` (
 
 CREATE TABLE `hostnames` (
   `id` int(11) NOT NULL,
-  `ip` varchar(15) NOT NULL,
+  `ip` varchar(45) NOT NULL,
   `hostname` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -186,7 +186,7 @@ CREATE TABLE `NetworkStatus1` (
   `Name` varchar(256) DEFAULT NULL,
   `LastDescriptorPublished` datetime DEFAULT NULL,
   `DescriptorHash` varchar(256) DEFAULT NULL,
-  `IP` varchar(256) DEFAULT NULL,
+  `IP` varchar(45) DEFAULT NULL,
   `Hostname` varchar(256) DEFAULT NULL,
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
@@ -217,7 +217,7 @@ CREATE TABLE `NetworkStatus2` (
   `Name` varchar(256) DEFAULT NULL,
   `LastDescriptorPublished` datetime DEFAULT NULL,
   `DescriptorHash` varchar(256) DEFAULT NULL,
-  `IP` varchar(256) DEFAULT NULL,
+  `IP` varchar(45) DEFAULT NULL,
   `Hostname` varchar(256) DEFAULT NULL,
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
@@ -247,7 +247,7 @@ CREATE TABLE `NetworkStatusSource` (
   `Fingerprint` varchar(256) DEFAULT NULL,
   `Name` varchar(256) DEFAULT NULL,
   `LastDescriptorPublished` datetime DEFAULT NULL,
-  `IP` varchar(256) DEFAULT NULL,
+  `IP` varchar(45) DEFAULT NULL,
   `ORPort` int(10) UNSIGNED DEFAULT NULL,
   `DirPort` int(10) UNSIGNED DEFAULT NULL,
   `Platform` varchar(256) DEFAULT NULL,
@@ -294,7 +294,7 @@ CREATE TABLE `Status` (
 CREATE TABLE `ORAddresses1` (
   `id` int(11) NOT NULL,
   `descriptor_id` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL,
+  `address` varchar(45) NOT NULL,
   `port` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -307,7 +307,7 @@ CREATE TABLE `ORAddresses1` (
 CREATE TABLE `ORAddresses2` (
   `id` int(11) NOT NULL,
   `descriptor_id` int(11) NOT NULL,
-  `address` varchar(100) NOT NULL,
+  `address` varchar(45) NOT NULL,
   `port` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
@@ -515,7 +515,7 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 
--- 
+--
 -- Insert the required rows into the database
 --
 INSERT INTO `NetworkStatusSource` (`ID`,`Fingerprint`,`Name`,`LastDescriptorPublished`,`IP`,`ORPort`,`DirPort`,`Platform`,`Contact`,`Uptime`,`BandwidthMAX`,`BandwidthBURST`,`BandwidthOBSERVED`,`OnionKey`,`SigningKey`,`WriteHistoryLAST`,`WriteHistoryINC`,`WriteHistorySERDATA`,`ReadHistoryLAST`,`ReadHistoryINC`,`ReadHistorySERDATA`,`ExitPolicySERDATA`,`FamilySERDATA`,`Hibernating`,`DescriptorSignature`) VALUES (1,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL);
@@ -525,4 +525,3 @@ INSERT INTO `Status` (`ID`,`LastUpdate`,`LastUpdateElapsed`,`ActiveNetworkStatus
 INSERT INTO `Mirrors` (`id`,`mirrors`) VALUES (1,'');
 
 COMMIT;
-

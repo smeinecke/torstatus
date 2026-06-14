@@ -64,6 +64,28 @@ def test_update_descriptors_indexed_minimal() -> None:
     assert cursor.execute.call_count == 2
 
 
+def test_update_descriptors_ipv6_or_address() -> None:
+    """IPv6 OR addresses are normalized and inserted in ORAddresses."""
+    lines = [
+        "router TestRelay 1.2.3.4 9001 0 9030",
+        "or-address [2001:0db8::1]:9001",
+        "bandwidth 100 200 150",
+        "published 2024-01-01 00:00:00",
+        "fingerprint ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD ABCD",
+        "router-signature",
+        "-----BEGIN SIGNATURE-----",
+        "sigdata",
+        "-----END SIGNATURE-----",
+    ]
+    cursor = MagicMock(spec=pymysql.cursors.Cursor)
+    cursor.lastrowid = 42
+    tor = MagicMock()
+
+    _update_descriptors_indexed(tor, lines, cursor, "INSERT DESC", "INSERT BW", "INSERT OR")
+
+    assert cursor.execute.call_args_list[-1].args == ("INSERT OR", (42, "2001:db8::1", 9001))
+
+
 def test_update_network_status_minimal() -> None:
     lines = [
         "r TestRelay AAAAbbbb /abcd 2024-01-01 00:00:00 1.2.3.4 9001 9030",

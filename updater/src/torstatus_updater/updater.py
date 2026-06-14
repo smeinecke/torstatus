@@ -1,24 +1,25 @@
-from __future__ import annotations
-
 """Orchestrator that fetches Tor data and writes it to the TorStatus DB."""
 
+from __future__ import annotations
+
 import base64
+import ipaddress
 import logging
 import re
 from datetime import UTC, datetime
 
-import pymemcache.client.base
 import pymysql.cursors
 
 from . import db as db_mod
 from . import dns_lookup, geoip, serializer
+from .cache import CacheClient
 from .tor_client import TorClient
 
 LOG = logging.getLogger(__name__)
 
 # Regex patterns for descriptor lines
 _RE_ROUTER = re.compile(r"^router\s+(\S+)\s+(\S+)\s+(\d+)\s+(\d+)\s+(\d+)$")
-_RE_OR_ADDRESS = re.compile(r"^or-address\s+(.+):(\d+)$")
+_RE_OR_ADDRESS = re.compile(r"^or-address\s+(?:\[([^\]]+)\]|([^:]+)):(\d+)$")
 _RE_BANDWIDTH = re.compile(r"^bandwidth\s+(\d+)\s+(\d+)\s+(\d+)$")
 _RE_PLATFORM = re.compile(r"^platform\s+(.+)$")
 _RE_PUBLISHED = re.compile(r"^published\s+(.+)$")
@@ -34,6 +35,14 @@ _RE_WRITE_HISTORY = re.compile(r"^write-history\s+(\d{4}-\d{2}-\d{2})\s+(\d{2}:\
 # Regex patterns for network-status lines
 _RE_NS_R = re.compile(r"^r\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\d+)\s+(\d+)$")
 _RE_NS_S = re.compile(r"^s\s+(.+)$")
+
+
+def _normalize_ip(value: str) -> str:
+    """Return a canonical textual IPv4/IPv6 address, or the original value."""
+    try:
+        return str(ipaddress.ip_address(value.strip("[]")))
+    except ValueError:
+        return value.strip("[]")
 
 
 def _parse_timestamp(ts_str: str) -> int:
@@ -210,7 +219,7 @@ def _update_descriptors_indexed(
             router_count += 1
             current = {
                 "nickname": m.group(1),
-                "address": m.group(2),
+                "address": _normalize_ip(m.group(2)),
                 "ORPort": int(m.group(3)),
                 "DirPort": int(m.group(5)),
                 "Hibernating": 0,
@@ -221,10 +230,8 @@ def _update_descriptors_indexed(
         # or-address
         m = _RE_OR_ADDRESS.match(line)
         if m:
-            addr = m.group(1)
-            if addr.startswith("[") and addr.endswith("]"):
-                addr = addr[1:-1]
-            or_addresses.append({"address": addr, "port": int(m.group(2))})
+            addr = m.group(1) or m.group(2) or ""
+            or_addresses.append({"address": _normalize_ip(addr), "port": int(m.group(3))})
             continue
 
         # bandwidth
@@ -416,10 +423,10 @@ def update_network_status(
                 current["Identity"] = _decode_tor_base64(m.group(2)).hex()
                 current["Digest"] = m.group(3)
                 current["Publication"] = f"{m.group(4)} {m.group(5)}"
-                current["IP"] = m.group(6)
+                current["IP"] = _normalize_ip(m.group(6))
                 current["ORPort"] = int(m.group(7))
                 current["DirPort"] = int(m.group(8))
-                current["Country"] = geoip.get_country(m.group(6), ip_list)
+                current["Country"] = geoip.get_country(current["IP"], ip_list)
             continue
 
         # s line (flags)
@@ -436,7 +443,7 @@ def update_network_status(
 def update_hostnames(
     database: db_mod.Database,
     descriptor_table: int,
-    memcached_client: pymemcache.client.base.Client | None,
+    cache_client: CacheClient | None,
     router_count: int,
 ) -> None:
     """Look up reverse hostnames for every router in NetworkStatus."""
@@ -451,7 +458,7 @@ def update_hostnames(
         lookup_counter += 1
         LOG.debug("Looking up %s (%d/%d)", ip, lookup_counter, router_count)
 
-        hostname = dns_lookup.lookup(ip, memcached_client=memcached_client)
+        hostname = dns_lookup.lookup(ip, cache_client=cache_client)
         with database.cursor() as uc:
             uc.execute(update_sql, (hostname, fingerprint))
 

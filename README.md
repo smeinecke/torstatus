@@ -5,92 +5,138 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 ## Docker-based setup (recommended)
 
 ### Prerequisites
- - Git
- - [Composer](https://getcomposer.org/)
- - Docker together with Docker compose
+
+- Git
+- [Composer](https://getcomposer.org/)
+- Docker together with Docker Compose
 
 ### Steps
- - Clone the repository.
- - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
- - Create the Docker network `torstatus` using `docker create network torstatus`.
- - Run `docker compose build` from the root of your repository clone.
- - Run `docker compose up` to start everything.
- - Wait for the updater to finish (it will log `Script successful, waiting 900 seconds...`).
- - Point your browser to [https://localhost:8765](https://localhost:8765).
+
+- Clone the repository.
+- Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
+- Create the Docker network `torstatus` using `docker network create torstatus`.
+- Run `docker compose build` from the root of your repository clone.
+- Run `docker compose up` to start everything.
+- Wait for the updater to finish a full update cycle.
+- Point your browser to [http://localhost:8765](http://localhost:8765).
 
 ### Things to note
- - The first start-up will take more time as the database needs to be initialized.
- - As long as the database is not up, the updater will complain about not being able to connect to the database. This is fine; as soon as the database is up, the updater will connect to it and start running.
- - The first run of the updater after every startup will take longer than the subsequent runs. This is because memcached has not yet been initialized.
- - The tor process will complain about its control port being accessible from non-local addresses. This warning can be ignored as it is only accessible from the containers of the TorStatus application.
- - All containers feature a health check that you can observe, e.g. using `docker ps`.
+
+- The first start-up takes more time because the database must be initialized.
+- As long as the database is not up, the updater will log database connection errors. This is expected during startup.
+- The first updater run after startup can take longer because the shared cache is empty.
+- The Tor process will warn that its control port is accessible from non-local addresses. In the default Compose setup it is only reachable from the TorStatus Docker network.
+- All containers include health checks that you can inspect with `docker ps`.
 
 ### Environment variables
- - `REAL_SERVER_IP`: The public IPv4 address of the TorStatus instance. Used for determining whether a certain Tor exit node will allow connecting to this TorStatus instance.
- - `HIDDEN_SERVICE_URL`: self-explanatory
+
+- `REAL_SERVER_IP`: The public IPv4 or IPv6 address of the TorStatus instance. Used for determining whether a Tor exit node will allow connecting to this TorStatus instance.
+- `HIDDEN_SERVICE_URL`: Optional onion-service URL shown in the UI.
+- `CACHE_BACKEND`: `memcached`, `redis`, `valkey`, or `none`. Defaults to `memcached`.
+- `CACHE_HOST`: Optional cache hostname. Defaults to `memcached` for memcached and `valkey` for Redis/Valkey in Docker.
+- `CACHE_PORT`: Optional cache TCP port. Defaults to `11211` for memcached and `6379` for Redis/Valkey.
+
+To use Valkey in Docker, start Compose with for example:
+
+```bash
+CACHE_BACKEND=valkey docker compose up
+```
+
+The Compose file still starts both `memcached` and `valkey` so deployments can switch the cache backend without changing service definitions.
+
+### Public web root
+
+Only `nginx/web/public` is intended to be reachable by the web server. Internal files such as `src`, `templates`, `config.php`, and `init.php` remain under `nginx/web` but outside the document root.
+
+The included nginx configuration uses:
+
+```nginx
+root /var/www/html/public;
+```
 
 ### Reverse proxy
 
-If you intend run a web server as a reverse proxy in front of TorStatus, there are two options where to forward incoming requests: Either to nginx or to PHP-FPM.
+If you run a reverse proxy in front of TorStatus, forward incoming requests either to nginx or directly to PHP-FPM.
 
 #### Forward requests to nginx
 
-The `nginx` container exposes port `8765`. You can forward requests there, e.g. in Apache with `mod_proxy`:
+The `nginx` container exposes port `8765`. You can forward requests there, for example in Apache with `mod_proxy`:
 
+```apache
+ProxyPass / http://127.0.0.1:8765/
+ProxyPassReverse / http://127.0.0.1:8765/
 ```
-ProxyPass / https://127.0.0.1:8765/
-ProxyPassReverse / https://127.0.0.1:8765/
-```
-
-The disadvantage of this approach is that requests to PHP files will be forwarded twice, once by your reverse proxy and once by nginx in the `nginx` container. To avoid this, use the below approach to directly forward PHP requests to PHP-FPM.
 
 #### Forward requests to PHP-FPM
 
-The `php-fpm` container exposes port `9001`. You can have your reverse proxy handle static content from the `nginx/web` directory and forward requests for PHP files to that port, e.g. in Apache:
+The `php-fpm` container exposes port `9001`. Serve static files from `nginx/web/public` and forward PHP requests to PHP-FPM. Example Apache snippet:
 
-```
+```apache
+DocumentRoot /path/to/torstatus/nginx/web/public
+
 <FilesMatch ".+\.ph(ar|p|tml)$">
-  ProxyFCGISetEnvIf "true" SCRIPT_FILENAME "/var/www/html%{reqenv:SCRIPT_NAME}"
+  ProxyFCGISetEnvIf "true" SCRIPT_FILENAME "/var/www/html/public%{reqenv:SCRIPT_NAME}"
   SetHandler "proxy:fcgi://127.0.0.1:9001"
 </FilesMatch>
 ```
 
 ### Hidden services
 
- - The directory `tor/hidden_services` will be mounted at `/var/lib/tor/hidden_services` inside the container. Place the files for your hidden services there.
- - Add a file to the `tor/torrc.d` directory configuring your hidden services using the `HiddenService*` directives. Use `/var/lib/tor/hidden_services/...` for `HiddenServiceDir` and keep the above mount in mind.
+- The directory `tor/hidden_services` is mounted at `/var/lib/tor/hidden_services` inside the Tor container.
+- Place hidden-service key material there.
+- Add a file to `tor/torrc.d` configuring the hidden service with `HiddenService*` directives. Use `/var/lib/tor/hidden_services/...` for `HiddenServiceDir`.
 
 ### Logging
 
- - All containers' logs are sent to journald.
+All containers' logs are sent to journald.
 
-
-## Setup without docker
+## Setup without Docker
 
 ### Tor
 
- - You need access to a running Tor daemon (client, middle node, exit node).
- - Configure a control port with a password (settings `ControlPort` and `HashedControlPassword` in `torrc`).
- - Additionally, set `UseMicrodescriptors` to `0` in `torrc`.
+- You need access to a running Tor daemon.
+- Configure a control port with a password using `ControlPort` and `HashedControlPassword` in `torrc`.
+- Set `UseMicrodescriptors` to `0` in `torrc`.
 
-### memcached
+### Shared cache
 
-Set up an instance of memcached.
+Set up one of these cache backends:
+
+- memcached
+- Redis
+- Valkey
+
+Configure it in `config.php`:
+
+```php
+$cache_backend = 'memcached'; // or 'redis', 'valkey', 'none'
+$cache_host = '127.0.0.1';
+$cache_port = '11211';
+```
+
+For Redis or Valkey, use port `6379` unless your deployment differs.
 
 ### MariaDB
 
 Set up MariaDB, create a database with a user, and populate the database using [mariadb/sql/install.sql](mariadb/sql/install.sql).
 
+Existing installations that predate IPv6 support should also apply:
+
+```bash
+mysql -u torstatus -p torstatus < mariadb/sql/migrations/20260614_ipv6.sql
+```
+
 ### Web application
 
- - Copy [nginx/web/config\_template.php](nginx/web/config_template.php) to `config.php` and modify it to your needs.
- - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
- - Set up a web server with PHP support (e.g. Apache or nginx with PHP-FPM).
- - You will need the PHP modules `memcached`, `mysqli`, and `gd`.
- - Configure your web server (or a separate vhost) to serve content from `nginx/web`.
+- Copy [nginx/web/config_template.php](nginx/web/config_template.php) to `nginx/web/config.php` and modify it to your needs.
+- Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
+- Set up a web server with PHP support.
+- Configure the web server document root to `nginx/web/public`.
+- Install PHP modules: `mysqli`, `gd`, and either `memcached` or `redis` depending on the selected cache backend. Install both when you want runtime-switchable cache backends.
 
 ### Updater
 
- - `cd` to the directory `updater`.
- - Run `uv run python -m torstatus_updater`.
- - Alternatively, launch `updater.sh` once after each reboot; it will loop and run the updater every 15 minutes.
+- `cd updater`.
+- Run `uv run python -m torstatus_updater`.
+- The updater reads the same `config.php` values as the PHP frontend.
+- IPv6 OR addresses are read from Tor descriptors and stored in the `ORAddresses*` tables. Country lookup supports Tor's `geoip` and `geoip6` files when both are available.

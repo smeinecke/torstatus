@@ -8,8 +8,9 @@ The package is split into focused modules under `src/torstatus_updater/`:
 
 - **`config.py`** — Parses the shared PHP `config.php` (regex-based, includes env-var fallback).
 - **`tor_client.py`** — Thin wrapper around `stem.control.Controller` for Tor control-port communication.
-- **`geoip.py`** — Binary-search country lookup over Tor's GeoIP CSV.
-- **`dns_lookup.py`** — Reverse DNS with an in-process LRU cache and optional pymemcache integration.
+- **`geoip.py`** — Binary-search country lookup over Tor's IPv4 and IPv6 GeoIP CSV files.
+- **`dns_lookup.py`** — IPv4/IPv6 reverse DNS with an in-process LRU cache and optional shared cache integration.
+- **`cache.py`** — Memcached and Redis/Valkey cache adapters with a no-cache fallback.
 - **`serializer.py`** — Wrapper around `phpserialize` for PHP frontend compatibility.
 - **`db.py`** — MariaDB helpers with atomic table-flipping (Descriptor1/2, NetworkStatus1/2, etc.).
 - **`updater.py`** — Orchestrates descriptor parsing, network-status parsing, hostname lookups, and DB writes.
@@ -97,11 +98,16 @@ The updater reads the same `config.php` used by the PHP frontend (looked up as `
 Required settings:
 - `SQL_Server`, `SQL_User`, `SQL_Pass`, `SQL_Catalog` — MariaDB connection
 - `LocalTorServerIP`, `LocalTorServerControlPort`, `LocalTorServerPassword` — Tor control port
-- `memcached_host` — Memcached server (port 11211)
+
+Cache settings:
+- `cache_backend` — `memcached`, `redis`, `valkey`, or `none`
+- `cache_host` — optional explicit host; defaults to `memcached` for Memcached and `valkey` for Redis/Valkey in Docker
+- `cache_port` — optional explicit port; defaults to `11211` for Memcached and `6379` for Redis/Valkey
+- `memcached_host` — deprecated compatibility alias for older configs
 
 ## Migration notes
 
-This Python package replaces the legacy `tns_update.pl` Perl script and the intermediate `tns_update.py` monolith. It keeps full parity with the original logic (descriptor/network-status parsing, PHP serialization, GeoIP lookup, memcached DNS caching, and atomic table-flipping) while improving:
+This Python package replaces the legacy `tns_update.pl` Perl script and the intermediate `tns_update.py` monolith. It keeps parity with the original logic while adding IPv6 OR-address parsing, IPv6 GeoIP support, Redis/Valkey caching, PHP serialization, and atomic table-flipping. It improves:
 - Connection reuse via `stem.Controller`
 - Structured error handling and logging
 - Modular testability with pytest

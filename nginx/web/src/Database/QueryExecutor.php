@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace TorStatus\Database;
 
+use TorStatus\Cache\CacheInterface;
 use TorStatus\Http\Response;
 
 final class QueryExecutor
@@ -11,13 +12,13 @@ final class QueryExecutor
     /** @var \mysqli */
     private $mysqli;
 
-    /** @var \Memcached */
-    private $memcached;
+    /** @var CacheInterface */
+    private $cache;
 
-    public function __construct(\mysqli $mysqli, \Memcached $memcached)
+    public function __construct(\mysqli $mysqli, CacheInterface $cache)
     {
         $this->mysqli = $mysqli;
-        $this->memcached = $memcached;
+        $this->cache = $cache;
     }
 
     /** @param array<int, mixed> $params */
@@ -50,7 +51,7 @@ final class QueryExecutor
         $cacheKey = null;
         if ($cacheExpiration > -1) {
             $cacheKey = 'torstatus_query_' . sha1($query . "\0" . serialize($params));
-            $cached = $this->memcached->get($cacheKey);
+            $cached = $this->cache->get($cacheKey);
             if (is_string($cached) && $cached !== '') {
                 $record = unserialize($cached, ['allowed_classes' => false]);
                 if (is_array($record)) {
@@ -65,7 +66,7 @@ final class QueryExecutor
 
         $row = is_array($record) ? $record : [];
         if ($cacheKey !== null) {
-            $this->memcached->set($cacheKey, serialize($row), $cacheExpiration);
+            $this->cache->set($cacheKey, serialize($row), $cacheExpiration);
         }
 
         return $row;
@@ -80,7 +81,7 @@ final class QueryExecutor
         $cacheKey = null;
         if ($cacheExpiration > -1) {
             $cacheKey = 'torstatus_query_rows_' . sha1($query . "\0" . serialize($params));
-            $cached = $this->memcached->get($cacheKey);
+            $cached = $this->cache->get($cacheKey);
             if (is_string($cached) && $cached !== '') {
                 $rows = unserialize($cached, ['allowed_classes' => false]);
                 if (is_array($rows)) {
@@ -97,7 +98,7 @@ final class QueryExecutor
         $result->free();
 
         if ($cacheKey !== null) {
-            $this->memcached->set($cacheKey, serialize($rows), $cacheExpiration);
+            $this->cache->set($cacheKey, serialize($rows), $cacheExpiration);
         }
 
         return $rows;

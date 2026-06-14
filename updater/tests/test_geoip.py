@@ -34,3 +34,15 @@ def test_unknown_country() -> None:
 
     ip_list = init_countries(path)
     assert get_country("1.0.0.0", ip_list) == ""
+
+
+def test_ipv6_country() -> None:
+    rows = [["2001:db8::", "2001:db8::ffff", "DE"]]
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".csv", delete=False) as fh:
+        writer = csv.writer(fh)
+        writer.writerows(rows)
+        path = fh.name
+
+    ip_list = init_countries(path, path)
+    assert get_country("2001:db8::1", ip_list) == "DE"
+    assert get_country("2001:db8:1::1", ip_list) == ""

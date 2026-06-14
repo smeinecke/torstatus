@@ -7,9 +7,8 @@ RUN apt-get -y autoremove
 RUN apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}')
 RUN apt-get clean
 
-RUN pecl install memcached && docker-php-ext-enable memcached
+RUN pecl install memcached redis && docker-php-ext-enable memcached redis
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 RUN docker-php-ext-install gd && docker-php-ext-enable gd
 
 COPY torstatus.ini /usr/local/etc/php/conf.d/
-

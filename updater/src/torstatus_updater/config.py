@@ -30,6 +30,8 @@ def parse_config(path: str) -> dict[str, str]:
                     value = os.environ.get(env_match.group(1), env_match.group(2))
                 else:
                     value = ""
+            elif value.startswith("$"):
+                value = config.get(value[1:], value)
 
             config[key] = value
     return config

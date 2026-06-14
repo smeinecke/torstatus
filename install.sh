@@ -16,7 +16,7 @@ PHP_VERSION=$(php -r 'echo PHP_VERSION;')
 echo "Found PHP $PHP_VERSION"
 
 # Check required PHP extensions
-for ext in mysqli gd memcached; do
+for ext in mysqli gd memcached redis; do
     if ! php -m | grep -qi "^$ext$"; then
         echo "WARNING: PHP extension '$ext' is not enabled."
     fi
