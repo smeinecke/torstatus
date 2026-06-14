@@ -1,8 +1,8 @@
-<dl class="ts-description-list">
+<dl class="ts-metric-list">
 {% for row in stats_rows %}
-	<div>
+	<div class="ts-metric-card">
 		<dt>{{ row.label }}</dt>
-		<dd>{{ row.count }} <span class="ts-muted-inline">{{ row.percentage }}%</span></dd>
+		<dd><strong>{{ row.count }}</strong> <span>{{ row.percentage }}%</span></dd>
 	</div>
 {% endfor %}
 </dl>

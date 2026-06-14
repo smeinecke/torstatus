@@ -241,6 +241,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+  align-items: start;
   margin-top: 1rem;
 }
 .ts-card summary {
@@ -254,7 +255,10 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 .ts-card[open] summary { margin-bottom: .8rem; }
 
 .ts-dialog {
+  position: relative;
   width: min(38rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  overflow: auto;
   border: 1px solid var(--ts-card-border);
   border-radius: 1rem;
   padding: 1rem;
@@ -262,13 +266,19 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-dialog-wide { width: min(52rem, calc(100vw - 2rem)); }
 .ts-dialog::backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(2px); }
-.ts-dialog-close-form { float: right; margin: -.3rem -.3rem 0 0; }
+.ts-dialog-close-form {
+  position: absolute;
+  top: .8rem;
+  right: .8rem;
+  margin: 0;
+}
 .ts-dialog-header {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: .75rem;
   align-items: start;
   margin-bottom: 1rem;
+  padding-right: 2.75rem;
 }
 .ts-dialog-header > .ti { font-size: 1.6rem; color: var(--ts-purple); margin-top: .15rem; }
 .ts-dialog-header p { margin: .2rem 0 0; color: var(--ts-muted); }
@@ -279,7 +289,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-field { display: grid; gap: .35rem; color: #334155; font-size: .86rem; font-weight: 750; }
 .ts-field-wide { grid-column: 1 / -1; }
-.ts-field input,
+.ts-field input:not([type='radio']):not([type='checkbox']),
 .ts-field select,
 .ts-legacy-filter-form input[type='text'],
 .ts-legacy-filter-form select,
@@ -293,7 +303,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   padding: .45rem .65rem;
   font: inherit;
 }
-.ts-field input:focus,
+.ts-field input:not([type='radio']):not([type='checkbox']):focus,
 .ts-field select:focus,
 .ts-legacy-filter-form input[type='text']:focus,
 .ts-legacy-filter-form select:focus,
@@ -321,6 +331,32 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-description-list dt { color: var(--ts-muted); font-size: .76rem; font-weight: 800; text-transform: uppercase; }
 .ts-description-list dd { margin: .25rem 0 0; font-weight: 750; overflow-wrap: anywhere; }
+.ts-metric-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr));
+  gap: .65rem;
+  margin: 0;
+}
+.ts-metric-card {
+  border: 1px solid #e2e8f0;
+  border-radius: .85rem;
+  background: linear-gradient(180deg, #fff, #f8fafc);
+  padding: .75rem;
+}
+.ts-metric-card dt {
+  color: #475569;
+  font-size: .8rem;
+  font-weight: 750;
+  line-height: 1.25;
+}
+.ts-metric-card dd {
+  display: flex;
+  align-items: baseline;
+  gap: .35rem;
+  margin: .35rem 0 0;
+}
+.ts-metric-card strong { font-size: 1.05rem; line-height: 1; }
+.ts-metric-card span { color: var(--ts-muted); font-size: .78rem; font-weight: 750; }
 
 /* Legacy table normalization while the PHP row renderer is still table-based. */
 .displayTable,
@@ -524,13 +560,83 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 }
 .ts-status-badge { background: #f5f3ff; color: #5b21b6; border-color: #ddd6fe; }
 .ts-platform-badge { background: #ecfeff; color: #0e7490; border-color: #cffafe; }
-.ts-flag-filter-grid { border: 1px solid #e2e8f0; border-radius: .9rem; padding: .85rem; }
+.ts-filter-form { gap: .9rem; }
+.ts-filter-form .ts-form-actions {
+  position: sticky;
+  bottom: -1rem;
+  margin: .25rem -1rem -1rem;
+  padding: .8rem 1rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  border-radius: 0 0 1rem 1rem;
+  background: rgba(255, 255, 255, .96);
+  backdrop-filter: blur(10px);
+}
+.ts-flag-filter-grid {
+  border: 1px solid #e2e8f0;
+  border-radius: .9rem;
+  padding: .85rem;
+}
 .ts-flag-filter-grid legend { padding: 0 .35rem; color: #0f172a; font-weight: 850; }
-.ts-flag-filter-row { display: grid; grid-template-columns: minmax(8rem, 1fr) repeat(3, auto); align-items: center; gap: .6rem; padding: .42rem 0; border-bottom: 1px solid #f1f5f9; }
+.ts-flag-filter-head,
+.ts-flag-filter-row {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(13rem, auto);
+  align-items: center;
+  gap: .75rem;
+}
+.ts-flag-filter-head {
+  color: var(--ts-muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  padding: .15rem .25rem .35rem;
+  text-transform: uppercase;
+}
+.ts-flag-filter-row { padding: .45rem .25rem; border-bottom: 1px solid #f1f5f9; }
 .ts-flag-filter-row:last-child { border-bottom: 0; }
-.ts-flag-filter-row > span { font-weight: 750; color: #334155; }
-.ts-flag-filter-row label { display: inline-flex; align-items: center; gap: .25rem; color: #475569; font-weight: 650; }
-.ts-flag-filter-row input { accent-color: var(--ts-purple); }
+.ts-flag-filter-name { font-weight: 750; color: #334155; }
+.ts-radio-segment {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(3.2rem, 1fr));
+  gap: .15rem;
+  justify-self: end;
+  width: min(100%, 14rem);
+  border: 1px solid #cbd5e1;
+  border-radius: .75rem;
+  background: #f8fafc;
+  padding: .15rem;
+}
+.ts-radio-segment label { position: relative; min-width: 0; }
+.ts-radio-segment input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.ts-radio-segment span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.85rem;
+  border-radius: .55rem;
+  color: #475569;
+  font-size: .78rem;
+  font-weight: 800;
+  line-height: 1;
+  padding: .35rem .45rem;
+  white-space: nowrap;
+}
+.ts-radio-segment input:checked + span {
+  background: #fff;
+  color: var(--ts-purple-dark);
+  box-shadow: 0 1px 5px rgba(15, 23, 42, .12);
+}
+.ts-radio-segment input[value='1']:checked + span { color: #166534; }
+.ts-radio-segment input[value='0']:checked + span { color: #991b1b; }
+.ts-radio-segment input:focus-visible + span { outline: 3px solid var(--ts-ring); outline-offset: 1px; }
 .ts-muted-inline { color: var(--ts-muted); font-weight: 650; }
 .ts-card-link { margin: .9rem 0 0; }
 .ts-card-link a { font-weight: 750; }
@@ -615,5 +721,7 @@ div.fg8 { background: #f97316; }
 
 @media (max-width: 760px) {
   .ts-pagination { display: grid; justify-items: start; }
-  .ts-flag-filter-row { grid-template-columns: 1fr; }
+  .ts-flag-filter-head { display: none; }
+  .ts-flag-filter-row { grid-template-columns: 1fr; align-items: stretch; }
+  .ts-radio-segment { justify-self: stretch; width: 100%; }
 }

@@ -203,22 +203,22 @@ final class IndexRepository
         }
 
         $stats = [
-            ['Total Number of Routers:', $routerCount],
-            ['Routers in Current Query Result Set:', $currentResultSet],
-            ["Total Number of 'Authority' Routers:", (int)($aggregateStats['Authority'] ?? 0)],
-            ["Total Number of 'Bad Directory' Routers:", (int)($aggregateStats['BadDirectory'] ?? 0)],
-            ["Total Number of 'Bad Exit' Routers:", (int)($aggregateStats['BadExit'] ?? 0)],
-            ["Total Number of 'Exit' Routers:", (int)($aggregateStats['Exit'] ?? 0)],
-            ["Total Number of 'Fast' Routers:", (int)($aggregateStats['Fast'] ?? 0)],
-            ["Total Number of 'Guard' Routers:", (int)($aggregateStats['Guard'] ?? 0)],
-            ["Total Number of 'Hibernating' Routers:", (int)($aggregateStats['Hibernating'] ?? 0)],
-            ["Total Number of 'Named' Routers:", (int)($aggregateStats['Named'] ?? 0)],
-            ["Total Number of 'Stable' Routers:", (int)($aggregateStats['Stable'] ?? 0)],
-            ["Total Number of 'Running' Routers:", (int)($aggregateStats['Running'] ?? 0)],
-            ["Total Number of 'Valid' Routers:", (int)($aggregateStats['Valid'] ?? 0)],
-            ["Total Number of 'V2Dir' Routers:", (int)($aggregateStats['V2Dir'] ?? 0)],
-            ["Total Number of 'HSDir' Routers:", (int)($aggregateStats['HSDir'] ?? 0)],
-            ["Total Number of 'Directory Mirror' Routers:", (int)($aggregateStats['DirMirror'] ?? 0)],
+            ['Total routers', $routerCount],
+            ['Current result set', $currentResultSet],
+            ['Authority routers', (int)($aggregateStats['Authority'] ?? 0)],
+            ['Bad directory routers', (int)($aggregateStats['BadDirectory'] ?? 0)],
+            ['Bad exit routers', (int)($aggregateStats['BadExit'] ?? 0)],
+            ['Exit routers', (int)($aggregateStats['Exit'] ?? 0)],
+            ['Fast routers', (int)($aggregateStats['Fast'] ?? 0)],
+            ['Guard routers', (int)($aggregateStats['Guard'] ?? 0)],
+            ['Hibernating routers', (int)($aggregateStats['Hibernating'] ?? 0)],
+            ['Named routers', (int)($aggregateStats['Named'] ?? 0)],
+            ['Stable routers', (int)($aggregateStats['Stable'] ?? 0)],
+            ['Running routers', (int)($aggregateStats['Running'] ?? 0)],
+            ['Valid routers', (int)($aggregateStats['Valid'] ?? 0)],
+            ['V2Dir routers', (int)($aggregateStats['V2Dir'] ?? 0)],
+            ['HSDir routers', (int)($aggregateStats['HSDir'] ?? 0)],
+            ['Directory mirrors', (int)($aggregateStats['DirMirror'] ?? 0)],
         ];
 
         $rows = [];
