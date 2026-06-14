@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace TorStatus;
 
-use TorStatus\Cache\CacheFactory;
 use TorStatus\Cache\CacheInterface;
+use TorStatus\Cache\MemcachedCache;
+use TorStatus\Cache\RedisCache;
 use TorStatus\Database\QueryExecutor;
 use TorStatus\Http\Response;
 use TorStatus\Template\Renderer;
@@ -19,10 +20,16 @@ final class Common
         @session_start() or Response::badRequest();
     }
 
-    public static function cache(string $backend, string $host, int $port = 0): CacheInterface
+    public static function cache(string $redisUri, string $memcachedHost): CacheInterface
     {
         try {
-            return CacheFactory::create($backend, $host, $port);
+            if ($redisUri !== '') {
+                $parts = parse_url($redisUri);
+                $host = $parts['host'] ?? 'valkey';
+                $port = $parts['port'] ?? 6379;
+                return new RedisCache($host, $port);
+            }
+            return new MemcachedCache($memcachedHost, 11211);
         } catch (\Throwable $e) {
             Response::serviceUnavailable('Could not initialize cache: ' . $e->getMessage());
         }

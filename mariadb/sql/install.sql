@@ -325,13 +325,15 @@ ALTER TABLE `Bandwidth`
 -- Indizes für die Tabelle `Bandwidth1`
 --
 ALTER TABLE `Bandwidth1`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fingerprint` (`fingerprint`(40));
 
 --
 -- Indizes für die Tabelle `Bandwidth2`
 --
 ALTER TABLE `Bandwidth2`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fingerprint` (`fingerprint`(40));
 
 --
 -- Indizes für die Tabelle `Descriptor1`
@@ -343,6 +345,7 @@ ALTER TABLE `Descriptor1`
   ADD KEY `Index_Uptime` (`Uptime`),
   ADD KEY `Index_Platform` (`Platform`),
   ADD KEY `Index_Contact` (`Contact`),
+  ADD KEY `Index_LastDescriptorPublished` (`LastDescriptorPublished`),
   ADD KEY `Name` (`Name`);
 
 --
@@ -355,6 +358,7 @@ ALTER TABLE `Descriptor2`
   ADD KEY `Index_Uptime` (`Uptime`),
   ADD KEY `Index_Platform` (`Platform`),
   ADD KEY `Index_Contact` (`Contact`),
+  ADD KEY `Index_LastDescriptorPublished` (`LastDescriptorPublished`),
   ADD KEY `Name` (`Name`);
 
 --

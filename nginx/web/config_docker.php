@@ -83,12 +83,8 @@ $OffsetFromGMT = 0;
 
 $Hidden_Service_URL = isset($_ENV['HIDDEN_SERVICE_URL']) ? $_ENV['HIDDEN_SERVICE_URL'] : null;
 
-$cache_backend = isset($_ENV['CACHE_BACKEND']) ? $_ENV['CACHE_BACKEND'] : 'memcached';
-$cache_host = isset($_ENV['CACHE_HOST']) ? $_ENV['CACHE_HOST'] : '';
-$cache_port = isset($_ENV['CACHE_PORT']) ? $_ENV['CACHE_PORT'] : '';
-
-// Deprecated compatibility alias; use cache_host instead.
-$memcached_host = $cache_host;
+$redis_uri = 'tcp://valkey:6379';
+$memcached_host = 'memcached';
 
 // See if WHOIS wants the footer
 if (isset($argv) && isset($argv[1]) && $argv[1] == 'printthefooter')

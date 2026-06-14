@@ -16,9 +16,7 @@ $SQL_Catalog = 'torstatus';
 $LocalTorServerIP = '127.0.0.1';
 $LocalTorServerControlPort = '9051';
 $LocalTorServerPassword = 'null';
-$cache_backend = 'memcached';
-$cache_host = 'memcached';
-$cache_port = '11211';
+$redis_uri = '';
 $memcached_host = 'memcached';
 """
     with tempfile.NamedTemporaryFile(mode="w", suffix=".php", delete=False) as fh:
@@ -33,9 +31,7 @@ $memcached_host = 'memcached';
         assert cfg["LocalTorServerIP"] == "127.0.0.1"
         assert cfg["LocalTorServerControlPort"] == "9051"
         assert cfg["LocalTorServerPassword"] == "null"
-        assert cfg["cache_backend"] == "memcached"
-        assert cfg["cache_host"] == "memcached"
-        assert cfg["cache_port"] == "11211"
+        assert cfg["redis_uri"] == ""
         assert cfg["memcached_host"] == "memcached"
     finally:
         os.unlink(path)
@@ -58,15 +54,15 @@ def test_parse_env_fallback() -> None:
 def test_parse_variable_reference() -> None:
     content = """
 <?php
-$cache_host = isset($_ENV['CACHE_HOST']) ? $_ENV['CACHE_HOST'] : '';
-$memcached_host = $cache_host;
+$redis_uri = isset($_ENV['REDIS_URI']) ? $_ENV['REDIS_URI'] : '';
+$memcached_host = '127.0.0.1';
 """
     with tempfile.NamedTemporaryFile(mode="w", suffix=".php", delete=False) as fh:
         fh.write(content)
         path = fh.name
     try:
         cfg = parse_config(path)
-        assert cfg["cache_host"] == ""
-        assert cfg["memcached_host"] == ""
+        assert cfg["redis_uri"] == ""
+        assert cfg["memcached_host"] == "127.0.0.1"
     finally:
         os.unlink(path)

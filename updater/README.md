@@ -100,10 +100,8 @@ Required settings:
 - `LocalTorServerIP`, `LocalTorServerControlPort`, `LocalTorServerPassword` — Tor control port
 
 Cache settings:
-- `cache_backend` — `memcached`, `redis`, `valkey`, or `none`
-- `cache_host` — optional explicit host; defaults to `memcached` for Memcached and `valkey` for Redis/Valkey in Docker
-- `cache_port` — optional explicit port; defaults to `11211` for Memcached and `6379` for Redis/Valkey
-- `memcached_host` — deprecated compatibility alias for older configs
+- `redis_uri` — Redis/Valkey URI such as `tcp://valkey:6379`. When non-empty, Redis is used.
+- `memcached_host` — Memcached server hostname (port 11211). Used when `redis_uri` is empty.
 
 ## Migration notes
 

@@ -32,17 +32,23 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 - `REAL_SERVER_IP`: The public IPv4 or IPv6 address of the TorStatus instance. Used for determining whether a Tor exit node will allow connecting to this TorStatus instance.
 - `HIDDEN_SERVICE_URL`: Optional onion-service URL shown in the UI.
-- `CACHE_BACKEND`: `memcached`, `redis`, `valkey`, or `none`. Defaults to `memcached`.
-- `CACHE_HOST`: Optional cache hostname. Defaults to `memcached` for memcached and `valkey` for Redis/Valkey in Docker.
-- `CACHE_PORT`: Optional cache TCP port. Defaults to `11211` for memcached and `6379` for Redis/Valkey.
 
-To use Valkey in Docker, start Compose with for example:
+### Cache backend
 
-```bash
-CACHE_BACKEND=valkey docker compose up
+By default the Docker config (`nginx/web/config_docker.php`) uses Valkey:
+
+```php
+$redis_uri = 'tcp://valkey:6379';
 ```
 
-The Compose file still starts both `memcached` and `valkey` so deployments can switch the cache backend without changing service definitions.
+To use Memcached instead, change it to:
+
+```php
+$redis_uri = '';
+$memcached_host = 'memcached';
+```
+
+The Compose file starts both `memcached` and `valkey` so deployments can switch the cache backend without changing service definitions.
 
 ### Public web root
 
@@ -109,21 +115,30 @@ Set up one of these cache backends:
 Configure it in `config.php`:
 
 ```php
-$cache_backend = 'memcached'; // or 'redis', 'valkey', 'none'
-$cache_host = '127.0.0.1';
-$cache_port = '11211';
-```
+// To use Redis/Valkey:
+$redis_uri = 'tcp://127.0.0.1:6379';
 
-For Redis or Valkey, use port `6379` unless your deployment differs.
+// To use Memcached instead (default when $redis_uri is empty):
+$redis_uri = '';
+$memcached_host = '127.0.0.1';
+```
 
 ### MariaDB
 
 Set up MariaDB, create a database with a user, and populate the database using [mariadb/sql/install.sql](mariadb/sql/install.sql).
 
-Existing installations that predate IPv6 support should also apply:
+#### Migrations
+
+After the initial setup, apply any pending migrations using the CLI helper:
 
 ```bash
-mysql -u torstatus -p torstatus < mariadb/sql/migrations/20260614_ipv6.sql
+php nginx/web/apply_migration.php
+```
+
+The script tracks applied migrations in `nginx/web/.applied_migrations.json` (ignored by Git). To skip a migration that was already applied manually:
+
+```bash
+php nginx/web/apply_migration.php --skip migration_20250614_add_missing_indexes.sql
 ```
 
 ### Web application

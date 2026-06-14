@@ -36,9 +36,6 @@ services:
     environment:
       - REAL_SERVER_IP=${REAL_SERVER_IP}
       - HIDDEN_SERVICE_URL=${HIDDEN_SERVICE_URL}
-      - CACHE_BACKEND=${CACHE_BACKEND:-memcached}
-      - CACHE_HOST=${CACHE_HOST:-}
-      - CACHE_PORT=${CACHE_PORT:-}
     volumes:
       - ./nginx/web:/var/www/html
       - ./nginx/web/config_docker.php:/var/www/html/config.php
@@ -86,10 +83,6 @@ services:
         condition: service_healthy
       valkey:
         condition: service_healthy
-    environment:
-      - CACHE_BACKEND=${CACHE_BACKEND:-memcached}
-      - CACHE_HOST=${CACHE_HOST:-}
-      - CACHE_PORT=${CACHE_PORT:-}
     volumes:
       - ./nginx/web/config_docker.php:/opt/torstatus/config.php
       - geoip:/usr/share/tor

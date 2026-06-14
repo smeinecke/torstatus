@@ -1,4 +1,5 @@
 nginx/web/config.php
+nginx/web/.applied_migrations.json
 updater/last_update
 tor/torrc.d/*
 !tor/torrc.d/.gitkeep

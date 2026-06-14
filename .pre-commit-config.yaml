@@ -27,7 +27,7 @@ repos:
         files: \.php$
       - id: phpstan
         name: PHPStan
-        entry: nginx/vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
+        entry: nginx/vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist --memory-limit=2G
         language: system
         files: \.php$
         pass_filenames: false

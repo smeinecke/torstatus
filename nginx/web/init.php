@@ -11,12 +11,9 @@ use TorStatus\Database\QueryExecutor;
 Common::startSession();
 
 $TimeStart = microtime(true);
-$cacheBackend = isset($cache_backend) ? (string)$cache_backend : 'memcached';
-$cacheHost = isset($cache_host) && (string)$cache_host !== ''
-    ? (string)$cache_host
-    : (in_array(strtolower($cacheBackend), ['redis', 'valkey'], true) ? 'valkey' : (isset($memcached_host) && (string)$memcached_host !== '' ? (string)$memcached_host : 'memcached'));
-$cachePort = isset($cache_port) && (string)$cache_port !== '' ? (int)$cache_port : 0;
-$cache = Common::cache($cacheBackend, $cacheHost, $cachePort);
+$redisUri = isset($redis_uri) ? (string)$redis_uri : '';
+$memcachedHost = isset($memcached_host) && (string)$memcached_host !== '' ? (string)$memcached_host : 'memcached';
+$cache = Common::cache($redisUri, $memcachedHost);
 $mysqli = Common::database((string)($SQL_Server ?? ''), (string)($SQL_User ?? ''), (string)($SQL_Pass ?? ''), (string)($SQL_Catalog ?? ''));
 $db = new QueryExecutor($mysqli, $cache);
 

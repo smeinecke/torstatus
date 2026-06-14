@@ -11,9 +11,13 @@ LOG = logging.getLogger(__name__)
 class CacheClient(Protocol):
     """Small cache protocol used by the updater."""
 
-    def get(self, key: str) -> str | None: ...
+    def get(self, key: str) -> str | None:
+        """Return the cached value or *None* on miss."""
+        ...
 
-    def set(self, key: str, value: str, expire: int = 0) -> bool | None: ...  # noqa: V103
+    def set(self, key: str, value: str, expire: int = 0) -> bool | None:
+        """Store *value* under *key* with optional TTL."""
+        ...
 
 
 class NullCache:
@@ -23,7 +27,7 @@ class NullCache:
         """Return a guaranteed cache miss."""
         return None
 
-    def set(self, key: str, value: str, expire: int = 0) -> bool:  # noqa: V103
+    def set(self, key: str, value: str, expire: int = 0) -> bool:
         """Ignore writes."""
         return False
 
@@ -42,7 +46,7 @@ class MemcachedCache:
         value = self._client.get(key)
         return value if isinstance(value, str) else None
 
-    def set(self, key: str, value: str, expire: int = 0) -> bool | None:  # noqa: V103
+    def set(self, key: str, value: str, expire: int = 0) -> bool | None:
         """Write a value."""
         return self._client.set(key, value, expire=expire)
 
@@ -61,7 +65,7 @@ class RedisCache:
         value = self._client.get(key)
         return value if isinstance(value, str) else None
 
-    def set(self, key: str, value: str, expire: int = 0) -> bool | None:  # noqa: V103
+    def set(self, key: str, value: str, expire: int = 0) -> bool | None:
         """Write a value."""
         return self._client.set(key, value, ex=expire if expire > 0 else None)
 
@@ -69,25 +73,25 @@ class RedisCache:
 def build_cache(config: dict[str, str]) -> CacheClient:
     """Build the configured cache client.
 
-    ``CACHE_*`` environment variables are resolved by ``parse_config`` when
-    Docker's config file is used. Supported backends are ``memcached``,
-    ``redis``, ``valkey`` and ``none``.
+    When ``redis_uri`` is set (non-empty) a Redis/Valkey client is created;
+    otherwise falls back to Memcached via ``memcached_host``.
     """
-    backend = config.get("cache_backend", "memcached").strip().lower() or "memcached"
-    if backend == "memcache":
-        backend = "memcached"
-
-    if backend in {"none", "null", "off"}:
-        return NullCache()
-
-    host = config.get("cache_host") or config.get("memcached_host") or ("valkey" if backend in {"redis", "valkey"} else "memcached")
-    default_port = 6379 if backend in {"redis", "valkey"} else 11211
-    port = int(config.get("cache_port") or default_port)
-
-    if backend == "memcached":
-        return MemcachedCache(host, port)
-    if backend in {"redis", "valkey"}:
+    redis_uri = config.get("redis_uri", "").strip()
+    if redis_uri:
+        # Parse simple URI like tcp://host:port or just host
+        host = redis_uri
+        port = 6379
+        if "://" in host:
+            host = host.split("://", 1)[1]
+        if ":" in host:
+            host, port_str = host.rsplit(":", 1)
+            if port_str.isdigit():
+                port = int(port_str)
         return RedisCache(host, port)
 
-    LOG.warning("Unsupported cache backend %r; disabling cache", backend)
+    memcached_host = config.get("memcached_host", "").strip() or "memcached"
+    if memcached_host:
+        return MemcachedCache(memcached_host, 11211)
+
+    LOG.warning("No cache configured; using null cache")
     return NullCache()
