@@ -59,36 +59,6 @@ if ($Fingerprint && preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 		$ReadHistory_LAST = $record['ReadHistoryLAST'];
 	}
 }
-else
-{
-	// Fall back to session data for backwards compatibility
-	if (isset($_SESSION["WriteHistory_DATA_ARRAY_SERIALIZED"]))
-	{
-		$WriteHistory_DATA_ARRAY = unserialize($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
-	}
-	if (isset($_SESSION["WriteHistory_INC"]))
-	{
-		$WriteHistory_INC = $_SESSION['WriteHistory_INC'];
-	}
-	if (isset($_SESSION["WriteHistory_LAST"]))
-	{
-		$WriteHistory_LAST = $_SESSION['WriteHistory_LAST'];
-	}
-
-	if (isset($_SESSION["ReadHistory_DATA_ARRAY_SERIALIZED"]))
-	{
-		$ReadHistory_DATA_ARRAY = unserialize($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
-	}
-	if (isset($_SESSION["ReadHistory_INC"]))
-	{
-		$ReadHistory_INC = $_SESSION['ReadHistory_INC'];
-	}
-	if (isset($_SESSION["ReadHistory_LAST"]))
-	{
-		$ReadHistory_LAST = $_SESSION['ReadHistory_LAST'];
-	}
-}
-
 // Deal with no data situations
 if (!is_array($WriteHistory_DATA_ARRAY) || count($WriteHistory_DATA_ARRAY) < 2)
 {

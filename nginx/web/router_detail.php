@@ -103,15 +103,6 @@ $FRunning = $record['FRunning'];
 $FValid = $record['FValid'];
 $FV2Dir = $record['FV2Dir'];
 
-// Register necessary variables in session
-// TODO get rid of this
-$_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'] = $record['WriteHistorySERDATA'];
-$_SESSION['WriteHistory_INC'] = $record['WriteHistoryINC'];
-$_SESSION['WriteHistory_LAST'] = $record['WriteHistoryLAST'];
-$_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'] = $record['ReadHistorySERDATA'];
-$_SESSION['ReadHistory_INC'] = $record['ReadHistoryINC'];
-$_SESSION['ReadHistory_LAST'] = $record['ReadHistoryLAST'];
-
 $noindex = true;
 
 // Handle no descriptor available situation

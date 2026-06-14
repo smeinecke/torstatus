@@ -35,8 +35,17 @@ if ! command -v composer >/dev/null 2>&1; then
     fi
     php composer-setup.php --quiet
     rm composer-setup.php
-    mv composer.phar /usr/local/bin/composer
-    echo "Composer installed."
+    if mv composer.phar /usr/local/bin/composer 2>/dev/null; then
+        echo "Composer installed to /usr/local/bin/composer."
+    else
+        mkdir -p "$HOME/.local/bin"
+        mv composer.phar "$HOME/.local/bin/composer"
+        echo "Composer installed to $HOME/.local/bin/composer."
+        if ! echo "$PATH" | grep -q "$HOME/.local/bin"; then
+            echo "WARNING: $HOME/.local/bin is not in your PATH."
+            echo "Add it to your shell profile, e.g.: export PATH=\"\$HOME/.local/bin:\$PATH\""
+        fi
+    fi
 else
     echo "Composer already installed."
 fi
