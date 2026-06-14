@@ -2163,10 +2163,10 @@ if($onion_service)
 else if ($PositiveMatch_IP == 1)
 {
 	echo '<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">';
-	echo "<span class='usingTor'>It appears that you are using the Tor network</span><br/>Your OR is: $RemoteIP<br/>";
+	echo "<span class='usingTor'>It appears that you are using the Tor network</span><br/>Your OR is: " . htmlspecialchars($RemoteIP, ENT_QUOTES) . "<br/>";
 	for($i=1 ; $i < ($Count + 1) ; $i++)
 	{
-		echo "Server name: <a class='tab' href='router_detail.php?FP=$TorNodeFP[$i]'>$TorNodeName[$i]</a><br/>";
+		echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
 		if ($PositiveMatch_ExitPolicy[$i] == 1)
 		{
 			echo "<span class='usingTor'>This Tor server would allow exiting to this page</span><br />";
