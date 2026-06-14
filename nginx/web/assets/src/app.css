@@ -61,9 +61,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
-  max-width: 1400px;
   min-height: 3.25rem;
-  margin: 0 auto;
   padding: .45rem 1rem;
 }
 .ts-brand,
@@ -118,13 +116,10 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 .ts-service-banner span { display: inline-flex; align-items: center; gap: .4rem; }
 
 .ts-page {
-  max-width: 1400px;
-  margin: 0 auto;
   padding: 1.5rem 1rem 2.25rem;
 }
 .ts-footer {
-  max-width: 960px;
-  margin: 0 auto 2rem;
+  margin-bottom: 2rem;
   padding: 0 1rem;
   color: var(--ts-muted);
   text-align: center;
@@ -538,7 +533,7 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-pagination a:hover { background: #ede9fe; text-decoration: none; }
 .ts-router-table { min-width: 100%; border-collapse: separate; border-spacing: 0; }
 .ts-router-table th,
-.ts-router-table td { border-bottom: 1px solid #e2e8f0; padding: .48rem .55rem; vertical-align: middle; white-space: nowrap; }
+.ts-router-table td { border-bottom: 1px solid #e2e8f0; padding: .48rem .55rem; vertical-align: middle; }
 .ts-router-table th { font-size: .76rem; text-transform: uppercase; letter-spacing: .025em; }
 .ts-router-table tbody tr:last-child td { border-bottom: 0; }
 .ts-router-table tbody tr:hover td { background: #f8fafc !important; }
@@ -546,7 +541,7 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-header-link:hover { color: var(--ts-purple-dark) !important; }
 .ts-sort-icon { min-width: .85rem; color: var(--ts-purple); font-weight: 900; }
 .ts-country { text-transform: uppercase; }
-.ts-host-cell { display: grid; gap: .35rem; min-width: max-content; }
+.ts-host-cell { display: grid; gap: .35rem; }
 .ts-badge-list { flex-wrap: wrap; gap: .25rem; }
 .ts-status-badge,
 .ts-platform-badge {

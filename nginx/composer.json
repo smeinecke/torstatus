@@ -3,6 +3,7 @@
     "description": "TorStatus web interface and updater",
     "type": "project",
     "license": "MIT",
+    "version": "5.0",
     "require": {
         "mitoteam/jpgraph": "^10.0",
         "twig/twig": "^3.0"

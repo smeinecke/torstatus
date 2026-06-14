@@ -17,7 +17,7 @@ function setupDialogs() {
     dialog.addEventListener('click', (event) => {
       const rect = dialog.getBoundingClientRect();
       const inDialog = rect.top <= event.clientY && event.clientY <= rect.bottom && rect.left <= event.clientX && event.clientX <= rect.right;
-      if (!inDialog && typeof dialog.close === 'function') dialog.close();
+      if (!inDialog && event.target === dialog && typeof dialog.close === 'function') dialog.close();
     });
   });
 }
