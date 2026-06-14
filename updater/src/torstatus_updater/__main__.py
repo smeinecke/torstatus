@@ -30,6 +30,7 @@ def main() -> int:
         level=logging.DEBUG if args.debug else logging.INFO,
         format="%(asctime)s %(levelname)s %(name)s: %(message)s",
     )
+    logging.getLogger("stem").setLevel(logging.INFO)
 
     start_time = time.time()
 

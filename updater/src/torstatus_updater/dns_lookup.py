@@ -46,7 +46,11 @@ def lookup(
 
     # Check memcached first
     if memcached_client is not None:
-        cached = memcached_client.get(cache_key)
+        try:
+            cached = memcached_client.get(cache_key)
+        except Exception:
+            LOG.exception("Memcached get failed for %s", ip)
+            cached = None
         if cached is not None:
             LOG.debug("Memcached hit for %s -> %s", ip, cached)
             return cached
