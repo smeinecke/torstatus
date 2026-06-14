@@ -134,7 +134,7 @@ final class IndexRequest
 
         $sortRequest = in_array($sortRequest, self::SORT_FIELDS, true) ? $sortRequest : 'Name';
         $sortOrder = in_array($sortOrder, ['Asc', 'Desc'], true) ? $sortOrder : 'Asc';
-        $rowsPerPage = in_array($rowsPerPage, ['25', '50', '100'], true) ? (int)$rowsPerPage : 25;
+        $rowsPerPage = in_array($rowsPerPage, ['100', '500', '1000'], true) ? (int)$rowsPerPage : 100;
 
         $page = filter_var($page, FILTER_VALIDATE_INT);
         if ($page === false || $page < 1) {
@@ -312,7 +312,7 @@ final class IndexRequest
     {
         return array_map(function (int $value): array {
             return ['value' => $value, 'selected' => $this->rowsPerPage === $value];
-        }, [25, 50, 100]);
+        }, [100, 500, 1000]);
     }
 
     /** @return array<string, mixed> */
