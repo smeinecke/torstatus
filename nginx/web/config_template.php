@@ -85,7 +85,7 @@ $OffsetFromGMT = 0;
 //$Hidden_Service_URL = null;
 $Hidden_Service_URL = "http://t3qi4hdmvqo752lhyglhyb5ysoutggsdocmkxhuojfn62ntpcyydwmqd.onion/";
 
-$memcached_host = 'localhost';
+$memcached_host = '127.0.0.1';
 
 // See if WHOIS wants the footer
 if (isset($argv) && isset($argv[1]) && $argv[1] == 'printthefooter')
