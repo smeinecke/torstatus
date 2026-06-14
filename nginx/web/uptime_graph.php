@@ -1,69 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 // Copyright (c) 2006-2007, Joseph B. Kowalski
 // See LICENSE for licensing information
 
-// Start new session
 @session_start() or die();
 
-// Include configuration settings
-include("config.php");
+require_once __DIR__ . '/../vendor/autoload.php';
+require_once __DIR__ . '/src/Graph/GraphSessionStore.php';
+require_once __DIR__ . '/src/Graph/SessionBarGraphRenderer.php';
 
-// Include JPGraph items
-require_once '../vendor/autoload.php';
-use mitoteam\jpgraph\MtJpGraph;
-MtJpGraph::load('bar');
+use TorStatus\Graph\SessionBarGraphRenderer;
 
-// Declare and initialize variables
-$DATA_ARRAY = null;
-$LABEL_ARRAY = null;
-$Title = null;
-$Legend = null;
-
-// Get variables from session
-if (isset($_SESSION["UptimeGraph_DATA_ARRAY_SERIALIZED"]))
-{
-	$DATA_ARRAY = unserialize($_SESSION['UptimeGraph_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
-}
-else
-{
-	http_response_code(400);
-	die();
-}
-if (isset($_SESSION["UptimeGraph_LABEL_ARRAY_SERIALIZED"]))
-{
-	$LABEL_ARRAY = unserialize($_SESSION['UptimeGraph_LABEL_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
-}
-else
-{
-	http_response_code(400);
-	die();
-}
-if (isset($_SESSION["UptimeGraph_Title"]))
-{
-	$Title = $_SESSION['UptimeGraph_Title'];
-}
-else
-{
-	http_response_code(400);
-	die();
-}
-if (isset($_SESSION["UptimeGraph_Legend"]))
-{
-	$Legend = $_SESSION['UptimeGraph_Legend'];
-}
-
-$graph = new Graph(1144,398,'auto');
-$graph->SetMargin(40,10,30,30);
-$graph->SetScale("textlin");
-$graph->xaxis->SetTickLabels($LABEL_ARRAY);
-#$graph->xaxis->SetLabelAngle(90);
-$graph->title->Set($Title);
-$graph->title->SetFont(FF_FONT2,FS_BOLD);
-$bar = new BarPlot($DATA_ARRAY);
-$bar->SetLegend($Legend);
-$bar->SetShadow();
-$bar->value->Show();
-$bar->value->SetFormat('%d');
-$graph->Add($bar);
-$graph->Stroke();
+(new SessionBarGraphRenderer($_SESSION))->render('UptimeGraph', 1144, 398, [40, 10, 30, 30], false);

@@ -21,35 +21,19 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 <tr>
 <td class='TRS' style='text-align: center;'><br/><br/><b>
 {% if QueryIP is null %}
-<font color='#ff0000'>-You must enter a Query IP, at minimum-</font><br/><br/>
-{% elseif DestinationIP is null or DestinationPort is null %}
-{% if PositiveMatch_IP == 1 %}
-<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>
-{% if Count > 0 %}
-{% for i in 1..Count %}
-Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ TorNodeName[i]|e }}</a><br/>
-{% endfor %}
-{% endif %}
-<br/>
-{% else %}
-<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>
-{% endif %}
-{% else %}
-{% if PositiveMatch_IP == 1 %}
-<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>
-{% if Count > 0 %}
-{% for i in 1..Count %}
-Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ TorNodeName[i]|e }}</a><br/>
-{% if PositiveMatch_ExitPolicy[i] == 1 %}
-<font color='#00dd00'>-This Tor server would allow exiting to your destination-</font><br/><br/>
-{% elseif PositiveMatch_ExitPolicy[i] == 0 %}
-<font color='#ff0000'>-This Tor server would NOT allow exiting to your destination-</font><br/><br/>
+<span style='color: #ff0000;'>-You must enter a Query IP, at minimum-</span><br/><br/>
+{% elseif is_tor_server %}
+<span style='color: #00dd00;'>-The IP Address you entered matches one or more active Tor servers-</span><br/><br/>
+{% for result in results %}
+Server name: <a class='tab' href='router_detail.php?FP={{ result.fingerprint|e }}'>{{ result.name|e }}</a><br/>
+{% if has_destination and result.exit_allowed is same as(true) %}
+<span style='color: #00dd00;'>-This Tor server would allow exiting to your destination-</span><br/><br/>
+{% elseif has_destination and result.exit_allowed is same as(false) %}
+<span style='color: #ff0000;'>-This Tor server would NOT allow exiting to your destination-</span><br/><br/>
 {% endif %}
 {% endfor %}
-{% endif %}
 {% else %}
-<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>
-{% endif %}
+<span style='color: #ff0000;'>-The IP Address you entered is NOT an active Tor server-</span><br/><br/>
 {% endif %}
 </b></td>
 </tr>

@@ -6,6 +6,8 @@ parameters:
     excludePaths:
         - nginx/web/config.php (?)
         - nginx/web/*_graph.php
+        - nginx/web/src/Graph/SessionBarGraphRenderer.php
+        - nginx/web/src/Graph/BandwidthHistoryGraphRenderer.php
     ignoreErrors:
         -
             message: '#might not be defined#'

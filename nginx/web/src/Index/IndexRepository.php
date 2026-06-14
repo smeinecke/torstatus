@@ -144,6 +144,66 @@ final class IndexRepository
         return new RouterPage($result, $totalResults, $totalPages, $page);
     }
 
+    public function fetchRouterExport(IndexRequest $request): \mysqli_result
+    {
+        $query = $this->appendOrderBy($this->buildRouterQuery($request, false), $request);
+        $result = $this->mysqli->query($query);
+        if (!$result) {
+            \die_503('Export query failed: ' . $this->mysqli->error);
+        }
+
+        return $result;
+    }
+
+    public function countRoutersByIp(string $ip): int
+    {
+        $ip = $this->mysqli->real_escape_string($ip);
+        $record = $this->cachedSingleRow("select count(*) as Count from {$this->tables->networkStatus} where IP = '$ip'", 1800);
+
+        return (int)($record['Count'] ?? 0);
+    }
+
+    /** @return array<int, array{name: string, fingerprint: string, exitPolicy: array<int, string>|null}> */
+    public function fetchRoutersByIp(string $ip, bool $includeExitPolicy): array
+    {
+        $ip = $this->mysqli->real_escape_string($ip);
+        $networkStatus = $this->tables->networkStatus;
+        $descriptor = $this->tables->descriptor;
+
+        if ($includeExitPolicy) {
+            $query = "select $networkStatus.Name, $networkStatus.Fingerprint, $descriptor.ExitPolicySERDATA
+                from $networkStatus
+                    inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
+                where $networkStatus.IP = '$ip'";
+        } else {
+            $query = "select $networkStatus.Name, $networkStatus.Fingerprint
+                from $networkStatus
+                where $networkStatus.IP = '$ip'";
+        }
+
+        $result = $this->mysqli->query($query);
+        if (!$result) {
+            \die_503('Query failed: ' . $this->mysqli->error);
+        }
+
+        $rows = [];
+        while ($record = $result->fetch_assoc()) {
+            $exitPolicy = null;
+            if ($includeExitPolicy) {
+                $unserialized = unserialize((string)($record['ExitPolicySERDATA'] ?? ''), ['allowed_classes' => false]);
+                $exitPolicy = is_array($unserialized) ? array_values(array_filter($unserialized, 'is_string')) : [];
+            }
+            $rows[] = [
+                'name' => (string)($record['Name'] ?? ''),
+                'fingerprint' => (string)($record['Fingerprint'] ?? ''),
+                'exitPolicy' => $exitPolicy,
+            ];
+        }
+        $result->free();
+
+        return $rows;
+    }
+
     /** @return array<int, array{label: string, count: int, percentage: float}> */
     public function buildStatsRows(array $aggregateStats, int $routerCount, int $currentResultSet): array
     {
