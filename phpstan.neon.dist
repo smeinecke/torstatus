@@ -1,0 +1,15 @@
+parameters:
+    phpVersion: 80500
+    level: 5
+    paths:
+        - nginx/web
+    excludePaths:
+        - nginx/web/jpgraph/*
+        - nginx/web/config.php (?)
+        - nginx/web/*_graph.php
+    scanDirectories:
+        - nginx/web/jpgraph
+    ignoreErrors:
+        -
+            message: '#might not be defined#'
+            path: nginx/web/*

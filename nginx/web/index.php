@@ -885,14 +885,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 // GET
 else if ($_SERVER['REQUEST_METHOD'] == 'GET' && isset($_GET["SR"]) && isset($_GET["SO"]))
 {
-	if (isset($_GET["SR"]))
-	{
-		$SR = $_GET["SR"];
-	}
-	if (isset($_GET["SO"]))
-	{
-		$SO = $_GET["SO"];
-	}
+	$SR = $_GET["SR"];
+	$SO = $_GET["SO"];
 }
 
 // SESSION
@@ -2171,7 +2165,7 @@ else if ($PositiveMatch_IP == 1)
 		{
 			echo "<span class='usingTor'>This Tor server would allow exiting to this page</span><br />";
 		}
-		else if ($PositiveMatch_ExitPolicy[$i] == 0)
+		else
 		{
 			echo "<span class='notUsingTor'>This Tor server would NOT allow exiting to this page</span><br />";
 		}

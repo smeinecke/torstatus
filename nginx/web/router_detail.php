@@ -279,25 +279,16 @@ include("header.php");
 
 </tr>
 <tr>
-<?php if(1): ?>
 <td class='HRN' colspan='2'>Bandwidth</td>
-<?php else: ?>
-<td class='HRN' colspan='2'></td>
-<?php endif; ?>
 <td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Router Flags</td>
 </tr>
 <tr>
-<?php if(1): ?>
 <td class='TRS' style="text-align: center;">
 <img src='bandwidth_history_graph.php?MODE=WriteHistory&amp;FP=<?php echo $Fingerprint; ?>' />
 </td>
 <td class='TRSB' style="text-align: center;">
 <img src='bandwidth_history_graph.php?MODE=ReadHistory&amp;FP=<?php echo $Fingerprint; ?>' />
 </td>
-<?php else: ?>
-<td class='TRS' style="text-align: center;"></td>
-<td class='TRSB' style="text-align: center;"></td>
-<?php endif; ?>
 <td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'>
 <table cellspacing='0' cellpadding='0'>
 <?php

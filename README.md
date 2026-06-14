@@ -88,8 +88,6 @@ Set up MariaDB, create a database with a user, and populate the database using [
 
 ### Updater
 
- - Set up Perl.
- - You need these CPAN modules: `DBI PHP::Serialization LWP::Simple File::Touch Parallel::ForkManager Cache::Memcached Net::IP DBD::MariaDB`
- - `cd` to the directory `updater` and invoke `tns_update.pl` there.
- - Use Cron to invoke `tns_update.pl` regularly. Alternatively, you may launch `updater.sh` once after each reboot.
-
+ - `cd` to the directory `updater`.
+ - Run `uv run python -m torstatus_updater`.
+ - Alternatively, launch `updater.sh` once after each reboot; it will loop and run the updater every 15 minutes.

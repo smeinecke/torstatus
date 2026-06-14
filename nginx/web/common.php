@@ -69,6 +69,7 @@ function connection_information() {
 @session_start() or die_400();
 
 // Include configuration settings
+// @phpstan-ignore-next-line (runtime-generated from config_template.php)
 require_once("config.php");
 
 $memcached = new Memcached();
@@ -116,5 +117,3 @@ $onion_service = preg_match('/^[0-9a-z]*\.onion$/', $Host);
 
 #$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
 #$mysqli->query($query);
-
-

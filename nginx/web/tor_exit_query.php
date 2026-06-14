@@ -51,8 +51,8 @@ function IsIPInSubnet($IP,$Subnet)
        list($a, $b, $c, $d) = explode('.', $base);
 
        /* now do some bit shifting/switching to convert to ints */
-       $i = ($a << 24) + ($b << 16) + ($c << 8) + $d;
-       $mask = $bits == 0 ? 0 : (~0 << (32 - $bits));
+       $i = ((int)$a << 24) + ((int)$b << 16) + ((int)$c << 8) + (int)$d;
+       $mask = (int)$bits == 0 ? 0 : (~0 << (32 - (int)$bits));
 
        /* here's our lowest int */
        $low = $i & $mask;
@@ -64,7 +64,7 @@ function IsIPInSubnet($IP,$Subnet)
        list($a, $b, $c, $d) = explode('.', $IP);
 
        /* now convert the ip we're checking against to an int */
-       $check = ($a << 24) + ($b << 16) + ($c << 8) + $d;
+       $check = ((int)$a << 24) + ((int)$b << 16) + ((int)$c << 8) + (int)$d;
 
        /* if the ip is within the range, including highest/lowest values, then it's within the subnet range */
        if ($check >= $low && $check <= $high)
@@ -326,7 +326,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 	}
 
 	// Query IP entered, but either the DestinationIP or DestinationPort is empty or bogus
-	else if ($QueryIP != null && ($DestinationIP == null || $DestinationPort == null))
+	else if ($DestinationIP == null || $DestinationPort == null)
 	{
 		if ($PositiveMatch_IP == 1)
 		{
@@ -337,14 +337,14 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 			}
 			echo "<br/>";
 		}
-		else if ($PositiveMatch_IP == 0)
+		else
 		{
 			echo "<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>";
 		}
 	}
 
 	// Query IP, DestinationIP, and DestinationPort entered
-	else if ($QueryIP != null && $DestinationIP != null && $DestinationPort != null)
+	else
 	{
 		if ($PositiveMatch_IP == 1)
 		{
@@ -356,13 +356,13 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 				{
 					echo "<font color='#00dd00'>-This Tor server would allow exiting to your destination-</font><br/><br/>";
 				}
-				else if ($PositiveMatch_ExitPolicy[$i] == 0)
+				else
 				{
 					echo "<font color='#ff0000'>-This Tor server would NOT allow exiting to your destination-</font><br/><br/>";
 				}
 			}
 		}
-		else if ($PositiveMatch_IP == 0)
+		else
 		{
 			echo "<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>";
 		}
@@ -418,4 +418,3 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 
 // Close connection
 $mysqli->close();
-
