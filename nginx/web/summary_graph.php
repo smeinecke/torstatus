@@ -1,7 +1,7 @@
 <?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 // Start new session
 @session_start() or die();
@@ -22,7 +22,7 @@ $Legend = null;
 // Get variables from session
 if (isset($_SESSION["SummaryGraph_DATA_ARRAY_SERIALIZED"]))
 {
-	$DATA_ARRAY = unserialize($_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED']);
+	$DATA_ARRAY = unserialize($_SESSION['SummaryGraph_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
 }
 else
 {
@@ -31,7 +31,7 @@ else
 }
 if (isset($_SESSION["SummaryGraph_LABEL_ARRAY_SERIALIZED"]))
 {
-	$LABEL_ARRAY = unserialize($_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED']);
+	$LABEL_ARRAY = unserialize($_SESSION['SummaryGraph_LABEL_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
 }
 else
 {

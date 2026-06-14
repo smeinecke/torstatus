@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 require_once('common.php');
 
@@ -29,8 +29,8 @@ $CSInput = null;
 // Function Declarations
 function GenerateHeaderRow()
 {
-	global 	
-			$HeaderRowString, 
+	global
+			$HeaderRowString,
 			$ColumnList_ACTIVE;
 
 	$HeaderRowString .= "Router Name";
@@ -140,11 +140,22 @@ function GenerateHeaderRow()
 	$HeaderRowString .= "\n";
 }
 
+function csv_escape_cell($value)
+{
+	$value = str_replace('"', "'", $value);
+	$value = str_replace(',', '-', $value);
+	if (strlen($value) > 0 && in_array($value[0], array('=', '+', '-', '@')))
+	{
+		$value = "'" . $value;
+	}
+	return $value;
+}
+
 function DisplayRouterRow()
 {
 	global $record, $ColumnList_ACTIVE;
 
-	echo $record['Name'];
+	echo csv_escape_cell($record['Name']);
 
 	foreach($ColumnList_ACTIVE as $value)
 	{
@@ -152,7 +163,7 @@ function DisplayRouterRow()
 		{
 			if ($record[$value] > -1)
 			{
-				echo "," . str_replace(",","-",str_replace("\"","'",$record[$value]));
+				echo "," . csv_escape_cell($record[$value]);
 			}
 			else
 			{
@@ -163,7 +174,7 @@ function DisplayRouterRow()
 		{
 			if ($record[$value] > 0)
 			{
-				echo "," . str_replace(",","-",str_replace("\"","'",$record[$value]));
+				echo "," . csv_escape_cell($record[$value]);
 			}
 			else
 			{
@@ -174,7 +185,7 @@ function DisplayRouterRow()
 		{
 			if ($record[$value] != null)
 			{
-				echo "," . str_replace(",","-",str_replace("\"","'",$record[$value]));
+				echo "," . csv_escape_cell($record[$value]);
 			}
 			else
 			{
@@ -183,7 +194,7 @@ function DisplayRouterRow()
 		}
 		else
 		{
-			echo "," . str_replace(",","-",str_replace("\"","'",$record[$value]));
+			echo "," . csv_escape_cell($record[$value]);
 		}
 	}
 
@@ -292,14 +303,14 @@ if(
 	$SR != "FV2Dir")
 {
 	$SR = "Name";
-} 
+}
 
 if(
 	$SO != "Asc"				&&
 	$SO != "Desc")
 {
 	$SO = "Asc";
-} 
+}
 
 if (!(isset($_SESSION['ColumnSetVisited'])) && !(isset($_SESSION['IndexVisited'])))
 {
@@ -381,7 +392,7 @@ if(
 	$CSField != "Contact")
 {
 	$CSField = "Fingerprint";
-} 
+}
 
 if(
 	$CSMod != "Equals"		&&
@@ -671,7 +682,7 @@ if ($CSInput != null)
 
 	if (strpos($query, "where") === false)
 	{
-		$QueryPrepend = " where "; 
+		$QueryPrepend = " where ";
 	}
 	else
 	{
@@ -741,7 +752,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'Bandwidth')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -766,7 +777,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'Uptime')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -848,7 +859,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'ORPort')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -873,7 +884,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'DirPort')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -965,7 +976,7 @@ header('Content-disposition: inline; filename=Tor_query_EXPORT.csv');
 
 echo $HeaderRowString;
 
-while ($record = $result->fetch_assoc()) 
+while ($record = $result->fetch_assoc())
 {
 	DisplayRouterRow();
 }

@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 require_once('common.php');
 
@@ -151,10 +151,10 @@ if ($DestinationPort != null)
 	}
 
 	if 	(
-		!is_numeric($DestinationPort) 	|| 
-		intval($DestinationPort) < 0	|| 
+		!is_numeric($DestinationPort) 	||
+		intval($DestinationPort) < 0	||
 		intval($DestinationPort) > 65535
-		) 
+		)
 	{
 		$DestinationPort = null;
 	}
@@ -165,14 +165,14 @@ if ($QueryIP != null)
 	// Determine if query IP exists in database as a Tor server
 	$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$QueryIP'";
 	$record = db_query_single_row($query);
-	
+
 	$QueryIPDBCount = $record['Count'];
-	
+
 	if ($QueryIPDBCount > 0)
 	{
-		$PositiveMatch_IP = 1;	
+		$PositiveMatch_IP = 1;
 	}
-	
+
 	// Get name, fingerprint, and exit policy of Tor node(s) if match was found and Destination IP/Port was specified, look for match in ExitPolicy
 	if ($PositiveMatch_IP == 1 && $DestinationIP != null && $DestinationPort != null)
 	{
@@ -181,15 +181,15 @@ if ($QueryIP != null)
 		if(!$result) {
 			die_503('Query failed: ' . $mysqli->error);
 		}
-	
+
 		while ($record = $result->fetch_assoc())
-		{ 
-			$Count++;			
+		{
+			$Count++;
 
 			$TorNodeName[$Count] = $record['Name'];
 			$TorNodeFP[$Count] = $record['Fingerprint'];
-			$TorNodeExitPolicy = unserialize($record['ExitPolicySERDATA']);
-	
+			$TorNodeExitPolicy = unserialize($record['ExitPolicySERDATA'], ['allowed_classes' => false]);
+
 			foreach($TorNodeExitPolicy as $ExitPolicyLine)
 			{
 				// Initialize variables
@@ -198,12 +198,12 @@ if ($QueryIP != null)
 				$Subnet = null;
 				$PortLine = null;
 				$Port = null;
-	
+
 				// Seperate parts of ExitPolicy line
 				list($Condition,$NetworkLine) = explode(' ', rtrim($ExitPolicyLine));
 				list($Subnet,$PortLine) = explode(':', $NetworkLine);
 				$Port = explode(',', $PortLine);
-	
+
 				// Find out if Destination IP user provided is a match for the subnet specified on this ExitPolicy line
 				if (IsIPInSubnet($DestinationIP,$Subnet) == 1)
 				{
@@ -224,12 +224,12 @@ if ($QueryIP != null)
 								break 2;
 							}
 						}
-	
+
 						// $CurrentPortExpression is a range of ports
 						if(strpos($CurrentPortExpression, '-') !== FALSE)
 						{
 							list($LowerPort,$UpperPort) = explode('-', $CurrentPortExpression);
-		
+
 							if (($DestinationPort >= $LowerPort && $DestinationPort <= $UpperPort) && ($Condition == 'accept'))
 							{
 								$PositiveMatch_ExitPolicy[$Count] = 1;
@@ -245,7 +245,7 @@ if ($QueryIP != null)
 								continue;
 							}
 						}
-		
+
 						// $CurrentPortExpression is a single port number
 						else
 						{
@@ -286,7 +286,7 @@ if ($QueryIP != null)
 		while ($record = $result->fetch_assoc())
 		{
 			$Count++;
-	
+
 			$TorNodeName[$Count] = $record['Name'];
 			$TorNodeFP[$Count] = $record['Fingerprint'];
 		}
@@ -324,7 +324,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 	{
 		echo "<font color='#ff0000'>-You must enter a Query IP, at minimum-</font><br/><br/>";
 	}
-	
+
 	// Query IP entered, but either the DestinationIP or DestinationPort is empty or bogus
 	else if ($QueryIP != null && ($DestinationIP == null || $DestinationPort == null))
 	{
@@ -333,7 +333,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 			echo "<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>";
 			for($i=1 ; $i < ($Count + 1) ; $i++)
 			{
-				echo "Server name: <a class='tab' href='router_detail.php?FP=$TorNodeFP[$i]'>$TorNodeName[$i]</a><br/>";
+				echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
 			}
 			echo "<br/>";
 		}
@@ -342,7 +342,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 			echo "<font color='#ff0000'>-The IP Address you entered is NOT an active Tor server-</font><br/><br/>";
 		}
 	}
-	
+
 	// Query IP, DestinationIP, and DestinationPort entered
 	else if ($QueryIP != null && $DestinationIP != null && $DestinationPort != null)
 	{
@@ -351,7 +351,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 			echo "<font color='#00dd00'>-The IP Address you entered matches one or more active Tor servers-</font><br/><br/>";
 			for($i=1 ; $i < ($Count + 1) ; $i++)
 			{
-				echo "Server name: <a class='tab' href='router_detail.php?FP=$TorNodeFP[$i]'>$TorNodeName[$i]</a><br/>";
+				echo "Server name: <a class='tab' href='router_detail.php?FP=" . htmlspecialchars($TorNodeFP[$i], ENT_QUOTES) . "'>" . htmlspecialchars($TorNodeName[$i], ENT_QUOTES) . "</a><br/>";
 				if ($PositiveMatch_ExitPolicy[$i] == 1)
 				{
 					echo "<font color='#00dd00'>-This Tor server would allow exiting to your destination-</font><br/><br/>";
@@ -383,7 +383,7 @@ Policy would permit it to exit to a certain destination IP address and port.</b>
 <?php
 	echo "<form action='$Self' method='post'>\n";
 	echo "<b>IP Address to Query:<br/><span class='TRSM'>(Required)</span></b><br/>\n";
-	echo "<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($QueryIP ? $QueryIP : '', ENT_QUOTES) . "' /><br/><br/><br/>\n"; 
+	echo "<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($QueryIP ? $QueryIP : '', ENT_QUOTES) . "' /><br/><br/><br/>\n";
 	echo "<b>Destination IP Address:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
 	echo "<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='" . htmlspecialchars($DestinationIP ? $DestinationIP : '', ENT_QUOTES) . "' /><br/><br/>\n";
 	echo "<b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>\n";
