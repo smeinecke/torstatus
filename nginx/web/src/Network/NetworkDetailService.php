@@ -186,20 +186,20 @@ final class NetworkDetailService
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
         $query = "select
-            (select count(*) from $networkStatus) as Total,
-            (select count(*) from $networkStatus where FAuthority = ?) as Authority,
-            (select count(*) from $networkStatus where FBadDirectory = ?) as BadDirectory,
-            (select count(*) from $networkStatus where FBadExit = ?) as BadExit,
-            (select count(*) from $networkStatus where FExit = ?) as Exit,
-            (select count(*) from $networkStatus where FFast = ?) as Fast,
-            (select count(*) from $networkStatus where FGuard = ?) as Guard,
-            (select count(*) from $descriptor inner join $networkStatus on $networkStatus.Fingerprint = $descriptor.Fingerprint where Hibernating = ?) as Hibernating,
-            (select count(*) from $networkStatus where FNamed = ?) as Named,
-            (select count(*) from $networkStatus where FStable = ?) as Stable,
-            (select count(*) from $networkStatus where FRunning = ?) as Running,
-            (select count(*) from $networkStatus where FValid = ?) as Valid,
-            (select count(*) from $networkStatus where FV2Dir = ?) as V2Dir,
-            (select count(*) from $networkStatus where DirPort > ?) as DirMirror";
+            (select count(*) from $networkStatus) as 'Total',
+            (select count(*) from $networkStatus where FAuthority = ?) as 'Authority',
+            (select count(*) from $networkStatus where FBadDirectory = ?) as 'BadDirectory',
+            (select count(*) from $networkStatus where FBadExit = ?) as 'BadExit',
+            (select count(*) from $networkStatus where FExit = ?) as 'Exit',
+            (select count(*) from $networkStatus where FFast = ?) as 'Fast',
+            (select count(*) from $networkStatus where FGuard = ?) as 'Guard',
+            (select count(*) from $descriptor inner join $networkStatus on $networkStatus.Fingerprint = $descriptor.Fingerprint where Hibernating = ?) as 'Hibernating',
+            (select count(*) from $networkStatus where FNamed = ?) as 'Named',
+            (select count(*) from $networkStatus where FStable = ?) as 'Stable',
+            (select count(*) from $networkStatus where FRunning = ?) as 'Running',
+            (select count(*) from $networkStatus where FValid = ?) as 'Valid',
+            (select count(*) from $networkStatus where FV2Dir = ?) as 'V2Dir',
+            (select count(*) from $networkStatus where DirPort > ?) as 'DirMirror'";
 
         $record = $this->db->singleRow($query, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 1800);
         return [
