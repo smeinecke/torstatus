@@ -55,7 +55,7 @@ Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ 
 <tr>
 <td>
 
-<a href="#Legend" onclick="lgndToggle = 0;javascript:toggleLGND();" class="LegendLink">View the Legend</a>
+<a href="#Legend" data-toggle-show="lgnd" class="LegendLink">View the Legend</a>
 
 {{ router_table_block|raw }}
 
@@ -67,59 +67,19 @@ Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ 
 </tr>
 <tr><td>
 
-<a href="javascript:toggleANSS();" class="LegendLink" id='anssTableLink'>Aggregate Network Statistic Summary</a>
+<a name="Stats"></a>
+<a href="#" data-toggle="anss" class="LegendLink" id='anssTableLink'>Aggregate Network Statistic Summary</a>
 
 {{ stats_block|raw }}
 
-<script type='text/javascript'>
-<!--
-var anssToggle = 1;
-toggleANSS();
-function toggleANSS()
-{
-if (anssToggle == 0)
-{
-document.getElementById('anssTable').style.display='table';
-document.getElementById('anssTableLink').innerHTML='Hide Aggregate Network Statistic Summary  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-anssToggle = 1;
-}
-else
-{
-document.getElementById('anssTable').style.display='none';
-document.getElementById('anssTableLink').innerHTML='Show Aggregate Network Statistic Summary  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-anssToggle = 0;
-}
-}
-// -->
-</script>
 
 <br/>
 
-<a href="javascript:toggleNSOS();" class="LegendLink" id='nsosTableLink'>Network Status Opinion Source</a>
+<a name="TorServer"></a>
+<a href="#" data-toggle="nsos" class="LegendLink" id='nsosTableLink'>Network Status Opinion Source</a>
 
 {{ nsos_block|raw }}
 
-<script type='text/javascript'>
-<!--
-var nsosToggle = 1;
-toggleNSOS();
-function toggleNSOS()
-{
-if (nsosToggle == 0)
-{
-document.getElementById('nsosTable').style.display='table';
-document.getElementById('nsosTableLink').innerHTML='Hide Network Status Opinion Source  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-nsosToggle = 1;
-}
-else
-{
-document.getElementById('nsosTable').style.display='none';
-document.getElementById('nsosTableLink').innerHTML='Show Network Status Opinion Source  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-nsosToggle = 0;
-}
-}
-// -->
-</script>
 
 <br/>
 
@@ -127,93 +87,31 @@ nsosToggle = 0;
 
 <br/>
 
-<a href="javascript:toggleCAQO();" class="LegendLink" id='caqoTableLink'>Custom / Advanced Query Options</a>
+<a name="CustomQuery"></a>
+<a href="#" data-toggle="caqo" class="LegendLink" id='caqoTableLink'>Custom / Advanced Query Options</a>
 
 {{ query_block|raw }}
 
-<script type='text/javascript'>
-<!--
-var caqoToggle = 1;
-toggleCAQO();
-function toggleCAQO()
-{
-if (caqoToggle == 0)
-{
-document.getElementById('caqoTable').style.display='table';
-document.getElementById('caqoTableLink').innerHTML='Hide Custom / Advanced Query Options  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-caqoToggle = 1;
-}
-else
-{
-document.getElementById('caqoTable').style.display='none';
-document.getElementById('caqoTableLink').innerHTML='Show Custom / Advanced Query Options  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-caqoToggle = 0;
-}
-}
-// -->
-</script>
 
 <br/>
 
 <a name="Legend"></a>
 
-<a href="javascript:toggleLGND();" class="LegendLink" id='lgndTableLink'>Table Legend</a>
+<a href="#" data-toggle="lgnd" class="LegendLink" id='lgndTableLink'>Table Legend</a>
 
 {{ legend_block|raw }}
 
-<script type='text/javascript'>
-<!--
-var lgndToggle = 1;
-toggleLGND();
-function toggleLGND()
-{
-if (lgndToggle == 0)
-{
-document.getElementById('lgndTable').style.display='table';
-document.getElementById('lgndTableLink').innerHTML='Hide Table Legend  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-lgndToggle = 1;
-}
-else
-{
-document.getElementById('lgndTable').style.display='none';
-document.getElementById('lgndTableLink').innerHTML='Show Table Legend  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-lgndToggle = 0;
-}
-}
-// -->
-</script>
 
 <br/>
 
 <a name="AppServer"></a>
 
-<a href="javascript:toggleASD();" class="LegendLink" id='asdTableLink'>Application Server Details</a>
+<a href="#" data-toggle="asd" class="LegendLink" id='asdTableLink'>Application Server Details</a>
 
 <br/>
 
 {{ appserver_block|raw }}
 
-<script type='text/javascript'>
-<!--
-var asdToggle = 1;
-toggleASD();
-function toggleASD()
-{
-if (asdToggle == 0)
-{
-document.getElementById('asdTable').style.display='table';
-document.getElementById('asdTableLink').innerHTML='Hide Application Server Details  <img src="img/blackinfobarcollapse.png" class="infobarbutton"/>';
-asdToggle = 1;
-}
-else
-{
-document.getElementById('asdTable').style.display='none';
-document.getElementById('asdTableLink').innerHTML='Show Application Server Details  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-asdToggle = 0;
-}
-}
-// -->
-</script>
 
 </td></tr>
 </table>
