@@ -203,6 +203,38 @@ final class IndexRequest
         ]);
     }
 
+    public function toBaseUrl(string $self): string
+    {
+        $params = ['RowsPerPage' => (string)$this->rowsPerPage];
+        foreach ($this->filters as $field => $value) {
+            $params[$field] = $value;
+        }
+        if ($this->customSearchInput !== null) {
+            $params['CSField'] = $this->customSearchField;
+            $params['CSMod'] = $this->customSearchModifier;
+            $params['CSInput'] = $this->customSearchInput;
+        }
+        return $self . '?' . http_build_query($params);
+    }
+
+    public function toBaseQuery(): string
+    {
+        $params = [
+            'RowsPerPage' => (string)$this->rowsPerPage,
+            'SR' => $this->sortRequest,
+            'SO' => $this->sortOrder,
+        ];
+        foreach ($this->filters as $field => $value) {
+            $params[$field] = $value;
+        }
+        if ($this->customSearchInput !== null) {
+            $params['CSField'] = $this->customSearchField;
+            $params['CSMod'] = $this->customSearchModifier;
+            $params['CSInput'] = $this->customSearchInput;
+        }
+        return http_build_query($params);
+    }
+
     /** @param array<string, mixed> $source */
     private static function stringFrom(array $source, string $key): ?string
     {

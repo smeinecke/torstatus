@@ -27,6 +27,10 @@ if (!preg_match('/^[a-fA-F0-9]{40}$/', $fingerprint)) {
 
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
 $context = (new RouterDetailService($db, $tables, (int)$OffsetFromGMT))->findByFingerprint($fingerprint);
+if ($context !== null) {
+    $context['BandwidthWriteGraphUrl'] = 'bandwidth_history_graph.php?' . http_build_query(['MODE' => 'WriteHistory', 'FP' => $fingerprint]);
+    $context['BandwidthReadGraphUrl'] = 'bandwidth_history_graph.php?' . http_build_query(['MODE' => 'ReadHistory', 'FP' => $fingerprint]);
+}
 if ($context === null) {
     http_response_code(404);
     echo 'Unknown fingerprint';

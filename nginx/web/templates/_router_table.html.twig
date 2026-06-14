@@ -9,29 +9,27 @@
 {% set arrow = 'sortingarrowdown.png' %}
 {% set alt = '&#9662;' %}
 {% endif %}
-<a class="header" href="{{ base }}&amp;SR={{ sr_key|e('url') }}&amp;SO={{ next_so|e('url') }}">
+<a class="header" href="{{ base|raw }}&SR={{ sr_key|e('url') }}&SO={{ next_so|e('url') }}">
 {% if has_arrow %}<img src="img/{{ arrow }}" alt="{{ alt }}" class="sorting"/> {% endif %}{{ label|raw }}</a>
 {% endmacro %}
 
-{% set base_url = Self ~ '?RowsPerPage=' ~ rows_per_page ~ '&amp;FAuthority=' ~ FAuthority|default('OFF')|e('url') ~ '&amp;FBadDirectory=' ~ FBadDirectory|default('OFF')|e('url') ~ '&amp;FBadExit=' ~ FBadExit|default('OFF')|e('url') ~ '&amp;FExit=' ~ FExit|default('OFF')|e('url') ~ '&amp;FFast=' ~ FFast|default('OFF')|e('url') ~ '&amp;FGuard=' ~ FGuard|default('OFF')|e('url') ~ '&amp;FHibernating=' ~ FHibernating|default('OFF')|e('url') ~ '&amp;FNamed=' ~ FNamed|default('OFF')|e('url') ~ '&amp;FStable=' ~ FStable|default('OFF')|e('url') ~ '&amp;FRunning=' ~ FRunning|default('OFF')|e('url') ~ '&amp;FValid=' ~ FValid|default('OFF')|e('url') ~ '&amp;FV2Dir=' ~ FV2Dir|default('OFF')|e('url') ~ '&amp;FHSDir=' ~ FHSDir|default('OFF')|e('url') %}
-{% if CSInput %}{% set base_url = base_url ~ '&amp;CSField=' ~ CSField|default('Fingerprint')|e('url') ~ '&amp;CSMod=' ~ CSMod|default('Contains')|e('url') ~ '&amp;CSInput=' ~ CSInput|e('url') %}{% endif %}
 
 <table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" class="displayTable">
 <thead>
 <tr>
 <td class="{% if sr == 'Name' %}HRS{% else %}HRN{% endif %}">
-&nbsp;<a class="header" href="{{ base_url }}&amp;SR=CountryCode&amp;SO={% if sr == 'CountryCode' and so == 'Asc' %}Desc{% else %}Asc{% endif %}"><img src="img/{% if sr == 'CountryCode' and so == 'Asc' %}sortingarrowup{% else %}sortingarrowdown{% endif %}.png" alt="{% if sr == 'CountryCode' and so == 'Asc' %}&#9652;{% else %}&#9662;{% endif %}" class="sorting"/></a>&nbsp;&nbsp;
+&nbsp;<a class="header" href="{{ base_url|raw }}&SR=CountryCode&SO={% if sr == 'CountryCode' and so == 'Asc' %}Desc{% else %}Asc{% endif %}"><img src="img/{% if sr == 'CountryCode' and so == 'Asc' %}sortingarrowup{% else %}sortingarrowdown{% endif %}.png" alt="{% if sr == 'CountryCode' and so == 'Asc' %}&#9652;{% else %}&#9662;{% endif %}" class="sorting"/></a>&nbsp;&nbsp;
 {{ _self.sort_link(base_url, 'Name', so, 'Router Name', sr, so, true) }}
 </td>
 {% for col in columns_active %}
 {% if col == 'Fingerprint' %}
-<td class="{% if sr == 'Fingerprint' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR=Fingerprint&amp;SO={% if sr == 'Fingerprint' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Fingerprint</a></td>
+<td class="{% if sr == 'Fingerprint' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR=Fingerprint&SO={% if sr == 'Fingerprint' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Fingerprint</a></td>
 {% elseif col == 'Bandwidth' %}
 <td class="{% if sr == 'Bandwidth' %}HRS{% else %}HRN{% endif %}">{{ _self.sort_link(base_url, 'Bandwidth', so, 'Bandwidth <span class="TRSM">(KB/s)</span>', sr, so, true) }}</td>
 {% elseif col == 'Uptime' %}
 <td class="{% if sr == 'Uptime' %}HRS{% else %}HRN{% endif %}">{{ _self.sort_link(base_url, 'Uptime', so, 'Uptime', sr, so, true) }}</td>
 {% elseif col == 'LastDescriptorPublished' %}
-<td class="{% if sr == 'LastDescriptorPublished' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR=LastDescriptorPublished&amp;SO={% if sr == 'LastDescriptorPublished' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Last Descriptor<br/><span class="TRSM">(GMT)</span></a></td>
+<td class="{% if sr == 'LastDescriptorPublished' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR=LastDescriptorPublished&SO={% if sr == 'LastDescriptorPublished' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Last Descriptor<br/><span class="TRSM">(GMT)</span></a></td>
 {% elseif col == 'Hostname' %}
 <td class="{% if sr == 'Hostname' %}HRS{% else %}HRN{% endif %}">{{ _self.sort_link(base_url, 'Hostname', so, 'Hostname', sr, so, true) }}</td>
 {% elseif col == 'ORPort' %}
@@ -39,13 +37,13 @@
 {% elseif col == 'DirPort' %}
 <td class="{% if sr == 'DirPort' %}HRS{% else %}HRN{% endif %}">{{ _self.sort_link(base_url, 'DirPort', so, 'DirPort', sr, so, true) }}</td>
 	{% elseif col == 'Contact' %}
-	<td class="{% if sr == 'Contact' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR=Contact&amp;SO={% if sr == 'Contact' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Contact</a></td>
+	<td class="{% if sr == 'Contact' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR=Contact&SO={% if sr == 'Contact' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Contact</a></td>
 	{% elseif col == 'IP' %}
 	<td class="{% if sr == 'IP' %}HRS{% else %}HRN{% endif %}">{{ _self.sort_link(base_url, 'IP', so, 'IP Address', sr, so, true) }}</td>
 	{% elseif col == 'Platform' %}
-	<td class="{% if sr == 'Platform' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR=Platform&amp;SO={% if sr == 'Platform' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Platform</a></td>
+	<td class="{% if sr == 'Platform' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR=Platform&SO={% if sr == 'Platform' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Platform</a></td>
 	{% elseif col == 'Hibernating' %}
-	<td class="{% if sr == 'Hibernating' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR=Hibernating&amp;SO={% if sr == 'Hibernating' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Hibernating</a></td>
+	<td class="{% if sr == 'Hibernating' %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR=Hibernating&SO={% if sr == 'Hibernating' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Hibernating</a></td>
 	{% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir'] %}
 	{% set sort_key = {
 		'Authority': 'FAuthority',
@@ -59,7 +57,7 @@
 		'V2Dir': 'FV2Dir',
 		'HSDir': 'FHSDir'
 	}[col] %}
-	<td class="{% if sr == sort_key %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url }}&amp;SR={{ sort_key|e('url') }}&amp;SO={% if sr == sort_key and so == 'Asc' %}Desc{% else %}Asc{% endif %}">{{ col }}</a></td>
+	<td class="{% if sr == sort_key %}HRS{% else %}HRN{% endif %}"><a class="header" href="{{ base_url|raw }}&SR={{ sort_key|e('url') }}&SO={% if sr == sort_key and so == 'Asc' %}Desc{% else %}Asc{% endif %}">{{ col }}</a></td>
 	{% elseif col == 'BadDir' %}
 	{% set fbd = FBadDirectory ?? 'OFF' %}
 {% if fbd == '0' and sr == 'FBadDirectory' %}{% set hdr_cls = 'HRFNOS' %}
@@ -69,7 +67,7 @@
 {% elseif fbd == 'OFF' and sr == 'FBadDirectory' %}{% set hdr_cls = 'HRS' %}
 {% else %}{% set hdr_cls = 'HRN' %}
 {% endif %}
-<td class="{{ hdr_cls }}"><a class="header" href="{{ base_url }}&amp;SR=FBadDirectory&amp;SO={% if sr == 'FBadDirectory' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Bad Dir</a></td>
+<td class="{{ hdr_cls }}"><a class="header" href="{{ base_url|raw }}&SR=FBadDirectory&SO={% if sr == 'FBadDirectory' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Bad Dir</a></td>
 {% elseif col == 'BadExit' %}
 {% set fbe = FBadExit ?? 'OFF' %}
 {% if fbe == '0' and sr == 'FBadExit' %}{% set hdr_cls = 'HRFNOS' %}
@@ -79,7 +77,7 @@
 {% elseif fbe == 'OFF' and sr == 'FBadExit' %}{% set hdr_cls = 'HRS' %}
 {% else %}{% set hdr_cls = 'HRN' %}
 {% endif %}
-<td class="{{ hdr_cls }}"><a class="header" href="{{ base_url }}&amp;SR=FBadExit&amp;SO={% if sr == 'FBadExit' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Bad Exit</a></td>
+<td class="{{ hdr_cls }}"><a class="header" href="{{ base_url|raw }}&SR=FBadExit&SO={% if sr == 'FBadExit' and so == 'Asc' %}Desc{% else %}Asc{% endif %}">Bad Exit</a></td>
 {% else %}
 <td class="HRN">{{ col }}</td>
 {% endif %}

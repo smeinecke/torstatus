@@ -247,8 +247,8 @@ final class IndexRepository
         $query .= ", $networkStatus.FBadDirectory as BadDir";
         $query .= ", $networkStatus.FBadExit as BadExit";
         $query .= ", $networkStatus.FExit as 'Exit'";
-        $query .= ", $networkStatus.FFast as Fast";
-        $query .= ", $networkStatus.FGuard as Guard";
+        $query .= ", $networkStatus.FFast as 'Fast'";
+        $query .= ", $networkStatus.FGuard as 'Guard'";
         $query .= ", $descriptor.Hibernating as 'Hibernating'";
         $query .= ", $networkStatus.FNamed as Named";
         $query .= ", $networkStatus.FStable as Stable";

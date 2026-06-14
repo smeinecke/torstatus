@@ -57,8 +57,6 @@ Server name: <a class="tab" href="router_detail.php?FP={{ TorNodeFP[i]|e('url') 
 
 <a href="#Legend" data-toggle-show="lgnd" class="LegendLink">View the Legend</a>
 
-{% set base_q = 'RowsPerPage=' ~ rows_per_page ~ '&amp;SR=' ~ sr|e('url') ~ '&amp;SO=' ~ so|e('url') ~ '&amp;FAuthority=' ~ FAuthority|default('OFF')|e('url') ~ '&amp;FBadDirectory=' ~ FBadDirectory|default('OFF')|e('url') ~ '&amp;FBadExit=' ~ FBadExit|default('OFF')|e('url') ~ '&amp;FExit=' ~ FExit|default('OFF')|e('url') ~ '&amp;FFast=' ~ FFast|default('OFF')|e('url') ~ '&amp;FGuard=' ~ FGuard|default('OFF')|e('url') ~ '&amp;FHibernating=' ~ FHibernating|default('OFF')|e('url') ~ '&amp;FNamed=' ~ FNamed|default('OFF')|e('url') ~ '&amp;FStable=' ~ FStable|default('OFF')|e('url') ~ '&amp;FRunning=' ~ FRunning|default('OFF')|e('url') ~ '&amp;FValid=' ~ FValid|default('OFF')|e('url') ~ '&amp;FV2Dir=' ~ FV2Dir|default('OFF')|e('url') ~ '&amp;FHSDir=' ~ FHSDir|default('OFF')|e('url') %}
-{% if CSInput %}{% set base_q = base_q ~ '&amp;CSField=' ~ CSField|default('Fingerprint')|e('url') ~ '&amp;CSMod=' ~ CSMod|default('Contains')|e('url') ~ '&amp;CSInput=' ~ CSInput|e('url') %}{% endif %}
 
 <div style="margin: 5px 0;">
 <form action="{{ Self|e }}" method="get" style="display: inline;">
@@ -92,9 +90,9 @@ Rows per page:
 <noscript><input type="submit" value="Apply" /></noscript>
 </form>
 <span style="float: right;">
-{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
+{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
 | Page {{ page }} of {{ total_pages }}
-| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
+| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
 </span>
 </div>
 
@@ -102,9 +100,9 @@ Rows per page:
 
 <div style="margin: 5px 0;">
 <span style="float: right;">
-{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
+{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
 | Page {{ page }} of {{ total_pages }}
-| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&amp;Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
+| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
 </span>
 </div>
 
