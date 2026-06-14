@@ -26,28 +26,18 @@
 			<div><dt>Router name</dt><dd>{{ Name|e }}</dd></div>
 			<div><dt>Fingerprint</dt><dd>{{ Fingerprint_formatted|e }}</dd></div>
 			<div><dt>Contact</dt><dd>{% if Contact is not null %}{{ Contact|e }}{% else %}None Given{% endif %}</dd></div>
-			<div><dt>IP address</dt><dd>{{ IP|e }}</dd></div>
-			<div><dt>Hostname</dt><dd>{% if Hostname == IP %}Unavailable{% else %}{{ Hostname|e }}{% endif %}</dd></div>
+			<div><dt>IP address</dt><dd>{% if WHOISPath %}<a href="{{ (WHOISPath ~ IP)|e }}">{{ IP|e }}</a>{% else %}{{ IP|e }}{% endif %}{% for item in ORAddresses %}{% if item.address != IP %}, {% if WHOISPath %}<a href="{{ (WHOISPath ~ item.address)|e }}">{{ item.address|e }}</a>{% else %}{{ item.address|e }}{% endif %}{% endif %}{% endfor %}</dd></div>
+			<div><dt>Hostname</dt><dd>{{ Hostname|e }}</dd></div>
 			<div><dt>ORPort</dt><dd>{{ ORPort|e }}</dd></div>
 			<div><dt>DirPort</dt><dd>{% if DirPort == 0 %}None{% else %}{{ DirPort|e }}{% endif %}</dd></div>
 			<div><dt>Country</dt><dd>{% if CountryCode is not null %}<span class="flag flag-country-{{ CountryCode|lower }}"></span> {{ CountryCode|e }}{% else %}Unknown{% endif %}</dd></div>
 			<div><dt>Platform</dt><dd>{{ Platform|e }}</dd></div>
 			<div><dt>Last descriptor</dt><dd>{{ LastDescriptorPublished|e }}</dd></div>
 			<div><dt>Current uptime</dt><dd>{% if Uptime > -1 %}{{ uptime_days }} d {{ uptime_hours }} h {{ uptime_minutes }} m {{ uptime_seconds }} s{% else %}Not Available{% endif %}</dd></div>
-			<div><dt>Bandwidth</dt><dd>{{ Bandwidth_MAX }} / {{ Bandwidth_BURST }} / {{ Bandwidth_OBSERVED }} Bps</dd></div>
+			<div><dt>Bandwidth</dt><dd>{{ Bandwidth_MAX|format_bytes_per_second }} / {{ Bandwidth_BURST|format_bytes_per_second }} / {{ Bandwidth_OBSERVED|format_bytes_per_second }}</dd></div>
 		</dl>
 		<details class="ts-subdetails">
-			<summary>Additional OR addresses and family</summary>
-			<h3>Additional OR addresses</h3>
-			{% if ORAddresses is empty %}
-				<p class="ts-muted">None</p>
-			{% else %}
-				<ul class="ts-inline-list">
-				{% for item in ORAddresses %}
-					<li>{% if WHOISPath %}<a href="{{ (WHOISPath ~ item.address)|e }}">{{ item.address|e }}</a>{% else %}{{ item.address|e }}{% endif %}:{{ item.port }}</li>
-				{% endfor %}
-				</ul>
-			{% endif %}
+			<summary>Family</summary>
 			<h3>Family</h3>
 			{% if Family_DATA_ARRAY is empty %}
 				<p class="ts-muted">No info given</p>
@@ -79,18 +69,18 @@
 		<h2>Router flags</h2>
 		<table class="ts-mini-table">
 			<tbody>
-				<tr><th>Authority</th><td class="F{{ FAuthority }}"></td></tr>
-				<tr><th>Bad directory</th><td class="F{{ FBadDirectory }}"></td></tr>
-				<tr><th>Bad exit</th><td class="F{{ FBadExit }}"></td></tr>
-				<tr><th>Exit</th><td class="F{{ FExit }}"></td></tr>
-				<tr><th>Fast</th><td class="F{{ FFast }}"></td></tr>
-				<tr><th>Guard</th><td class="F{{ FGuard }}"></td></tr>
-				<tr><th>Hibernating</th><td class="F{{ FHibernating }}"></td></tr>
-				<tr><th>Named</th><td class="F{{ FNamed }}"></td></tr>
-				<tr><th>Stable</th><td class="F{{ FStable }}"></td></tr>
-				<tr><th>Running</th><td class="F{{ FRunning }}"></td></tr>
-				<tr><th>Valid</th><td class="F{{ FValid }}"></td></tr>
-				<tr><th>V2Dir</th><td class="F{{ FV2Dir }}"></td></tr>
+				<tr><th>Authority</th><td class="F{{ FAuthority }}" title="Authority: {% if FAuthority == '1' %}yes{% elseif FAuthority == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Bad directory</th><td class="F{{ FBadDirectory }}" title="Bad directory: {% if FBadDirectory == '1' %}yes{% elseif FBadDirectory == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Bad exit</th><td class="F{{ FBadExit }}" title="Bad exit: {% if FBadExit == '1' %}yes{% elseif FBadExit == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Exit</th><td class="F{{ FExit }}" title="Exit: {% if FExit == '1' %}yes{% elseif FExit == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Fast</th><td class="F{{ FFast }}" title="Fast: {% if FFast == '1' %}yes{% elseif FFast == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Guard</th><td class="F{{ FGuard }}" title="Guard: {% if FGuard == '1' %}yes{% elseif FGuard == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Hibernating</th><td class="F{{ FHibernating }}" title="Hibernating: {% if FHibernating == '1' %}yes{% elseif FHibernating == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Named</th><td class="F{{ FNamed }}" title="Named: {% if FNamed == '1' %}yes{% elseif FNamed == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Stable</th><td class="F{{ FStable }}" title="Stable: {% if FStable == '1' %}yes{% elseif FStable == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Running</th><td class="F{{ FRunning }}" title="Running: {% if FRunning == '1' %}yes{% elseif FRunning == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>Valid</th><td class="F{{ FValid }}" title="Valid: {% if FValid == '1' %}yes{% elseif FValid == '0' %}no{% else %}unknown{% endif %}"></td></tr>
+				<tr><th>V2Dir</th><td class="F{{ FV2Dir }}" title="V2Dir: {% if FV2Dir == '1' %}yes{% elseif FV2Dir == '0' %}no{% else %}unknown{% endif %}"></td></tr>
 			</tbody>
 		</table>
 	</section>

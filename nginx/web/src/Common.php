@@ -12,6 +12,7 @@ use TorStatus\Http\Response;
 use TorStatus\Template\Renderer;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+use Twig\TwigFilter;
 
 final class Common
 {
@@ -81,6 +82,7 @@ final class Common
             'debug' => false,
             'autoescape' => 'html',
         ]);
+        $twig->addFilter(new TwigFilter('format_bytes_per_second', [self::class, 'formatBytesPerSecond']));
 
         return new Renderer($twig, $defaultContext);
     }
@@ -88,5 +90,17 @@ final class Common
     public static function isOnionHost(string $host): bool
     {
         return preg_match('/^[0-9a-z]+\.onion$/', $host) === 1;
+    }
+
+    public static function formatBytesPerSecond(float $bytes): string
+    {
+        $units = ['B/s', 'KB/s', 'MB/s', 'GB/s', 'TB/s'];
+        $unitIndex = 0;
+        while ($bytes >= 1024 && $unitIndex < count($units) - 1) {
+            $bytes /= 1024;
+            ++$unitIndex;
+        }
+
+        return round($bytes, 2) . ' ' . $units[$unitIndex];
     }
 }

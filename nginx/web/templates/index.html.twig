@@ -63,6 +63,9 @@
 			<button type="button" class="ts-button ts-button-secondary" data-dialog-open="columns-dialog" title="Choose which columns are shown in the router table">
 				<i class="ti ti-columns-3" aria-hidden="true"></i>Columns
 			</button>
+			<button type="button" class="ts-button ts-button-secondary" data-dialog-open="legend-dialog" title="Show legend for flag columns">
+				<i class="ti ti-help" aria-hidden="true"></i>Legend
+			</button>
 			<form action="{{ Self|e }}" method="get" class="ts-inline-form">
 {% for name, value in query_hidden_inputs %}
 				<input type="hidden" name="{{ name|e }}" value="{{ value|e }}">
@@ -96,16 +99,6 @@
 	<details class="ts-card ts-dashboard-card" open>
 		<summary><i class="ti ti-server" aria-hidden="true"></i>Application server</summary>
 		{% include '_index_appserver.html.twig' %}
-	</details>
-
-	<details class="ts-card ts-dashboard-card" open>
-		<summary><i class="ti ti-info-circle" aria-hidden="true"></i>Opinion source</summary>
-		{% include '_index_opinion_source.html.twig' %}
-	</details>
-
-	<details class="ts-card ts-dashboard-card" open>
-		<summary><i class="ti ti-legend" aria-hidden="true"></i>Legend</summary>
-		{% include '_index_legend.html.twig' %}
 	</details>
 </div>
 {% endblock %}
@@ -226,5 +219,27 @@
 			</div>
 		</div>
 	</form>
+</dialog>
+
+<dialog class="ts-dialog" id="legend-dialog">
+	<form method="dialog" class="ts-dialog-close-form">
+		<button class="ts-icon-button" aria-label="Close legend"><i class="ti ti-x" aria-hidden="true"></i></button>
+	</form>
+	<div class="ts-dialog-header">
+		<i class="ti ti-help" aria-hidden="true"></i>
+		<div>
+			<h2>Legend</h2>
+			<p>Flag columns use colored indicators.</p>
+		</div>
+	</div>
+	<div class="ts-legend-content">
+		<ul class="ts-legend-key">
+			<li><span class="ts-legend-sample ts-legend-yes"></span> yes</li>
+			<li><span class="ts-legend-sample ts-legend-no"></span> no</li>
+			<li><span class="ts-legend-sample ts-legend-unknown"></span> unknown / not present</li>
+		</ul>
+		<h3>Flags</h3>
+		<p class="ts-legend-flags">Authority, BadExit, Exit, Fast, Guard, Stable, Running, Valid, V2Dir, HSDir</p>
+	</div>
 </dialog>
 {% endblock %}

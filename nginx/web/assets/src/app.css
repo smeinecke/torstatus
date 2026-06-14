@@ -439,8 +439,9 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-section-header h2 { margin: 0; font-size: 1.05rem; }
 .ts-section-header p { margin: .15rem 0 0; color: var(--ts-muted); }
-.ts-table-card { padding: .9rem; }
+.ts-table-card { padding: .75rem; }
 .ts-table-scroll {
+  width: 100%;
   max-width: 100%;
   overflow: auto;
   border-radius: .75rem;
@@ -614,17 +615,9 @@ tr.B td { background: var(--ts-status-warn-bg) !important; }
   display: inline-flex;
   align-items: center;
   gap: .22rem;
-  border: 1px solid var(--ts-badge-border);
-  border-radius: 999px;
-  background: var(--ts-badge-bg);
-  color: var(--ts-badge-text);
-  font-size: .68rem;
-  font-weight: 800;
-  letter-spacing: .04em;
   margin-right: .25rem;
-  padding: .05rem .32rem;
 }
-.ts-country .flag { height: .85rem; border-radius: .15rem; vertical-align: middle; }
+.ts-country .flag { height: .85rem; vertical-align: middle; }
 .ts-row-icon { color: var(--ts-red); margin-right: .25rem; }
 .ts-row-spacer { display: inline-block; width: 1rem; }
 
@@ -756,7 +749,12 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-pagination span { color: var(--ts-muted); }
 .ts-pagination a { background: var(--ts-surface-3); color: var(--ts-purple); font-weight: 750; }
 .ts-pagination a:hover { background: var(--ts-nav-hover-bg); text-decoration: none; }
-.ts-router-table { min-width: 100%; border-collapse: separate; border-spacing: 0; }
+.ts-router-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  border-collapse: separate;
+  border-spacing: 0;
+}
 .ts-router-table th,
 .ts-router-table td { border-bottom: 1px solid var(--ts-table-border); padding: .48rem .55rem; vertical-align: middle; }
 .ts-router-table th { font-size: .76rem; text-transform: uppercase; letter-spacing: .025em; }
@@ -883,6 +881,31 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-legend-ok { background: var(--ts-legend-ok); }
 .ts-legend-hibernating { background: var(--ts-legend-hibernating); }
 .ts-legend-bad { background: var(--ts-legend-bad); }
+.ts-header-tip {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ts-muted);
+  cursor: help;
+  font-size: .72rem;
+  vertical-align: middle;
+  margin-left: .1rem;
+}
+.ts-header-tip:hover { color: var(--ts-purple); }
+.ts-legend-content { margin-top: .5rem; }
+.ts-legend-content h3 { margin: 1rem 0 .35rem; font-size: .9rem; color: var(--ts-nav-text); }
+.ts-legend-key { display: grid; gap: .45rem; list-style: none; padding: 0; margin: 0; }
+.ts-legend-key li { display: flex; align-items: center; gap: .55rem; font-size: .85rem; }
+.ts-legend-sample {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 999px;
+  display: inline-block;
+  border: 1px solid var(--ts-legend-dot-border);
+}
+.ts-legend-yes { background: var(--ts-pill-green-bg); border-color: var(--ts-pill-green-text); }
+.ts-legend-no { background: var(--ts-pill-red-bg); border-color: var(--ts-pill-red-text); }
+.ts-legend-unknown { background: var(--ts-table-header-bg); border-color: var(--ts-legend-dot-border); }
+.ts-legend-flags { color: var(--ts-muted); font-size: .85rem; margin: .25rem 0 0; }
 .ts-mini-table { width: 100%; border-collapse: collapse; margin-top: .75rem; }
 .ts-mini-table th,
 .ts-mini-table td { border-bottom: 1px solid var(--ts-table-border); padding: .45rem; text-align: left; }
@@ -948,8 +971,9 @@ div.fg8 { background: #f97316; }
 
 /* UX polish after the dashboard and chart refactor. */
 .ts-page {
-  width: min(100%, 1440px);
-  margin-inline: auto;
+  width: 100%;
+  max-width: none;
+  margin-inline: 0;
 }
 .ts-button:focus-visible,
 .ts-icon-button:focus-visible,

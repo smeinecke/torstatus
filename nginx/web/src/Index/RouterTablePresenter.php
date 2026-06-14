@@ -60,6 +60,10 @@ final class RouterTablePresenter
             'BadDir' => 'Bad Dir',
             'BadExit' => 'Bad Exit',
         ];
+        $flagColumns = [
+            'Hibernating', 'Authority', 'Exit', 'Fast', 'Guard', 'Named',
+            'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'BadDir', 'BadExit',
+        ];
         $sortKeys = [
             'Hibernating' => 'Hibernating',
             'Authority' => 'FAuthority',
@@ -83,6 +87,7 @@ final class RouterTablePresenter
             'arrow' => $this->arrow($sortKey, $request),
             'alt' => $this->arrowAlt($sortKey, $request),
             'label_html' => $labels[$column] ?? $column,
+            'is_flag' => in_array($column, $flagColumns, true),
         ];
     }
 
