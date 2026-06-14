@@ -14,7 +14,7 @@
 {% for router in routers %}
 <tr class="{{ router.row_class }}">
 <td class="{{ router.name_class }}">
-	<span class="ts-country" title="{{ router.country_name|e }}"><i class="ti ti-flag-{{ router.country_code != 'nna' ? router.country_code|lower : '3' }}" aria-hidden="true"></i>{{ router.country_code|upper }}</span>
+	<span class="ts-country" title="{{ router.country_name|e }}"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}"></span>{{ router.country_code|upper }}</span>
 	<a href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
 </td>
 {% for col in columns_active %}

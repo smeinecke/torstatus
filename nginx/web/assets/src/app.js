@@ -1,5 +1,28 @@
 import './app.css';
 
+function setupThemeToggle() {
+  const btn = document.getElementById('theme-toggle');
+  const icon = document.getElementById('theme-icon');
+  if (!btn) return;
+
+  function updateIcon() {
+    if (!icon) return;
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    icon.className = isDark ? 'ti ti-sun' : 'ti ti-moon';
+  }
+
+  updateIcon();
+
+  btn.addEventListener('click', () => {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('torstatus-theme', next);
+    updateIcon();
+  });
+}
+
 function setupDialogs() {
   document.querySelectorAll('[data-dialog-open]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -30,5 +53,6 @@ function setupAutoSubmit() {
   });
 }
 
+setupThemeToggle();
 setupDialogs();
 setupAutoSubmit();

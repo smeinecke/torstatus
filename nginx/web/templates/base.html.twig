@@ -9,6 +9,9 @@
 	<title>TorStatus - {{ pageTitle }}</title>
 	<link rel="stylesheet" href="css/app.css">
 {% block extra_css %}{% endblock %}
+	<script>
+	(function(){var t=localStorage.getItem('torstatus-theme');if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t);return;}try{if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();
+	</script>
 </head>
 
 <body class="ts-shell">

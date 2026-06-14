@@ -1,11 +1,13 @@
 @import '@tabler/icons-webfont/dist/tabler-icons.css';
+@import '@tabler/core/dist/css/tabler-flags.min.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
   --ts-bg: #f8fafc;
-  --ts-card: #ffffff;
+  --ts-card: rgba(255,255,255,.96);
+  --ts-card-solid: #ffffff;
   --ts-card-border: #e2e8f0;
   --ts-muted: #64748b;
   --ts-text: #0f172a;
@@ -16,6 +18,217 @@
   --ts-yellow: #ca8a04;
   --ts-ring: rgba(109, 40, 217, .25);
   --ts-shadow: 0 18px 45px rgba(15, 23, 42, .08);
+  --ts-topbar-bg: rgba(255,255,255,.92);
+  --ts-topbar-border: rgba(226,232,240,.88);
+  --ts-nav-text: #334155;
+  --ts-nav-hover-bg: #f1f5f9;
+  --ts-banner-bg: #eff6ff;
+  --ts-banner-border: #dbeafe;
+  --ts-banner-text: #1e3a8a;
+  --ts-surface-1: #ffffff;
+  --ts-surface-2: #f1f5f9;
+  --ts-surface-3: #f8fafc;
+  --ts-input-bg: #ffffff;
+  --ts-input-border: #cbd5e1;
+  --ts-button-secondary-bg: #ffffff;
+  --ts-button-secondary-border: #cbd5e1;
+  --ts-button-secondary-text: #334155;
+  --ts-button-secondary-hover-bg: #f8fafc;
+  --ts-button-secondary-hover-text: #0f172a;
+  --ts-icon-button-bg: #f1f5f9;
+  --ts-icon-button-text: #475569;
+  --ts-icon-button-hover-bg: #e2e8f0;
+  --ts-icon-button-hover-text: #0f172a;
+  --ts-table-header-bg: #f1f5f9;
+  --ts-table-row-odd: #ffffff;
+  --ts-table-row-even: #fff7ed;
+  --ts-table-row-hover: #f8fafc;
+  --ts-table-border: #e2e8f0;
+  --ts-pill-green-bg: #dcfce7;
+  --ts-pill-green-text: #166534;
+  --ts-pill-red-bg: #fee2e2;
+  --ts-pill-red-text: #991b1b;
+  --ts-status-ok-bg: #dcfce7;
+  --ts-status-warn-bg: #fef2f2;
+  --ts-badge-bg: #f8fafc;
+  --ts-badge-text: #475569;
+  --ts-badge-border: #e2e8f0;
+  --ts-status-badge-bg: #f5f3ff;
+  --ts-status-badge-text: #5b21b6;
+  --ts-status-badge-border: #ddd6fe;
+  --ts-platform-badge-bg: #ecfeff;
+  --ts-platform-badge-text: #0e7490;
+  --ts-platform-badge-border: #cffafe;
+  --ts-radio-segment-bg: #f8fafc;
+  --ts-radio-segment-border: #cbd5e1;
+  --ts-radio-segment-text: #475569;
+  --ts-radio-segment-active-bg: #ffffff;
+  --ts-radio-segment-active-text: var(--ts-purple-dark);
+  --ts-description-list-bg: #f8fafc;
+  --ts-metric-card-gradient-from: #ffffff;
+  --ts-metric-card-gradient-to: #f8fafc;
+  --ts-metric-card-border: #e2e8f0;
+  --ts-metric-label: #475569;
+  --ts-legend-ok: #ffffff;
+  --ts-legend-hibernating: #fff7ed;
+  --ts-legend-bad: #fecaca;
+  --ts-legend-dot-border: #cbd5e1;
+  --ts-scrollbar: #cbd5e1;
+  --ts-dialog-backdrop: rgba(15,23,42,.45);
+  --ts-flag-filter-row-border: #f1f5f9;
+  --ts-filter-form-sticky-bg: rgba(255,255,255,.96);
+}
+
+[data-theme="dark"] {
+  --ts-bg: #0f172a;
+  --ts-card: rgba(15,23,42,.96);
+  --ts-card-solid: #0f172a;
+  --ts-card-border: #1e293b;
+  --ts-muted: #94a3b8;
+  --ts-text: #f1f5f9;
+  --ts-purple: #a78bfa;
+  --ts-purple-dark: #c4b5fd;
+  --ts-green: #4ade80;
+  --ts-red: #f87171;
+  --ts-yellow: #facc15;
+  --ts-ring: rgba(167,139,250,.35);
+  --ts-shadow: 0 18px 45px rgba(0,0,0,.35);
+  --ts-topbar-bg: rgba(15,23,42,.92);
+  --ts-topbar-border: rgba(30,41,59,.88);
+  --ts-nav-text: #cbd5e1;
+  --ts-nav-hover-bg: #1e293b;
+  --ts-banner-bg: #1e3a8a;
+  --ts-banner-border: #1e40af;
+  --ts-banner-text: #bfdbfe;
+  --ts-surface-1: #1e293b;
+  --ts-surface-2: #1e293b;
+  --ts-surface-3: #0f172a;
+  --ts-input-bg: #0f172a;
+  --ts-input-border: #334155;
+  --ts-button-secondary-bg: #1e293b;
+  --ts-button-secondary-border: #334155;
+  --ts-button-secondary-text: #cbd5e1;
+  --ts-button-secondary-hover-bg: #334155;
+  --ts-button-secondary-hover-text: #f1f5f9;
+  --ts-icon-button-bg: #1e293b;
+  --ts-icon-button-text: #94a3b8;
+  --ts-icon-button-hover-bg: #334155;
+  --ts-icon-button-hover-text: #f1f5f9;
+  --ts-table-header-bg: #1e293b;
+  --ts-table-row-odd: #0f172a;
+  --ts-table-row-even: #172033;
+  --ts-table-row-hover: #1e293b;
+  --ts-table-border: #1e293b;
+  --ts-pill-green-bg: #064e3b;
+  --ts-pill-green-text: #4ade80;
+  --ts-pill-red-bg: #7f1d1d;
+  --ts-pill-red-text: #f87171;
+  --ts-status-ok-bg: #064e3b;
+  --ts-status-warn-bg: #450a0a;
+  --ts-badge-bg: #1e293b;
+  --ts-badge-text: #94a3b8;
+  --ts-badge-border: #334155;
+  --ts-status-badge-bg: #2e1065;
+  --ts-status-badge-text: #c4b5fd;
+  --ts-status-badge-border: #4c1d95;
+  --ts-platform-badge-bg: #164e63;
+  --ts-platform-badge-text: #67e8f9;
+  --ts-platform-badge-border: #155e75;
+  --ts-radio-segment-bg: #1e293b;
+  --ts-radio-segment-border: #334155;
+  --ts-radio-segment-text: #94a3b8;
+  --ts-radio-segment-active-bg: #0f172a;
+  --ts-radio-segment-active-text: #c4b5fd;
+  --ts-description-list-bg: #1e293b;
+  --ts-metric-card-gradient-from: #1e293b;
+  --ts-metric-card-gradient-to: #0f172a;
+  --ts-metric-card-border: #1e293b;
+  --ts-metric-label: #94a3b8;
+  --ts-legend-ok: #0f172a;
+  --ts-legend-hibernating: #172033;
+  --ts-legend-bad: #450a0a;
+  --ts-legend-dot-border: #334155;
+  --ts-scrollbar: #334155;
+  --ts-dialog-backdrop: rgba(0,0,0,.55);
+  --ts-flag-filter-row-border: #1e293b;
+  --ts-filter-form-sticky-bg: rgba(15,23,42,.96);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ts-bg: #0f172a;
+    --ts-card: rgba(15,23,42,.96);
+    --ts-card-solid: #0f172a;
+    --ts-card-border: #1e293b;
+    --ts-muted: #94a3b8;
+    --ts-text: #f1f5f9;
+    --ts-purple: #a78bfa;
+    --ts-purple-dark: #c4b5fd;
+    --ts-green: #4ade80;
+    --ts-red: #f87171;
+    --ts-yellow: #facc15;
+    --ts-ring: rgba(167,139,250,.35);
+    --ts-shadow: 0 18px 45px rgba(0,0,0,.35);
+    --ts-topbar-bg: rgba(15,23,42,.92);
+    --ts-topbar-border: rgba(30,41,59,.88);
+    --ts-nav-text: #cbd5e1;
+    --ts-nav-hover-bg: #1e293b;
+    --ts-banner-bg: #1e3a8a;
+    --ts-banner-border: #1e40af;
+    --ts-banner-text: #bfdbfe;
+    --ts-surface-1: #1e293b;
+    --ts-surface-2: #1e293b;
+    --ts-surface-3: #0f172a;
+    --ts-input-bg: #0f172a;
+    --ts-input-border: #334155;
+    --ts-button-secondary-bg: #1e293b;
+    --ts-button-secondary-border: #334155;
+    --ts-button-secondary-text: #cbd5e1;
+    --ts-button-secondary-hover-bg: #334155;
+    --ts-button-secondary-hover-text: #f1f5f9;
+    --ts-icon-button-bg: #1e293b;
+    --ts-icon-button-text: #94a3b8;
+    --ts-icon-button-hover-bg: #334155;
+    --ts-icon-button-hover-text: #f1f5f9;
+    --ts-table-header-bg: #1e293b;
+    --ts-table-row-odd: #0f172a;
+    --ts-table-row-even: #172033;
+    --ts-table-row-hover: #1e293b;
+    --ts-table-border: #1e293b;
+    --ts-pill-green-bg: #064e3b;
+    --ts-pill-green-text: #4ade80;
+    --ts-pill-red-bg: #7f1d1d;
+    --ts-pill-red-text: #f87171;
+    --ts-status-ok-bg: #064e3b;
+    --ts-status-warn-bg: #450a0a;
+    --ts-badge-bg: #1e293b;
+    --ts-badge-text: #94a3b8;
+    --ts-badge-border: #334155;
+    --ts-status-badge-bg: #2e1065;
+    --ts-status-badge-text: #c4b5fd;
+    --ts-status-badge-border: #4c1d95;
+    --ts-platform-badge-bg: #164e63;
+    --ts-platform-badge-text: #67e8f9;
+    --ts-platform-badge-border: #155e75;
+    --ts-radio-segment-bg: #1e293b;
+    --ts-radio-segment-border: #334155;
+    --ts-radio-segment-text: #94a3b8;
+    --ts-radio-segment-active-bg: #0f172a;
+    --ts-radio-segment-active-text: #c4b5fd;
+    --ts-description-list-bg: #1e293b;
+    --ts-metric-card-gradient-from: #1e293b;
+    --ts-metric-card-gradient-to: #0f172a;
+    --ts-metric-card-border: #1e293b;
+    --ts-metric-label: #94a3b8;
+    --ts-legend-ok: #0f172a;
+    --ts-legend-hibernating: #172033;
+    --ts-legend-bad: #450a0a;
+    --ts-legend-dot-border: #334155;
+    --ts-scrollbar: #334155;
+    --ts-dialog-backdrop: rgba(0,0,0,.55);
+    --ts-flag-filter-row-border: #1e293b;
+    --ts-filter-form-sticky-bg: rgba(15,23,42,.96);
+  }
 }
 
 * { box-sizing: border-box; }
@@ -25,7 +238,7 @@ body.ts-shell {
   margin: 0;
   background:
     radial-gradient(circle at top left, rgba(109, 40, 217, .11), transparent 32rem),
-    linear-gradient(180deg, #ffffff 0, var(--ts-bg) 17rem);
+    linear-gradient(180deg, var(--ts-surface-1) 0, var(--ts-bg) 17rem);
   color: var(--ts-text);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   font-size: 14px;
@@ -52,8 +265,8 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   position: sticky;
   top: 0;
   z-index: 20;
-  border-bottom: 1px solid rgba(226, 232, 240, .88);
-  background: rgba(255, 255, 255, .92);
+  border-bottom: 1px solid var(--ts-topbar-border);
+  background: var(--ts-topbar-bg);
   backdrop-filter: blur(14px);
 }
 .ts-topbar-inner {
@@ -92,12 +305,12 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-nav a {
   border-radius: .65rem;
-  color: #334155;
+  color: var(--ts-nav-text);
   padding: .48rem .65rem;
   font-weight: 650;
   text-decoration: none;
 }
-.ts-nav a:hover { background: #f1f5f9; color: var(--ts-purple-dark); text-decoration: none; }
+.ts-nav a:hover { background: var(--ts-nav-hover-bg); color: var(--ts-purple-dark); text-decoration: none; }
 .ts-topbar-actions { display: flex; gap: .5rem; justify-content: flex-end; }
 
 .ts-service-banner {
@@ -106,9 +319,9 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   align-items: center;
   justify-content: center;
   gap: .75rem;
-  border-bottom: 1px solid #dbeafe;
-  background: #eff6ff;
-  color: #1e3a8a;
+  border-bottom: 1px solid var(--ts-banner-border);
+  background: var(--ts-banner-bg);
+  color: var(--ts-banner-text);
   padding: .45rem 1rem;
   font-size: .83rem;
   font-weight: 650;
@@ -163,8 +376,8 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 .ts-button:hover { text-decoration: none; transform: translateY(-1px); }
 .ts-button-primary { background: var(--ts-purple); color: #fff; box-shadow: 0 8px 22px rgba(109, 40, 217, .24); }
 .ts-button-primary:hover { background: var(--ts-purple-dark); color: #fff; }
-.ts-button-secondary { background: #fff; color: #334155; border: 1px solid #cbd5e1; }
-.ts-button-secondary:hover { background: #f8fafc; color: #0f172a; }
+.ts-button-secondary { background: var(--ts-button-secondary-bg); color: var(--ts-button-secondary-text); border: 1px solid var(--ts-button-secondary-border); }
+.ts-button-secondary:hover { background: var(--ts-button-secondary-hover-bg); color: var(--ts-button-secondary-hover-text); }
 .ts-icon-button {
   display: inline-flex;
   align-items: center;
@@ -173,16 +386,16 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   height: 2rem;
   border: 0;
   border-radius: 999px;
-  background: #f1f5f9;
-  color: #475569;
+  background: var(--ts-icon-button-bg);
+  color: var(--ts-icon-button-text);
   cursor: pointer;
 }
-.ts-icon-button:hover { background: #e2e8f0; color: #0f172a; }
+.ts-icon-button:hover { background: var(--ts-icon-button-hover-bg); color: var(--ts-icon-button-hover-text); }
 
 .ts-card {
   border: 1px solid var(--ts-card-border);
   border-radius: 1rem;
-  background: rgba(255, 255, 255, .96);
+  background: var(--ts-card);
   padding: 1rem;
   box-shadow: var(--ts-shadow);
 }
@@ -202,8 +415,8 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   border-radius: .9rem;
 }
 .ts-status-icon .ti { font-size: 1.45rem; }
-.ts-status-icon-ok { background: #dcfce7; color: var(--ts-green); }
-.ts-status-icon-warn { background: #fef2f2; color: var(--ts-red); }
+.ts-status-icon-ok { background: var(--ts-status-ok-bg); color: var(--ts-green); }
+.ts-status-icon-warn { background: var(--ts-status-warn-bg); color: var(--ts-red); }
 .ts-inline-list { display: grid; gap: .4rem; margin: .75rem 0 0; padding-left: 1.2rem; }
 .ts-pill {
   display: inline-flex;
@@ -214,8 +427,8 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   font-size: .72rem;
   font-weight: 750;
 }
-.ts-pill-green { background: #dcfce7; color: #166534; }
-.ts-pill-red { background: #fee2e2; color: #991b1b; }
+.ts-pill-green { background: var(--ts-pill-green-bg); color: var(--ts-pill-green-text); }
+.ts-pill-red { background: var(--ts-pill-red-bg); color: var(--ts-pill-red-text); }
 
 .ts-section-header {
   display: flex;
@@ -245,7 +458,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   gap: .5rem;
   cursor: pointer;
   font-weight: 800;
-  color: #0f172a;
+  color: var(--ts-text);
 }
 .ts-card[open] summary { margin-bottom: .8rem; }
 
@@ -260,7 +473,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   box-shadow: var(--ts-shadow);
 }
 .ts-dialog-wide { width: min(52rem, calc(100vw - 2rem)); }
-.ts-dialog::backdrop { background: rgba(15, 23, 42, .45); backdrop-filter: blur(2px); }
+.ts-dialog::backdrop { background: var(--ts-dialog-backdrop); backdrop-filter: blur(2px); }
 .ts-dialog-close-form {
   position: absolute;
   top: .8rem;
@@ -282,7 +495,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: .85rem;
 }
-.ts-field { display: grid; gap: .35rem; color: #334155; font-size: .86rem; font-weight: 750; }
+.ts-field { display: grid; gap: .35rem; color: var(--ts-nav-text); font-size: .86rem; font-weight: 750; }
 .ts-field-wide { grid-column: 1 / -1; }
 .ts-field input:not([type='radio']):not([type='checkbox']),
 .ts-field select,
@@ -291,9 +504,9 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 .BOX {
   width: 100%;
   min-height: 2.4rem;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--ts-input-border);
   border-radius: .7rem;
-  background: #fff;
+  background: var(--ts-input-bg);
   color: var(--ts-text);
   padding: .45rem .65rem;
   font: inherit;
@@ -410,7 +623,7 @@ tr.B td { background: #fff1f2 !important; }
   margin-right: .25rem;
   padding: .05rem .32rem;
 }
-.ts-country .ti { font-size: .9rem; }
+.ts-country .flag { height: .85rem; border-radius: .15rem; vertical-align: middle; }
 .ts-row-icon { color: var(--ts-red); margin-right: .25rem; }
 .ts-row-spacer { display: inline-block; width: 1rem; }
 
