@@ -6,7 +6,7 @@
 require_once('common.php');
 
 // Include JPGraph items
-require_once 'vendor/autoload.php';
+require_once '../vendor/autoload.php';
 use mitoteam\jpgraph\MtJpGraph;
 MtJpGraph::load(['line', 'date']);
 
