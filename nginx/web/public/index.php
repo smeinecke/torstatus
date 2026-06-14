@@ -50,7 +50,7 @@ $descriptorCount = $repository->countDescriptors();
 $routerPage = $repository->fetchRouterPage($request);
 $request->page = $routerPage->page;
 
-$rowBuilder = new RouterRowBuilder($db, CountryCodes::all(), __DIR__ . '/img/flags');
+$rowBuilder = new RouterRowBuilder($db, CountryCodes::all());
 $routers = $rowBuilder->build($routerPage->result, $request->columnListActive);
 $tablePresenter = new RouterTablePresenter();
 $baseUrl = $request->toBaseUrl($Self);
@@ -65,6 +65,7 @@ $context = array_merge(
     $torUsage,
     [
         'pageTitle' => $pageTitle,
+        'showFilterButton' => true,
         'routers' => $routers,
         'name_header' => $tablePresenter->nameHeader($request, $baseUrl),
         'table_headers' => $tablePresenter->headers($request, $baseUrl),

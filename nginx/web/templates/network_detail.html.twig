@@ -1,61 +1,39 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
+<section class="ts-hero">
+	<div>
+		<p class="ts-eyebrow">Network</p>
+		<h1>Graphs</h1>
+		<p class="ts-muted">Country, uptime, bandwidth, platform and summary graphs generated from the current cache.</p>
+	</div>
+	<a href="index.php" class="ts-button ts-button-secondary" title="Return to the router list"><i class="ti ti-list-details" aria-hidden="true"></i>Routers</a>
+</section>
 
-<table width='100%' cellspacing='2' cellpadding='2'>
-<tr>
-<td>
-
-<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers by Country Code</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/cc_graph.php" alt="Number of Routers by Country Code" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Exit Routers by Country Code</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers by Uptime</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/uptime_graph.php" alt="Number of Routers by Uptime" />
-</td>
-</tr>
-<tr>
-<td class='HRN'>Number of Routers by Observed Bandwidth</td>
-<td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Number of Routers by Platform</td>
-</tr>
-<tr>
-<td class='TRSBcenter' colspan='1' align='center'>
-<img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth" />
-</td>
-<td class='TRSBcenter' colspan='1' align='center' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px;'>
-<img src="/platform_graph.php" alt="Number of Routers by Platform" />
-</td>
-</tr>
-<tr>
-<td class='HRN' colspan='2'>Number of Routers Matching Specified Criteria</td>
-</tr>
-
-<tr>
-<td class='TRSBcenter' colspan='2' align='center'>
-<img src="/summary_graph.php" alt="Summary Graph" />
-
-
-</td>
-</tr>
-</table>
-
-</td></tr></table>
-
+<div class="ts-graph-grid">
+	<section class="ts-card ts-graph-card ts-graph-card-wide">
+		<h2>Routers by country code</h2>
+		<img src="/cc_graph.php" alt="Number of Routers by Country Code">
+	</section>
+	<section class="ts-card ts-graph-card ts-graph-card-wide">
+		<h2>Exit routers by country code</h2>
+		<img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code">
+	</section>
+	<section class="ts-card ts-graph-card ts-graph-card-wide">
+		<h2>Routers by uptime</h2>
+		<img src="/uptime_graph.php" alt="Number of Routers by Uptime">
+	</section>
+	<section class="ts-card ts-graph-card">
+		<h2>Routers by observed bandwidth</h2>
+		<img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth">
+	</section>
+	<section class="ts-card ts-graph-card">
+		<h2>Routers by platform</h2>
+		<img src="/platform_graph.php" alt="Number of Routers by Platform">
+	</section>
+	<section class="ts-card ts-graph-card ts-graph-card-wide">
+		<h2>Routers matching specified criteria</h2>
+		<img src="/summary_graph.php" alt="Summary Graph">
+	</section>
+</div>
 {% endblock %}

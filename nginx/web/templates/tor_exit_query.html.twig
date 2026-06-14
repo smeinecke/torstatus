@@ -1,71 +1,81 @@
 {% extends "base.html.twig" %}
 
 {% block content %}
+<section class="ts-hero">
+	<div>
+		<p class="ts-eyebrow">Exit check</p>
+		<h1>Tor exit query</h1>
+		<p class="ts-muted">Check whether an IP address belongs to an active Tor server and whether its exit policy permits a destination.</p>
+	</div>
+	<button type="button" class="ts-button ts-button-primary" data-dialog-open="exit-query-dialog" title="Open the exit query form"><i class="ti ti-search" aria-hidden="true"></i>New query</button>
+</section>
 
-<table width='100%' cellspacing='2' cellpadding='2'>
-<tr>
-<td>
-
-<table class="displayTable" width='100%' cellspacing='0' cellpadding='0' align='center'>
-
-<tr>
-<td class="HRN">Tor Exit Query</td>
-</tr>
-
-<tr>
-<td style="white-space: normal;" class='TRS'><div><br/><br/><b>You can use this page to determine if an IP
-address is an active Tor server, and optionally see if that Tor server's Exit
-Policy would permit it to exit to a certain destination IP address and port.</b><br/></div></td>
-</tr>
-
-<tr>
-<td class='TRS' style='text-align: center;'><br/><br/><b>
+<section class="ts-card ts-status-card">
 {% if QueryIP is null %}
-<span style='color: #ff0000;'>-You must enter a Query IP, at minimum-</span><br/><br/>
+	<div class="ts-status-icon"><i class="ti ti-info-circle" aria-hidden="true"></i></div>
+	<div>
+		<h2>No query yet</h2>
+		<p class="ts-muted">Open the query form to test an IP address. Query parameters are stored in the URL.</p>
+	</div>
 {% elseif is_tor_server %}
-<span style='color: #00dd00;'>-The IP Address you entered matches one or more active Tor servers-</span><br/><br/>
+	<div class="ts-status-icon ts-status-icon-ok"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+	<div>
+		<h2>The IP address matches active Tor server data</h2>
+		<p class="ts-muted">Query IP: {{ QueryIP|e }}</p>
+{% if results is not empty %}
+		<ul class="ts-inline-list">
 {% for result in results %}
-Server name: <a class='tab' href='router_detail.php?FP={{ result.fingerprint|e }}'>{{ result.name|e }}</a><br/>
+			<li>
+				Server <a href="router_detail.php?FP={{ result.fingerprint|e }}">{{ result.name|e }}</a>
 {% if has_destination and result.exit_allowed is same as(true) %}
-<span style='color: #00dd00;'>-This Tor server would allow exiting to your destination-</span><br/><br/>
+				<span class="ts-pill ts-pill-green">Exit allowed</span>
 {% elseif has_destination and result.exit_allowed is same as(false) %}
-<span style='color: #ff0000;'>-This Tor server would NOT allow exiting to your destination-</span><br/><br/>
+				<span class="ts-pill ts-pill-red">Exit denied</span>
 {% endif %}
+			</li>
 {% endfor %}
-{% else %}
-<span style='color: #ff0000;'>-The IP Address you entered is NOT an active Tor server-</span><br/><br/>
+		</ul>
 {% endif %}
-</b></td>
-</tr>
+	</div>
+{% else %}
+	<div class="ts-status-icon ts-status-icon-warn"><i class="ti ti-shield-x" aria-hidden="true"></i></div>
+	<div>
+		<h2>The IP address is not an active Tor server</h2>
+		<p class="ts-muted">Query IP: {{ QueryIP|e }}</p>
+	</div>
+{% endif %}
+</section>
+{% endblock %}
 
-<tr>
-<td class='TRSCN'><br/>
-
-<table width='20%' cellpadding='8' cellspacing='2' border='1' align='center'>
-<tr>
-<td class='TRSCN'>
-<br/>
-
-<form action='{{ Self|e }}' method='post'>
-<b>IP Address to Query:<br/><span class='TRSM'>(IPv4 or IPv6, required)</span></b><br/>
-<input type='text' name='QueryIP' class='BOX' maxlength='64' size='40' value='{{ QueryIP|default('')|e }}' /><br/><br/><br/>
-<b>Destination IP Address:<br/><span class='TRSM'>(IPv4 or IPv6, optional)</span></b><br/>
-<input type='text' name='DestinationIP' class='BOX' maxlength='64' size='40' value='{{ DestinationIP|default('')|e }}' /><br/><br/>
-<b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>
-<input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='{{ DestinationPort|default('')|e }}' /><br/><br/><br/>
-<input type='submit' value='Submit Query' /><br/><br/>
-</form>
-
-</td>
-</tr>
-</table>
-
-<br/><br/>
-</td>
-</tr>
-
-</table>
-
-</td></tr></table>
-
+{% block dialogs %}
+<dialog class="ts-dialog" id="exit-query-dialog">
+	<form method="dialog" class="ts-dialog-close-form">
+		<button class="ts-icon-button" aria-label="Close exit query"><i class="ti ti-x" aria-hidden="true"></i></button>
+	</form>
+	<div class="ts-dialog-header">
+		<i class="ti ti-door-exit" aria-hidden="true"></i>
+		<div>
+			<h2>Query a Tor exit</h2>
+			<p>Destination IP and port are optional, but both are required to evaluate an exit policy.</p>
+		</div>
+	</div>
+	<form action="{{ Self|e }}" method="get" class="ts-form-grid">
+		<label class="ts-field ts-field-wide">
+			<span>IP address to query</span>
+			<input type="text" name="QueryIP" maxlength="64" value="{{ QueryIP|default('')|e }}" placeholder="IPv4 or IPv6" required>
+		</label>
+		<label class="ts-field">
+			<span>Destination IP</span>
+			<input type="text" name="DestinationIP" maxlength="64" value="{{ DestinationIP|default('')|e }}" placeholder="Optional IPv4 or IPv6">
+		</label>
+		<label class="ts-field">
+			<span>Destination port</span>
+			<input type="text" name="DestinationPort" maxlength="5" value="{{ DestinationPort|default('')|e }}" placeholder="Optional port">
+		</label>
+		<div class="ts-form-actions">
+			<a href="{{ Self|e }}" class="ts-button ts-button-secondary">Reset</a>
+			<button type="submit" class="ts-button ts-button-primary"><i class="ti ti-search" aria-hidden="true"></i>Run query</button>
+		</div>
+	</form>
+</dialog>
 {% endblock %}

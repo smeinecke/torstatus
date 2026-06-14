@@ -1,0 +1,21 @@
+<nav class="ts-pagination" aria-label="Pagination">
+	<div>
+{% if pagination.first %}
+		<a href="{{ pagination.first|e }}" title="First page"><i class="ti ti-chevrons-left" aria-hidden="true"></i>First</a>
+		<a href="{{ pagination.prev|e }}" title="Previous page"><i class="ti ti-chevron-left" aria-hidden="true"></i>Prev</a>
+{% else %}
+		<span>First</span>
+		<span>Prev</span>
+{% endif %}
+	</div>
+	<strong>Page {{ pagination.page }} of {{ pagination.total_pages }}</strong>
+	<div>
+{% if pagination.next %}
+		<a href="{{ pagination.next|e }}" title="Next page">Next<i class="ti ti-chevron-right" aria-hidden="true"></i></a>
+		<a href="{{ pagination.last|e }}" title="Last page">Last<i class="ti ti-chevrons-right" aria-hidden="true"></i></a>
+{% else %}
+		<span>Next</span>
+		<span>Last</span>
+{% endif %}
+	</div>
+</nav>

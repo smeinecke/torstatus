@@ -1,48 +1,52 @@
-<table width="100%" cellspacing="0" cellpadding="0" border="0" align="center" class="displayTable">
+<table class="displayTable ts-router-table">
 <thead>
 <tr>
-<td class="{{ name_header.class }}">
-&nbsp;<a class="header" href="{{ name_header.country_url|e }}"><img src="img/{{ name_header.country_arrow }}" alt="{{ name_header.country_alt }}" class="sorting"/></a>&nbsp;&nbsp;
-<a class="header" href="{{ name_header.url|e }}"><img src="img/{{ name_header.arrow }}" alt="{{ name_header.alt }}" class="sorting"/> {{ name_header.label_html|raw }}</a>
-</td>
+<th class="{{ name_header.class }}">
+	<a class="header ts-header-link" href="{{ name_header.country_url|e }}" title="Sort by country"><i class="ti ti-flag-3" aria-hidden="true"></i><span class="ts-sort-icon">{{ name_header.country_alt }}</span><span class="sr-only">Country</span></a>
+	<a class="header ts-header-link" href="{{ name_header.url|e }}" title="Sort by router name"><span class="ts-sort-icon">{{ name_header.alt }}</span> {{ name_header.label_html|raw }}</a>
+</th>
 {% for header in table_headers %}
-<td class="{{ header.class }}"><a class="header" href="{{ header.url|e }}"><img src="img/{{ header.arrow }}" alt="{{ header.alt }}" class="sorting"/> {{ header.label_html|raw }}</a></td>
+<th class="{{ header.class }}"><a class="header ts-header-link" href="{{ header.url|e }}" title="Sort by {{ header.label_text|default(header.label_html)|striptags }}"><span class="ts-sort-icon">{{ header.alt }}</span> {{ header.label_html|raw }}</a></th>
 {% endfor %}
 </tr>
 </thead>
 <tbody>
 {% for router in routers %}
 <tr class="{{ router.row_class }}">
-<td class="{{ router.name_class }}"><div class="flags_{{ router.country_code }}" title="{{ router.country_name|e }}"></div>&nbsp;<a href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a></td>
+<td class="{{ router.name_class }}">
+	<span class="ts-country" title="{{ router.country_name|e }}"><i class="ti ti-flag-3" aria-hidden="true"></i>{{ router.country_code|upper }}</span>
+	<a href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
+</td>
 {% for col in columns_active %}
 {% set cell = router.columns[loop.index0] %}
 {% if col == 'Hostname' %}
 <td class="TDS">
+	<div class="ts-host-cell">
+		<span>{{ cell.value|e }}{% if cell.ip is not null %}{% if WHOISPath %} <a class="who" href="{{ (WHOISPath ~ cell.ip)|e }}">{{ cell.ip|e }}</a>{% else %} {{ cell.ip|e }}{% endif %}{% endif %}</span>
 {% if cell.flags|length > 0 or cell.platform is defined %}
-<table class="iT"><tr><td class="iT">{{ cell.value|e }}{% if cell.ip is not null %}{% if WHOISPath %} [<a class="who" href="{{ (WHOISPath ~ cell.ip)|e }}">{{ cell.ip|e }}</a>]{% else %} [{{ cell.ip|e }}]{% endif %}{% endif %}</td>
+		<span class="ts-badge-list">
 {% for flag in cell.flags %}
-<td><div class="status_{{ flag }}" title="{% if flag == 'Fast' %}Fast Server{% elseif flag == 'Disputed' %}Not Listed By All Directory Servers{% elseif flag == 'Exit' %}Exit Server{% elseif flag == 'Dir' %}Directory Server{% elseif flag == 'HSDir' %}HS Directory Server{% elseif flag == 'Guard' %}Guard Server{% elseif flag == 'Stable' %}Stable Server{% elseif flag == 'Authority' %}Authority Server{% endif %}"></div></td>
+			<span class="ts-status-badge" title="{% if flag == 'Fast' %}Fast Server{% elseif flag == 'Disputed' %}Not Listed By All Directory Servers{% elseif flag == 'Exit' %}Exit Server{% elseif flag == 'Dir' %}Directory Server{% elseif flag == 'HSDir' %}HS Directory Server{% elseif flag == 'Guard' %}Guard Server{% elseif flag == 'Stable' %}Stable Server{% elseif flag == 'Authority' %}Authority Server{% endif %}"><i class="ti ti-flag-3" aria-hidden="true"></i>{{ flag }}</span>
 {% endfor %}
 {% if cell.platform is defined %}
-<td><div class="os_{{ cell.platform }}" title="{{ cell.platform_title|e }}"></div></td>
+			<span class="ts-platform-badge" title="{{ cell.platform_title|e }}"><i class="ti ti-device-desktop" aria-hidden="true"></i>{{ cell.platform|e }}</span>
 {% endif %}
-</tr></table>
-{% else %}
-{{ cell.value|e }}{% if cell.ip is not null %}{% if WHOISPath %} [<a class="who" href="{{ (WHOISPath ~ cell.ip)|e }}">{{ cell.ip|e }}</a>]{% else %} [{{ cell.ip|e }}]{% endif %}{% endif %}
+		</span>
 {% endif %}
+	</div>
 </td>
 {% elseif col == 'Bandwidth' %}
-<td class="TDb"><table cellspacing="0" cellpadding="0" class="bwb"><tr title="{{ cell.value|e }} KBs"><td class="{{ cell.bg }}"><div class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px; height: 16px;"></div></td><td>&nbsp;<small>&nbsp;{{ cell.value|e }}</small></td></tr></table></td>
+<td class="TDb"><table cellspacing="0" cellpadding="0" class="bwb"><tr title="{{ cell.value|e }} KB/s"><td class="{{ cell.bg }}"><div class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px; height: 16px;"></div></td><td><small>{{ cell.value|e }}</small></td></tr></table></td>
 {% elseif col == 'Uptime' %}
-<td class="{{ cell.class }}">{% if cell.down is defined and cell.down %}<img src="/img/routerdown.png" alt=" router is down" title="Router is currently down"/>{% else %}<img src="/img/blank.gif" alt=" " width="12px" />{% endif %}{% if cell.days is defined %}{{ cell.days }} d {{ cell.hours }} h{% else %}{{ cell.value|e }}{% endif %}</td>
+<td class="{{ cell.class }}">{% if cell.down is defined and cell.down %}<i class="ti ti-server-off ts-row-icon" aria-hidden="true" title="Router is currently down"></i>{% else %}<span class="ts-row-spacer"></span>{% endif %}{% if cell.days is defined %}{{ cell.days }} d {{ cell.hours }} h{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'ORPort' or col == 'DirPort' %}
-<td class="{{ cell.class }}">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<b>{{ cell.value }}</b>{% else %}{{ cell.value }}{% endif %}</td>
-	{% elseif col == 'BadDir' or col == 'BadExit' %}
-	<td class="F{{ cell.value }}"></td>
-	{% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'Hibernating'] %}
-	<td class="F{{ cell.value }}"></td>
-	{% else %}
-	<td class="{{ cell.class|default('TDS') }}">{{ cell.value|e }}</td>
+<td class="{{ cell.class }}">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<strong>{{ cell.value }}</strong>{% else %}{{ cell.value }}{% endif %}</td>
+{% elseif col == 'BadDir' or col == 'BadExit' %}
+<td class="F{{ cell.value }}"></td>
+{% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'Hibernating'] %}
+<td class="F{{ cell.value }}"></td>
+{% else %}
+<td class="{{ cell.class|default('TDS') }}">{{ cell.value|e }}</td>
 {% endif %}
 {% endfor %}
 </tr>

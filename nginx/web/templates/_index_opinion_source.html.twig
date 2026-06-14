@@ -1,26 +1,22 @@
-<table width="100%" cellspacing="0" cellpadding="0" class="displayTable" id="nsosTable">
-<tr>
-<td class="HRN">Network Status Opinion Source</td>
-</tr>
-<tr>
-<td class="TRSB">
 {% if SourceFingerprint %}
-<b>Nickname:</b><br/><a class="plainbox" href="router_detail.php?FP={{ SourceFingerprint|e('url') }}">{{ SourceName|e }}</a><br/>
-<b>Fingerprint:</b><br/>{{ SourceFingerprint_formatted|e }}<br/>
-<b>Country Code:</b><br/>{% if SourceCountryCode is empty %}Unknown{% else %}{{ SourceCountryCode|e }}{% endif %}<br/>
-<b>Contact:</b><br/>{% if SourceContact is empty %}None Given{% else %}{{ SourceContact|e }}{% endif %}<br/>
-<b>Platform:</b><br/>{{ SourcePlatform|e }}<br/>
-<b>IP Address:</b><br/>{{ SourceIP|e }}<br/>
-<b>Hostname:</b><br/>{% if SourceIP == SourceHostname %}Unavailable{% else %}{{ SourceHostname|e }}{% endif %}<br/>
-<b>Onion Router Port:</b><br/>{{ SourceORPort|e }}<br/>
-<b>Directory Server Port:</b><br/>{% if SourceDirPort == 0 %}None{% else %}{{ SourceDirPort|e }}{% endif %}<br/>
-<b>Last Published Descriptor (GMT):</b><br/>{{ SourceLastDescriptorPublished|e }}<br/><br/>
-<b>Onion Key:</b><pre>{{ SourceOnionKey|e }}</pre>
-<b>Signing Key:</b><pre>{{ SourceSigningKey|e }}</pre>
-<b>Descriptor Signature:</b><pre>{{ SourceDescriptorSignature|e }}</pre>
+<dl class="ts-description-list">
+	<div><dt>Nickname</dt><dd><a href="router_detail.php?FP={{ SourceFingerprint|e('url') }}">{{ SourceName|e }}</a></dd></div>
+	<div><dt>Fingerprint</dt><dd>{{ SourceFingerprint_formatted|e }}</dd></div>
+	<div><dt>Country</dt><dd>{% if SourceCountryCode is empty %}Unknown{% else %}{{ SourceCountryCode|e }}{% endif %}</dd></div>
+	<div><dt>Contact</dt><dd>{% if SourceContact is empty %}None Given{% else %}{{ SourceContact|e }}{% endif %}</dd></div>
+	<div><dt>Platform</dt><dd>{{ SourcePlatform|e }}</dd></div>
+	<div><dt>IP</dt><dd>{{ SourceIP|e }}</dd></div>
+	<div><dt>Hostname</dt><dd>{% if SourceIP == SourceHostname %}Unavailable{% else %}{{ SourceHostname|e }}{% endif %}</dd></div>
+	<div><dt>ORPort</dt><dd>{{ SourceORPort|e }}</dd></div>
+	<div><dt>DirPort</dt><dd>{% if SourceDirPort == 0 %}None{% else %}{{ SourceDirPort|e }}{% endif %}</dd></div>
+	<div><dt>Last descriptor</dt><dd>{{ SourceLastDescriptorPublished|e }}</dd></div>
+</dl>
+<details class="ts-subdetails">
+	<summary>Keys and signature</summary>
+	<h3>Onion key</h3><pre>{{ SourceOnionKey|e }}</pre>
+	<h3>Signing key</h3><pre>{{ SourceSigningKey|e }}</pre>
+	<h3>Descriptor signature</h3><pre>{{ SourceDescriptorSignature|e }}</pre>
+</details>
 {% else %}
-Data source is a client, not a relay, therefore no detailed information is available
+<p class="ts-muted">Data source is a client, not a relay, so no detailed relay information is available.</p>
 {% endif %}
-</td>
-</tr>
-</table>

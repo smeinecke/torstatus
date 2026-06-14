@@ -98,30 +98,15 @@ final class IndexRequest
     public static function fromGlobals(array $defaultActiveColumns, array $defaultInactiveColumns, array $server, array $get, array $post, array $session): self
     {
         $method = strtoupper((string)($server['REQUEST_METHOD'] ?? 'GET'));
+        $scriptName = (string)($server['SCRIPT_NAME'] ?? '');
+        $isExport = strpos($scriptName, 'query_export.php') !== false;
+        $useSessionFallback = $isExport && $method === 'GET' && $get === [];
+        $filterSource = $useSessionFallback ? $session : $get;
 
-        if ($method === 'POST') {
-            $sortRequest = self::stringFrom($post, 'SR');
-            $sortOrder = self::stringFrom($post, 'SO');
-        } elseif ($method === 'GET' && isset($get['SR'], $get['SO'])) {
-            $sortRequest = self::stringFrom($get, 'SR');
-            $sortOrder = self::stringFrom($get, 'SO');
-        } else {
-            $sortRequest = self::stringFrom($session, 'SR');
-            $sortOrder = self::stringFrom($session, 'SO');
-        }
-
-        if ($method === 'POST') {
-            $rowsPerPage = self::stringFrom($post, 'RowsPerPage');
-            $page = self::stringFrom($post, 'Page');
-        } elseif ($method === 'GET') {
-            $rowsPerPage = self::stringFrom($get, 'RowsPerPage');
-            $page = self::stringFrom($get, 'Page');
-        } else {
-            $rowsPerPage = self::stringFrom($session, 'RowsPerPage');
-            $page = self::stringFrom($session, 'Page');
-        }
-
-        $filterSource = $method === 'POST' ? $post : ($method === 'GET' ? $get : $session);
+        $sortRequest = self::stringFrom($filterSource, 'SR');
+        $sortOrder = self::stringFrom($filterSource, 'SO');
+        $rowsPerPage = self::stringFrom($filterSource, 'RowsPerPage');
+        $page = self::stringFrom($filterSource, 'Page');
         $filters = [];
         foreach (self::FLAG_FIELDS as $field) {
             $value = self::stringFrom($filterSource, $field);

@@ -50,6 +50,27 @@ jobs:
       - name: Run vulture
         run: uv run vulture . --exclude .venv,migrations,tests
 
+  frontend:
+    name: Frontend assets
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: nginx/package.json
+
+      - name: Install frontend dependencies
+        working-directory: nginx
+        run: npm install
+
+      - name: Build frontend assets
+        working-directory: nginx
+        run: npm run build
+
   php:
     name: PHP static analysis
     runs-on: ubuntu-latest

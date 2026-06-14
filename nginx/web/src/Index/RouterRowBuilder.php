@@ -15,23 +15,16 @@ final class RouterRowBuilder
     /** @var array<string, string> */
     private $countryCodes;
 
-    /** @var string */
-    private $flagDirectory;
-
     /** @var array<int, string> */
     private $notifiedMissingCountries = [];
-
-    /** @var array<int, string> */
-    private $notifiedMissingFlags = [];
 
     /**
      * @param array<string, string> $countryCodes
      */
-    public function __construct(QueryExecutor $db, array $countryCodes, string $flagDirectory)
+    public function __construct(QueryExecutor $db, array $countryCodes)
     {
         $this->db = $db;
         $this->countryCodes = $countryCodes;
-        $this->flagDirectory = rtrim($flagDirectory, '/');
     }
 
     /**
@@ -68,10 +61,6 @@ final class RouterRowBuilder
         $countryCode = isset($record['CountryCode']) ? strtolower((string)$record['CountryCode']) : '';
         if ($countryCode !== '' && !isset($this->countryCodes[$countryCode])) {
             $this->notifyOnce('missing_countries', $countryCode, $this->notifiedMissingCountries);
-        }
-
-        if ($countryCode !== '' && !file_exists($this->flagDirectory . '/' . $countryCode . '.gif')) {
-            $this->notifyOnce('missing_flags', $countryCode, $this->notifiedMissingFlags);
         }
 
         if ($countryCode === '' || !isset($this->countryCodes[$countryCode])) {

@@ -1,143 +1,185 @@
 {% extends "base.html.twig" %}
 
-{% block extra_css %}
-<link rel="stylesheet" type="text/css" href="css/sprites.css" />
+{% block content %}
+<section class="ts-hero">
+	<div>
+		<p class="ts-eyebrow">Live Tor network status</p>
+		<h1>Router directory</h1>
+		<p class="ts-muted">Browse relays, inspect flags, filter the result set, and export the current view as CSV.</p>
+	</div>
+	<div class="ts-hero-actions">
+		<button type="button" class="ts-button ts-button-primary" data-dialog-open="filters-dialog" title="Open router sort, search and flag filters">
+			<i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>Filters
+		</button>
+		<a href="query_export.php/Tor_query_EXPORT.csv" class="ts-button ts-button-secondary" title="Download the current router result set as CSV">
+			<i class="ti ti-file-type-csv" aria-hidden="true"></i>Export CSV
+		</a>
+	</div>
+</section>
+
+<section class="ts-card ts-status-card">
+{% if onion_service|default(false) %}
+	<div class="ts-status-icon ts-status-icon-ok"><i class="ti ti-brand-torchain" aria-hidden="true"></i></div>
+	<div>
+		<h2>You are connected through the onion service</h2>
+		<p class="ts-muted">This request reached TorStatus over the Tor network as an onion service.</p>
+	</div>
+{% elseif PositiveMatch_IP == 1 %}
+	<div class="ts-status-icon ts-status-icon-ok"><i class="ti ti-shield-check" aria-hidden="true"></i></div>
+	<div>
+		<h2>Tor connection detected</h2>
+		<p class="ts-muted">Your OR is {{ RemoteIP|e }}.</p>
+{% if Count > 0 %}
+		<ul class="ts-inline-list">
+{% for i in 1..Count %}
+			<li>
+				Server <a href="router_detail.php?FP={{ TorNodeFP[i]|e('url') }}">{{ TorNodeName[i]|e }}</a>
+{% if PositiveMatch_ExitPolicy[i] is defined and PositiveMatch_ExitPolicy[i] == 1 %}
+				<span class="ts-pill ts-pill-green">Can exit here</span>
+{% elseif PositiveMatch_ExitPolicy[i] is defined and PositiveMatch_ExitPolicy[i] == 0 %}
+				<span class="ts-pill ts-pill-red">Cannot exit here</span>
+{% endif %}
+			</li>
+{% endfor %}
+		</ul>
+{% endif %}
+	</div>
+{% else %}
+	<div class="ts-status-icon ts-status-icon-warn"><i class="ti ti-shield-x" aria-hidden="true"></i></div>
+	<div>
+		<h2>No Tor connection detected</h2>
+		<p class="ts-muted">Your IP address is {{ RemoteIP|e }}.</p>
+	</div>
+{% endif %}
+</section>
+
+<section class="ts-card ts-table-card">
+	<div class="ts-section-header">
+		<div>
+			<h2>Routers</h2>
+			<p>{{ total_results }} result{% if total_results != 1 %}s{% endif %}, page {{ pagination.page }} of {{ pagination.total_pages }}</p>
+		</div>
+		<div class="ts-table-actions">
+			<form action="{{ Self|e }}" method="get" class="ts-inline-form">
+{% for name, value in query_hidden_inputs %}
+				<input type="hidden" name="{{ name|e }}" value="{{ value|e }}">
+{% endfor %}
+				<label>
+					<span>Rows</span>
+					<select name="RowsPerPage" id="rows-per-page-select" data-auto-submit>
+{% for option in rows_per_page_options %}
+						<option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.value }}</option>
+{% endfor %}
+					</select>
+				</label>
+				<noscript><button type="submit" class="ts-button ts-button-secondary">Apply</button></noscript>
+			</form>
+		</div>
+	</div>
+
+	{% include '_pagination.html.twig' %}
+	<div class="ts-table-scroll">
+		{% include '_router_table.html.twig' %}
+	</div>
+	{% include '_pagination.html.twig' %}
+</section>
+
+<div class="ts-grid-two">
+	<details class="ts-card" open>
+		<summary><i class="ti ti-chart-pie" aria-hidden="true"></i>Network summary</summary>
+		{% include '_index_stats.html.twig' %}
+	</details>
+
+	<details class="ts-card">
+		<summary><i class="ti ti-server" aria-hidden="true"></i>Application server</summary>
+		{% include '_index_appserver.html.twig' %}
+	</details>
+
+	<details class="ts-card">
+		<summary><i class="ti ti-info-circle" aria-hidden="true"></i>Opinion source</summary>
+		{% include '_index_opinion_source.html.twig' %}
+	</details>
+
+	<details class="ts-card">
+		<summary><i class="ti ti-legend" aria-hidden="true"></i>Legend</summary>
+		{% include '_index_legend.html.twig' %}
+	</details>
+</div>
 {% endblock %}
 
-{% block content %}
-
-<div class="dropcontainer">
-<div class="dropshadow2">
-<div class="innerbox">
-
-<table class="torcheck" cellpadding="0" cellspacing="0">
-
-{% if onion_service|default(false) %}
-<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">
-<span class="usingTor">You appear to be accessing this server through the Tor network as an Onion service.</span>
-</td></tr>
-{% elseif PositiveMatch_IP == 1 %}
-<tr><td class="tab"><img src="/img/usingtor.png" alt="You are using Tor" /></td><td class="content" style="text-align: center">
-<span class="usingTor">It appears that you are using the Tor network</span><br/>Your OR is: {{ RemoteIP|e }}<br/>
-{% if Count > 0 %}
-{% for i in 1..Count %}
-Server name: <a class="tab" href="router_detail.php?FP={{ TorNodeFP[i]|e('url') }}">{{ TorNodeName[i]|e }}</a><br/>
-{% if PositiveMatch_ExitPolicy[i] is defined and PositiveMatch_ExitPolicy[i] == 1 %}
-<span class="usingTor">This Tor server would allow exiting to this page</span><br />
-{% elseif PositiveMatch_ExitPolicy[i] is defined and PositiveMatch_ExitPolicy[i] == 0 %}
-<span class="notUsingTor">This Tor server would NOT allow exiting to this page</span><br />
-{% endif %}
+{% block dialogs %}
+<dialog class="ts-dialog ts-dialog-wide" id="filters-dialog">
+	<form method="dialog" class="ts-dialog-close-form">
+		<button class="ts-icon-button" aria-label="Close filters"><i class="ti ti-x" aria-hidden="true"></i></button>
+	</form>
+	<div class="ts-dialog-header">
+		<i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
+		<div>
+			<h2>Filters</h2>
+			<p>All sort, search and flag filters are submitted as GET parameters.</p>
+		</div>
+	</div>
+	<form action="{{ Self|e }}" method="get" class="ts-form-grid">
+		<input type="hidden" name="Page" value="1">
+		<label class="ts-field">
+			<span>Sort by</span>
+			<select name="SR">
+{% for value, label in sort_options %}
+				<option value="{{ value }}"{% if sr == value %} selected{% endif %}>{{ label }}</option>
 {% endfor %}
-{% endif %}
-</td></tr>
-{% else %}
-<tr><td class="tab">
-<img alt="You are not using Tor" src="/img/notusingtor.png"/>
-</td><td class="content" style="text-align: center;">
-<span class="notUsingTor">You do not appear to be using Tor</span><br/>Your IP Address is: {{ RemoteIP|e }}
-</td></tr>
-{% endif %}
-
-{% if Hidden_Service_URL and Hidden_Service_URL matches '#^https?://[a-z2-7]{56}\.onion/?#i' %}
-<tr>
-<td colspan="2" style="border-top: solid 1px black; text-align: center;"><br />
-<font color="#3344ee">This site is available as an Onion V3 Service at:</font><br/><a style="text-decoration: underline; color: #3344ee;" href="{{ Hidden_Service_URL|e('html_attr') }}">{{ Hidden_Service_URL|e }}</a><br/><br/>
-</td>
-</tr>
-{% endif %}
-
-</table>
-
-</div></div></div>
-
-<table cellspacing="2" cellpadding="2" class="body">
-
-<tr>
-<td>
-
-<a href="#Legend" data-toggle-show="lgnd" class="LegendLink">View the Legend</a>
-
-
-<div style="margin: 5px 0;">
-<form action="{{ Self|e }}" method="get" style="display: inline;">
-{% for name, value in query_hidden_inputs %}
-<input type="hidden" name="{{ name|e }}" value="{{ value|e }}" />
-{% endfor %}
-Rows per page:
-<select name="RowsPerPage" id="rows-per-page-select">
+			</select>
+		</label>
+		<label class="ts-field">
+			<span>Sort order</span>
+			<select name="SO">
+				<option value="Asc"{% if so == 'Asc' %} selected{% endif %}>Ascending</option>
+				<option value="Desc"{% if so == 'Desc' %} selected{% endif %}>Descending</option>
+			</select>
+		</label>
+		<label class="ts-field">
+			<span>Rows per page</span>
+			<select name="RowsPerPage">
 {% for option in rows_per_page_options %}
-<option value="{{ option.value }}"{% if option.selected %} selected="selected"{% endif %}>{{ option.value }}</option>
+				<option value="{{ option.value }}"{% if option.selected %} selected{% endif %}>{{ option.value }}</option>
 {% endfor %}
-</select>
-<noscript><input type="submit" value="Apply" /></noscript>
-</form>
-<span style="float: right;">
-{% if pagination.first %}<a href="{{ pagination.first|e }}">First</a> | <a href="{{ pagination.prev|e }}">Prev</a>{% else %}First | Prev{% endif %}
-| Page {{ pagination.page }} of {{ pagination.total_pages }}
-| {% if pagination.next %}<a href="{{ pagination.next|e }}">Next</a> | <a href="{{ pagination.last|e }}">Last</a>{% else %}Next | Last{% endif %}
-</span>
-</div>
-
-{% include '_router_table.html.twig' %}
-
-<div style="margin: 5px 0;">
-<span style="float: right;">
-{% if pagination.first %}<a href="{{ pagination.first|e }}">First</a> | <a href="{{ pagination.prev|e }}">Prev</a>{% else %}First | Prev{% endif %}
-| Page {{ pagination.page }} of {{ pagination.total_pages }}
-| {% if pagination.next %}<a href="{{ pagination.next|e }}">Next</a> | <a href="{{ pagination.last|e }}">Last</a>{% else %}Next | Last{% endif %}
-</span>
-</div>
-
-</td>
-</tr>
-
-<tr>
-<td><br/></td>
-</tr>
-<tr><td>
-
-<a name="Stats"></a>
-<a href="#" data-toggle="anss" class="LegendLink" id="anssTableLink">Aggregate Network Statistic Summary</a>
-
-{% include '_index_stats.html.twig' %}
-
-<br/>
-
-<a name="TorServer"></a>
-<a href="#" data-toggle="nsos" class="LegendLink" id="nsosTableLink">Network Status Opinion Source</a>
-
-{% include '_index_opinion_source.html.twig' %}
-
-<br/>
-
-<a name="CustomDisplay" href="column_set.php" class="LegendLink">Custom / Advanced Display Options</a>
-
-<br/>
-
-<a name="CustomQuery"></a>
-<a href="#" data-toggle="caqo" class="LegendLink" id="caqoTableLink">Custom / Advanced Query Options</a>
-
-{% include '_index_query_options.html.twig' %}
-
-<br/>
-
-<a name="Legend"></a>
-
-<a href="#" data-toggle="lgnd" class="LegendLink" id="lgndTableLink">Table Legend</a>
-
-{% include '_index_legend.html.twig' %}
-
-<br/>
-
-<a name="AppServer"></a>
-
-<a href="#" data-toggle="asd" class="LegendLink" id="asdTableLink">Application Server Details</a>
-
-<br/>
-
-{% include '_index_appserver.html.twig' %}
-
-</td></tr>
-</table>
-
+			</select>
+		</label>
+		<label class="ts-field">
+			<span>Search field</span>
+			<select name="CSField">
+{% for value, label in search_options %}
+				<option value="{{ value }}"{% if CSField == value %} selected{% endif %}>{{ label }}</option>
+{% endfor %}
+			</select>
+		</label>
+		<label class="ts-field">
+			<span>Search match</span>
+			<select name="CSMod">
+{% for value, label in search_mod_options %}
+				<option value="{{ value }}"{% if CSMod == value %} selected{% endif %}>{{ label }}</option>
+{% endfor %}
+			</select>
+		</label>
+		<label class="ts-field">
+			<span>Search value</span>
+			<input type="search" name="CSInput" maxlength="128" value="{{ CSInput|default('')|e }}" placeholder="Empty disables search">
+		</label>
+		<fieldset class="ts-field ts-field-wide ts-flag-filter-grid">
+			<legend>Flag filters</legend>
+{% for name, label in filter_options %}
+{% set current = attribute(_context, name)|default('OFF') %}
+			<div class="ts-flag-filter-row">
+				<span>{{ label }}</span>
+				<label><input type="radio" name="{{ name }}" value="OFF"{% if current == 'OFF' %} checked{% endif %}>Off</label>
+				<label><input type="radio" name="{{ name }}" value="1"{% if current == '1' %} checked{% endif %}>Yes</label>
+				<label><input type="radio" name="{{ name }}" value="0"{% if current == '0' %} checked{% endif %}>No</label>
+			</div>
+{% endfor %}
+		</fieldset>
+		<div class="ts-form-actions">
+			<a href="{{ Self|e }}" class="ts-button ts-button-secondary">Reset</a>
+			<button type="submit" class="ts-button ts-button-primary"><i class="ti ti-check" aria-hidden="true"></i>Apply filters</button>
+		</div>
+	</form>
+</dialog>
 {% endblock %}

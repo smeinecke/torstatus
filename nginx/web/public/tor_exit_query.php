@@ -21,7 +21,7 @@ $repository = new IndexRepository(
     new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable),
     (int)$OffsetFromGMT
 );
-$request = TorExitQueryRequest::fromGlobals($_SERVER, $_POST);
+$request = TorExitQueryRequest::fromGlobals($_SERVER, $_GET);
 $context = (new TorExitQueryService($repository, new ExitPolicyMatcher()))->evaluate($request);
 $context['pageTitle'] = $pageTitle;
 $context['Self'] = $Self;

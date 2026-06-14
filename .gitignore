@@ -9,3 +9,6 @@ tor/hidden_services/*
 *.pyc
 nginx/vendor/
 /.ruff_cache
+
+nginx/node_modules/
+nginx/.vite/

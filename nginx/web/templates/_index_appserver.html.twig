@@ -1,25 +1,7 @@
-<table cellspacing="0" cellpadding="0" class="displayTable" width="500px" id="asdTable">
-<tr>
-<td class="HRN" colspan="2">Application Server Details</td>
-</tr>
-<tr>
-<td class="TRAR"><b>Cache Last Updated (Local Server Time):</b></td>
-<td class="TRS">{{ LastUpdate|e }} {{ LocalTimeZone|e }}</td>
-</tr>
-<tr>
-<td class="TRAR"><b>Last Update Cycle Processing Time (Seconds):</b></td>
-<td class="TRS">{{ LastUpdateElapsed|e }}</td>
-</tr>
-<tr>
-<td class="TRAR"><b>Number of Routers In Cache:</b></td>
-<td class="TRS">{{ RouterCount }}</td>
-</tr>
-<tr>
-<td class="TRAR"><b>Number of Descriptors In Cache:</b></td>
-<td class="TRS">{{ DescriptorCount }}</td>
-</tr>
-<tr>
-<td class="TRAR"><b>Approximate Page Generation Time (Seconds):</b></td>
-<td class="TRS">{{ page_generation_time }}</td>
-</tr>
-</table>
+<dl class="ts-description-list">
+	<div><dt>Cache updated</dt><dd>{{ LastUpdate|e }} {{ LocalTimeZone|e }}</dd></div>
+	<div><dt>Update cycle</dt><dd>{{ LastUpdateElapsed|e }} s</dd></div>
+	<div><dt>Routers</dt><dd>{{ RouterCount }}</dd></div>
+	<div><dt>Descriptors</dt><dd>{{ DescriptorCount }}</dd></div>
+	<div><dt>Page generation</dt><dd>{{ page_generation_time }} s</dd></div>
+</dl>

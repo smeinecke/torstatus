@@ -8,12 +8,14 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 - Git
 - [Composer](https://getcomposer.org/)
+- Node.js/npm for the Vite/Tailwind frontend build
 - Docker together with Docker Compose
 
 ### Steps
 
 - Clone the repository.
 - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
+- Install and build frontend assets: `cd nginx && npm install && npm run build`.
 - Create the Docker network `torstatus` using `docker network create torstatus`.
 - Run `docker compose build` from the root of your repository clone.
 - Run `docker compose up` to start everything.
@@ -25,6 +27,7 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 - The first start-up takes more time because the database must be initialized.
 - As long as the database is not up, the updater will log database connection errors. This is expected during startup.
 - The first updater run after startup can take longer because the shared cache is empty.
+- The committed CSS/JS assets are usable directly. After frontend changes run `cd nginx && npm run build` to rebuild the Vite/Tailwind bundle.
 - The Tor process will warn that its control port is accessible from non-local addresses. In the default Compose setup it is only reachable from the TorStatus Docker network.
 - All containers include health checks that you can inspect with `docker ps`.
 
@@ -145,8 +148,10 @@ php nginx/web/apply_migration.php --skip 20250614_add_missing_indexes.sql
 
 - Copy [nginx/web/config_template.php](nginx/web/config_template.php) to `nginx/web/config.php` and modify it to your needs.
 - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
+- Build frontend assets: `cd nginx && npm install && npm run build`.
 - Set up a web server with PHP support.
 - Configure the web server document root to `nginx/web/public`.
+- The frontend source lives in `nginx/web/assets/src` and is built with Vite/Tailwind into `nginx/web/public/css/app.css` and `nginx/web/public/js/app.js`.
 - Install PHP modules: `mysqli`, `gd`, and `redis` (or `memcached` if you prefer Memcached).
 
 ### Updater

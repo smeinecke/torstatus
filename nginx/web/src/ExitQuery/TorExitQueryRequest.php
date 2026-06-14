@@ -24,19 +24,20 @@ final class TorExitQueryRequest
         $this->destinationPort = $destinationPort;
     }
 
-    /** @param array<string, mixed> $server
-     *  @param array<string, mixed> $post
+    /**
+     * @param array<string, mixed> $server
+     * @param array<string, mixed> $query
      */
-    public static function fromGlobals(array $server, array $post): self
+    public static function fromGlobals(array $server, array $query): self
     {
-        if (strtoupper((string)($server['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+        if (strtoupper((string)($server['REQUEST_METHOD'] ?? 'GET')) !== 'GET') {
             return new self(null, null, null);
         }
 
         return new self(
-            self::sanitizeIp($post['QueryIP'] ?? null),
-            self::sanitizeIp($post['DestinationIP'] ?? null),
-            self::sanitizePort($post['DestinationPort'] ?? null)
+            self::sanitizeIp($query['QueryIP'] ?? null),
+            self::sanitizeIp($query['DestinationIP'] ?? null),
+            self::sanitizePort($query['DestinationPort'] ?? null)
         );
     }
 
