@@ -5,8 +5,6 @@
 
 require_once('init.php');
 
-$HeaderRowString = "";
-
 $Name = null;
 $CountryCode = null;
 $IP = null;
@@ -24,7 +22,9 @@ $DescriptorSignature = null;
 $RouterCount = 0;
 $DescriptorCount = 0;
 $CurrentResultSet = 0;
-$RowCounter = 0;
+
+$RowsPerPage = null;
+$Page = null;
 
 $Self = 'index.php';
 $RemoteIP = $_SERVER['REMOTE_ADDR'];
@@ -367,505 +367,162 @@ function IsIPInSubnet($IP,$Subnet)
 	return IpUtils::checkIp($IP, $Subnet);
 }
 
-function GenerateHeaderRow()
+function build_router_rows($result)
 {
-	global
-			$HeaderRowString,
-			$Self,
-			$ColumnList_ACTIVE,
-			$SR,
-			$SO,
-			$FAuthority,
-			$FBadDirectory,
-			$FBadExit,
-			$FExit,
-			$FFast,
-			$FGuard,
-			$FHibernating,
-			$FNamed,
-			$FStable,
-			$FRunning,
-			$FValid,
-			$FV2Dir,
-			$FHSDir;
+	global $ColumnList_ACTIVE, $country_codes, $notified_missing_countries, $notified_missing_flags, $mysqli;
 
-	$HeaderRowString .= "<tr>\n";
-
-	$ccso = "&nbsp;<a class='header' href='$Self?SR=CountryCode&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/></a>&nbsp;&nbsp;";
-	if ($SR == 'CountryCode' && $SO == 'Asc') { $ccso = "&nbsp;<a class='header' href='$Self?SR=CountryCode&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/></a>&nbsp;&nbsp;"; }
-
-	if($SR == 'Name'){$HeaderRowString .= "<td class='HRS'>$ccso";} else{$HeaderRowString .= "<td class='HRN'>$ccso";}
-	if ($SR == 'Name' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Desc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-	else if ($SR == 'Name' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Asc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-	else $HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
-	$HeaderRowString .= "&nbsp;Router Name</a></td>\n";
-
-	foreach($ColumnList_ACTIVE as $value)
+	$rows = [];
+	while ($record = $result->fetch_assoc())
 	{
-		switch ($value)
+		$countrycode = '';
+		if (isset($record['CountryCode']))
 		{
-			case "Fingerprint":
-   			if($SR == 'Fingerprint'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'Fingerprint' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Desc'>";}
-			else if ($SR == 'Fingerprint' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Asc'>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Asc'>";
-			$HeaderRowString .= "Fingerprint</a></td>\n";
-   			break;
-
-			case "Bandwidth":
-			if($SR == 'Bandwidth'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'Bandwidth' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-			else if ($SR == 'Bandwidth' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";
-			$HeaderRowString .= "&nbsp;Bandwidth <span class='TRSM'>(KB/s)</span></a></td>\n";
-			break;
-
-			case "Uptime":
-			if($SR == 'Uptime'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'Uptime' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-			else if ($SR == 'Uptime' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";
-			$HeaderRowString .= " Uptime</a></td>\n";
-			break;
-
-			case "LastDescriptorPublished":
-			if($SR == 'LastDescriptorPublished'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'LastDescriptorPublished' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Desc'>";}
-			else if ($SR == 'LastDescriptorPublished' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Asc'>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Asc'>";
-			$HeaderRowString .= "Last Descriptor<br/><span class='TRSM'>(GMT)</span></a></td>\n";
-			break;
-
-			case "Hostname":
-			if($SR == 'Hostname'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'Hostname' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-			else if ($SR == 'Hostname' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
-			$HeaderRowString .= " Hostname</a></td>\n";
-			break;
-
-			case "ORPort":
-			if($SR == 'ORPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'ORPort' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-			else if ($SR == 'ORPort' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
-			$HeaderRowString .= " ORPort</a></td>\n";
-			break;
-
-			case "DirPort":
-			if($SR == 'DirPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'DirPort' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
-			else if ($SR == 'DirPort' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
-			$HeaderRowString .= " DirPort</a></td>\n";
-			break;
-
-			case "Contact":
-			if($SR == 'Contact'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
-			if ($SR == 'Contact' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Contact&amp;SO=Desc'>";}
-			else if ($SR == 'Contact' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Contact&amp;SO=Asc'>";}
-			else $HeaderRowString .= "<a href='$Self?SR=Contact&amp;SO=Asc'>";
-			$HeaderRowString .= "Contact</a></td>\n";
-			break;
-
-			case "BadDir":
-			if(($FBadDirectory == '0') && ($SR == 'FBadDirectory'))
-			{
-				$HeaderRowString .= "<td class='HRFNOS'>";
-			}
-			else if(($FBadDirectory == '0') && ($SR != 'FBadDirectory'))
-			{
-				$HeaderRowString .= "<td class='HRFNO'>";
-			}
-			else if(($FBadDirectory == '1') && ($SR == 'FBadDirectory'))
-			{
-				$HeaderRowString .= "<td class='HRFYESS'>";
-			}
-			else if(($FBadDirectory == '1') && ($SR != 'FBadDirectory'))
-			{
-				$HeaderRowString .= "<td class='HRFYES'>";
-			}
-			else if(($FBadDirectory == 'OFF') && ($SR == 'FBadDirectory'))
-			{
-				$HeaderRowString .= "<td class='HRS'>";
-			}
-			else
-			{
-				$HeaderRowString .= "<td class='HRN'>";
-			}
-			if ($SR == 'FBadDirectory' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=FBadDirectory&amp;SO=Desc'>";}
-			else if ($SR == 'FBadDirectory' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=FBadDirectory&amp;SO=Asc'>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=FBadDirectory&amp;SO=Asc'>";
-			$HeaderRowString .= "Bad Dir</a></td>\n";
-			break;
-
-			case "BadExit":
-			if(($FBadExit == '0') && ($SR == 'FBadExit'))
-			{
-				$HeaderRowString .= "<td class='HRFNOS'>";
-			}
-			else if(($FBadExit == '0') && ($SR != 'FBadExit'))
-			{
-				$HeaderRowString .= "<td class='HRFNO'>";
-			}
-			else if(($FBadExit == '1') && ($SR == 'FBadExit'))
-			{
-				$HeaderRowString .= "<td class='HRFYESS'>";
-			}
-			else if(($FBadExit == '1') && ($SR != 'FBadExit'))
-			{
-				$HeaderRowString .= "<td class='HRFYES'>";
-			}
-			else if(($FBadExit == 'OFF') && ($SR == 'FBadExit'))
-			{
-				$HeaderRowString .= "<td class='HRS'>";
-			}
-			else
-			{
-				$HeaderRowString .= "<td class='HRN'>";
-			}
-			if ($SR == 'FBadExit' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=FBadExit&amp;SO=Desc'>";}
-			else if ($SR == 'FBadExit' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=FBadExit&amp;SO=Asc'>";}
-			else $HeaderRowString .= "<a class='header' href='$Self?SR=FBadExit&amp;SO=Asc'>";
-			$HeaderRowString .= "Bad Exit</a></td>\n";
-			break;
-
+			$countrycode = strtolower($record['CountryCode']);
 		}
-	}
-
-	$HeaderRowString .= "</tr>\n";
-}
-
-function DisplayRouterRow()
-{
-	global $CurrentResultSet, $record, $ColumnList_ACTIVE, $country_codes, $notified_missing_countries, $notified_missing_flags, $mysqli;
-	if (isset($record['BadExit']) && $record['BadExit'])
-	{
-		echo "<tr class='B'>";
-	}
-	else
-	{
-	if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 0)
-	{
-		echo "<tr class='d'>";
-	}
-	else if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 1)
-	{
-		echo "<tr class='R'>";
-	}
-	else
-	{
-		echo "<tr class='r'>";
-	}
-	}
-
-	if (isset($record['Named']) && $record['Named'] == 1)
-	{
-		echo "<td class='TRR'>";
-	}
-	else
-	{
-		echo "<td class='TRr'>";
-	}
-	$countrycode = '';
-	if(isset($record['CountryCode']))
-	{
-		$countrycode = strtolower($record['CountryCode']);
-	}
-	if ($countrycode != '' && !isset($country_codes[$countrycode]))
-	{
-		if(!isset($notified_missing_countries))
+		if ($countrycode != '' && !isset($country_codes[$countrycode]))
 		{
-			$notified_missing_countries = array();
+			if (!isset($notified_missing_countries))
+			{
+				$notified_missing_countries = array();
+			}
+			if (!in_array($countrycode, $notified_missing_countries))
+			{
+				$parameter = $mysqli->escape_string($countrycode);
+				$mysqli->query("INSERT INTO missing_countries (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code");
+				$notified_missing_countries[] = $countrycode;
+			}
+		}
+		if ($countrycode != '' && !file_exists("img/flags/$countrycode.gif"))
+		{
+			if (!isset($notified_missing_flags))
+			{
+				$notified_missing_flags = array();
+			}
+			if (!in_array($countrycode, $notified_missing_flags))
+			{
+				$parameter = $mysqli->escape_string($countrycode);
+				$mysqli->query("INSERT INTO missing_flags (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code");
+				$notified_missing_flags[] = $countrycode;
+			}
+		}
+		if ($countrycode == '' || !isset($country_codes[strtolower($record['CountryCode'])]))
+		{
+			$countrycode = 'nna';
+			$record['CountryCode'] = 'NNA';
 		}
 
-		if(!in_array($countrycode, $notified_missing_countries))
-		{
-			$parameter = $mysqli->escape_string($countrycode);
-			$mysqli->query("INSERT INTO missing_countries (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
+		// Row class
+		if (isset($record['BadExit']) && $record['BadExit'])
+		{		$row_class = 'B';		}
+		else if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 0)
+		{		$row_class = 'd';		}
+		else if (isset($record['Running']) && isset($record['Hibernating']) && $record['Running'] == 0 && $record['Hibernating'] == 1)
+		{		$row_class = 'R';		}
+		else
+		{		$row_class = 'r';		}
 
-			$notified_missing_countries[] = $countrycode;
+		// Name cell class
+		$name_class = (isset($record['Named']) && $record['Named'] == 1) ? 'TRR' : 'TRr';
+
+		// Build column data
+		$columns = [];
+		foreach ($ColumnList_ACTIVE as $value)
+		{			switch (true)
+			{			case ($value == 'Hostname'):
+					{					$col = ['type' => 'hostname', 'value' => $record[$value] ?? '', 'ip' => $record['IP'] ?? null];
+						$flags = [];
+						if (isset($record['Fast']) && $record['Fast'] == 1) $flags[] = 'Fast';
+						if (isset($record['Valid']) && $record['Valid'] == 0) $flags[] = 'Disputed';
+						if (isset($record['Exit']) && $record['Exit'] == 1) $flags[] = 'Exit';
+						if (isset($record['V2Dir']) && $record['V2Dir'] == 1) $flags[] = 'Dir';
+						if (isset($record['HSDir']) && $record['HSDir'] == 1) $flags[] = 'HSDir';
+						if (isset($record['Guard']) && $record['Guard'] == 1) $flags[] = 'Guard';
+						if (isset($record['Stable']) && $record['Stable'] == 1) $flags[] = 'Stable';
+						if (isset($record['Authority']) && $record['Authority'] == 1) $flags[] = 'Authority';
+						$col['flags'] = $flags;
+						if (isset($record['Platform']))
+						{							$image = 'NotAvailable';
+							if (strpos($record['Platform'], 'Linux') !== false || strpos($record['Platform'], 'linux') !== false) $image = 'Linux';
+							if (strpos($record['Platform'], 'Windows XP') !== false) $image = 'WindowsXP';
+							else if (strpos($record['Platform'], 'Windows') !== false && strpos($record['Platform'], 'server') !== false) $image = 'WindowsServer';
+							else if (strpos($record['Platform'], 'Windows') !== false) $image = 'WindowsOther';
+							if (strpos($record['Platform'], 'Darwin') !== false) $image = 'Darwin';
+							if (strpos($record['Platform'], 'DragonFly') !== false) $image = 'DragonFly';
+							if (strpos($record['Platform'], 'FreeBSD') !== false) $image = 'FreeBSD';
+							if (strpos($record['Platform'], 'NetBSD') !== false) $image = 'NetBSD';
+							if (strpos($record['Platform'], 'IRIX') !== false) $image = 'IRIX64';
+							if (strpos($record['Platform'], 'Cygwin') !== false) $image = 'Cygwin';
+							if (strpos($record['Platform'], 'SunOS') !== false) $image = 'SunOS';
+							if (strpos($record['Platform'], 'OpenBSD') !== false) $image = 'OpenBSD';
+							$col['platform'] = $image;
+							$col['platform_title'] = $record['Platform'];
+						}
+						$columns[] = $col;
+						break;
+					}
+					case ($value == 'Bandwidth'):
+					{					$bandwidth = $record[$value] ?? 0;
+						if ($bandwidth <= 1000) { $bg = 'bwr'; $fg = '1'; }
+						else if ($bandwidth <= 2000) { $bg = 'bwr1'; $fg = '2'; }
+						else if ($bandwidth <= 3000) { $bg = 'bwr2'; $fg = '3'; }
+						else if ($bandwidth <= 4000) { $bg = 'bwr3'; $fg = '4'; }
+						else if ($bandwidth <= 5000) { $bg = 'bwr4'; $fg = '5'; }
+						else if ($bandwidth <= 6000) { $bg = 'bwr5'; $fg = '6'; }
+						else if ($bandwidth <= 10000) { $bandwidth = floor(($bandwidth-6000)/4); $bg = 'bwr6'; $fg = '7'; }
+						else { $bandwidth = min(1000, ($bandwidth-9900)/90); $bg = 'bwr7'; $fg = '8'; }
+						$bandwidthtop = 1000/85;
+						if (intval($bandwidth) % 1000 == 0 && $bandwidth != 0) $bandwidth = 999;
+						$bar = floor((intval($bandwidth) % 1000) / $bandwidthtop);
+						if ($bar > 85) $bar = 85;
+						if ($bar == 0) $bar = 1;
+						$columns[] = ['type' => 'bandwidth', 'value' => $record[$value] ?? 0, 'bg' => $bg, 'fg' => $fg, 'bar' => $bar];
+						break;
+					}
+					case (in_array($value, ['Fingerprint', 'LastDescriptorPublished', 'Contact'])):
+					{					$columns[] = ['type' => 'text', 'value' => $record[$value] ?? '', 'class' => 'TDS'];
+						break;
+					}
+					case (in_array($value, ['BadDir', 'BadExit'])):
+					{					$columns[] = ['type' => 'flag', 'value' => $record[$value] ?? 0];
+						break;
+					}
+					case ($value == 'Uptime'):
+					{					$val = $record[$value] ?? -1;
+						$cls = ($val >= 5*24) ? 'TDcb' : 'TDc';
+						$down = (!isset($record['Running']) || $record['Running'] == 0) && (!isset($record['Hibernating']) || $record['Hibernating'] == 0);
+						if ($val > -1)
+						{							$days = floor($val/24);
+							$hours = $val%24;
+							$columns[] = ['type' => 'uptime', 'days' => $days, 'hours' => $hours, 'class' => $cls, 'down' => $down];
+						}
+						else
+						{							$columns[] = ['type' => 'text', 'value' => 'N/A', 'class' => 'TDc', 'down' => true];
+						}
+						break;
+					}
+					case ($value == 'ORPort' || $value == 'DirPort'):
+					{					$val = $record[$value] ?? 0;
+						$columns[] = ['type' => 'port', 'value' => $val, 'class' => 'TDc'];
+						break;
+					}
+					default:
+					{					$columns[] = ['type' => 'text', 'value' => $record[$value] ?? '', 'class' => 'TDS'];
+						break;
+					}
+			}
 		}
+
+		$rows[] = [
+			'row_class' => $row_class,
+			'name_class' => $name_class,
+			'country_code' => $countrycode,
+			'country_name' => $country_codes[strtolower($record['CountryCode'])],
+			'Name' => $record['Name'] ?? '',
+			'Fingerprint' => $record['Fingerprint'] ?? '',
+			'columns' => $columns,
+		];
 	}
-	if ($countrycode != '' && !file_exists("img/flags/$countrycode.gif"))
-	{
-		if(!isset($notified_missing_flags))
-		{
-			$notified_missing_flags = array();
-		}
-
-		if(!in_array($countrycode, $notified_missing_flags))
-		{
-			$parameter = $mysqli->escape_string($countrycode);
-			$mysqli->query("INSERT INTO missing_flags (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code" );
-
-			$notified_missing_flags[] = $countrycode;
-		}
-	}
-
-	if ($countrycode == "" || !isset($country_codes[strtolower($record['CountryCode'])])) {
-		$countrycode = "nna"; $record['CountryCode'] = "NNA";
-	}
-	echo "<div class='flags_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
-#	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
-	echo "<a href='router_detail.php?FP=" . htmlspecialchars($record['Fingerprint'], ENT_QUOTES) . "'>" . htmlspecialchars($record['Name'], ENT_QUOTES) . "</a></td>";
-
-	foreach($ColumnList_ACTIVE as $value)
-	{
-		switch (TRUE)
-		{
-			case
-			($value == "Hostname"):
-			echo "<td class='TDS'>";
-			$innerTable = 0;
-			if (isset($record['Authority']) || isset($record['Stable']) || isset($record['Platform']) || isset($record['Guard']) || isset($record['Fast']) || isset($record['Exit']) || isset($record['V2Dir']) || isset($record['Valid']) || isset($record['HSDir']))
-			{
-				$innerTable = 1;
-				echo "<table class='iT'><tr><td class='iT'>";
-			}
-			echo htmlspecialchars($record[$value], ENT_QUOTES);
-			if (isset($record['IP']))
-			{
-				if (defined("WHOISPath"))
-				{
-				echo " [<a class='who' href='".htmlspecialchars(WHOISPath.$record['IP'], ENT_QUOTES)."'>".htmlspecialchars($record['IP'], ENT_QUOTES)."</a>]";
-				}
-				else
-				{
-				echo " [".htmlspecialchars($record['IP'], ENT_QUOTES)."]";
-				}
-			}
-			if (isset($record['Fast']) && $record['Fast'] == 1)
-			{
-				echo "</td><td><div class='status_Fast' title='Fast Server'></div>";
-			}
-			if (isset($record['Valid']) && $record['Valid'] == 0)
-			{
-				echo "</td><td><div class='status_Disputed' title='Not Listed By All Directory Servers'></div>";
-			}
-			if (isset($record['Exit']) && $record['Exit'] == 1)
-			{
-				echo "</td><td><div class='status_Exit' title='Exit Server'></div>";
-			}
-			if (isset($record['V2Dir']) && $record['V2Dir'] == 1)
-			{
-				echo "</td><td><div class='status_Dir' title='Directory Server'></div>";
-			}
-			if (isset($record['HSDir']) && $record['HSDir'] == 1)
-			{
-				echo "</td><td><div class='status_HSDir' title='HS Directory Server'></div>";
-			}
-			if (isset($record['Guard']) && $record['Guard'] == 1)
-			{
-				echo "</td><td><div class='status_Guard' title='Guard Server'></div>";
-			}
-			if (isset($record['Stable']) && $record['Stable'] == 1)
-			{
-				echo "</td><td><div class='status_Stable' title='Stable Server'></div>";
-			}
-			if (isset($record['Authority']) && $record['Authority'] == 1)
-			{
-				echo "</td><td><div class='status_Authority' title='Authority Server'></div>";
-			}
-			if (isset($record['Platform']))
-			{
-				$image = "NotAvailable";
-				// Map the platform to something we know
-				if (strpos($record['Platform'],'Linux') !== false || strpos($record['Platform'],'linux') !== false)
-				{
-					$image = "Linux";
-				}
-				if (strpos($record['Platform'],'Windows XP') !== false)
-				{
-					$image = "WindowsXP";
-				}
-				else if (strpos($record['Platform'],'Windows') !== false && strpos($record['Platform'],'server') !== false)
-				{
-					$image = "WindowsServer";
-				}
-				else if (strpos($record['Platform'],'Windows') !== false)
-				{
-					$image = "WindowsOther";
-				}
-				if (strpos($record['Platform'],'Darwin') !== false)
-				{
-					$image = "Darwin";
-				}
-				if (strpos($record['Platform'],'DragonFly') !== false)
-				{
-					$image = "DragonFly";
-				}
-				if (strpos($record['Platform'],'FreeBSD') !== false)
-				{
-					$image = "FreeBSD";
-				}
-				if (strpos($record['Platform'],'NetBSD') !== false)
-				{
-					$image = "NetBSD";
-				}
-				if (strpos($record['Platform'],'IRIX') !== false)
-				{
-					$image = "IRIX64";
-				}
-				if (strpos($record['Platform'],'Cygwin') !== false)
-				{
-					$image = "Cygwin";
-				}
-				if (strpos($record['Platform'],'SunOS') !== false)
-				{
-					$image = "SunOS";
-				}
-				if (strpos($record['Platform'],'OpenBSD') !== false)
-				{
-					$image = "OpenBSD";
-				}
-				echo "</td><td><div class='os_$image' title='".htmlentities($record['Platform'],ENT_QUOTES)."'></div>";
-			}
-			if ($innerTable)
-			{
-				echo "</td></tr></table>";
-			}
-			echo "</td>";
-			break;
-
-			case
-			($value == "Bandwidth"):
-			// Determine the bandwidth colors
-			$bandwidth = $record[$value];
-			if ($record[$value] <= 1000)
-			{
-				$background = "bwr";
-				$foreground = "1";
-			}
-			else if ($record[$value] > 1000 && $record[$value] <= 2000)
-			{
-				$background = "bwr1";
-				$foreground = "2";
-			}
-			else if ($record[$value] > 2000 && $record[$value] <= 3000)
-			{
-				$background = "bwr2";
-				$foreground = "3";
-			}
-			else if ($record[$value] > 3000 && $record[$value] <= 4000)
-			{
-				$background = "bwr3";
-				$foreground = "4";
-			}
-			else if ($record[$value] > 4000 && $record[$value] <= 5000)
-			{
-				$background = "bwr4";
-				$foreground = "5";
-			}
-			else if ($record[$value] > 5000 && $record[$value] <= 6000)
-			{
-				$background = "bwr5";
-				$foreground = "6";
-			}
-			else if ($record[$value] > 6000 && $record[$value] <= 10000)
-			{
-				$bandwidth = floor(($bandwidth-6000)/4);
-				$background = "bwr6";
-				$foreground = "7";
-			}
-			else if ($record[$value] > 10000)
-			{
-				$bandwidth = min(1000, ($bandwidth-9900)/90);
-				$background = "bwr7";
-				$foreground = "8";
-			}
-
-			$bandwidthtop = 1000/85;
-			if (intval($bandwidth) % 1000 == 0 && $bandwidth != 0)
-			{
-				$bandwidth = 999;
-			}
-			$bandwidth = floor((intval($bandwidth) % 1000)/$bandwidthtop);
-			if ($bandwidth > 85) { $bandwidth = 85; }
-			if ($bandwidth == 0) { $bandwidth = 1; }
-			#echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><img src='img/bar/${foreground}.png' width='${bandwidth}px' height='16px' alt='".$record[$value]."' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
-			$recordValue = htmlspecialchars((string) $record[$value], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='" . $recordValue . " KBs'><td class='$background'><div class='fg{$foreground}' style='width: {$bandwidth}px; height: 16px;'></div></td><td>&nbsp;<small>&nbsp;" . $recordValue . "</small></td></tr></table></td>";
-			break;
-
-  			case
-			(
-				$value == "Fingerprint" 		||
-				$value == "LastDescriptorPublished"	||
-				$value == "Contact"
-			):
-
-			echo "<td class='TDS'>" . htmlentities($record[$value] ? $record[$value] : '', ENT_QUOTES) . "</td>";
-			break;
-
-  			case
-			(
-				$value == "BadDir" 			||
-				$value == "BadExit"
-			):
-
-			echo "<td class='F" . $record[$value] . "'></td>";
-			break;
-
-  			case
-			($value == "Uptime"):
-
-			if ($record[$value] > -1 && $record[$value] < 5*24)
-			{
-				echo "<td class='TDc'>";
-				if ((!isset($record['Running']) || $record['Running'] == 0) && (!isset($record['Hibernating']) || $record['Hibernating'] == 0))
-				{
-					echo "<img src='/img/routerdown.png' alt=' router is down' title='Router is currently down'/>";
-				}
-				else
-				{
-					echo "<img src='/img/blank.gif' alt=' ' width='12px' />";
-				}
-				$days = floor($record[$value]/24);
-				$hours = $record[$value]%24;
-				echo "$days d $hours h</td>";
-			}
-			else if ($record[$value] >= 5*24)
-			{
-				echo "<td class='TDcb'>";
-				if ((!isset($record['Running']) || $record['Running'] == 0) && (!isset($record['Hibernating']) || $record['Hibernating'] == 0))
-				{
-					echo "<img src='/img/routerdown.png' alt=' router is down' title='Router is currently down'/>";
-				}
-				else
-				{
-					echo "<img src='/img/blank.gif' alt=' ' width='12px' />";
-				}
-				$days = floor($record[$value]/24);
-				$hours = $record[$value]%24;
-				echo "$days d $hours h</td>";
-			}
-			else
-			{
-				echo "<td class='TDc'><img src='/img/routerdown.png' alt=' router is down' title='Router is currently down'/>N/A</td>";
-			}
-			break;
-
-  			case
-			($value == "ORPort" || $value == "DirPort"):
-
-			if ($record[$value] > 0 && $record[$value] != 80 && $record[$value] != 443)
-			{
-				echo "<td class='TDc'>" . $record[$value] . "</td>";
-			}
-			else if ($record[$value] == 80 || $record[$value] == 443)
-			{
-				echo "<td class='TDc'><b>" . $record[$value] . "</b></td>";
-			}
-			else
-			{
-				echo "<td class='TDc'>None</td>";
-			}
-			break;
-		}
-	}
-
-	echo "</tr>\n";
+	return $rows;
 }
 
 // Read SortRequest (SR) and SortOrder (SO) variables -- These come from POST, GET, or SESSION
@@ -900,6 +557,47 @@ else
 	if (isset($_SESSION["SO"]))
 	{
 		$SO = $_SESSION['SO'];
+	}
+}
+
+// Read RowsPerPage and Page variables -- These come from POST, GET, or SESSION
+
+// POST
+if ($_SERVER['REQUEST_METHOD'] == 'POST')
+{
+	if (isset($_POST["RowsPerPage"]))
+	{
+		$RowsPerPage = $_POST["RowsPerPage"];
+	}
+	if (isset($_POST["Page"]))
+	{
+		$Page = $_POST["Page"];
+	}
+}
+
+// GET
+else if ($_SERVER['REQUEST_METHOD'] == 'GET')
+{
+	if (isset($_GET["RowsPerPage"]))
+	{
+		$RowsPerPage = $_GET["RowsPerPage"];
+	}
+	if (isset($_GET["Page"]))
+	{
+		$Page = $_GET["Page"];
+	}
+}
+
+// SESSION
+else
+{
+	if (isset($_SESSION["RowsPerPage"]))
+	{
+		$RowsPerPage = $_SESSION['RowsPerPage'];
+	}
+	if (isset($_SESSION["Page"]))
+	{
+		$Page = $_SESSION['Page'];
 	}
 }
 
@@ -939,6 +637,20 @@ if(
 	$SO != "Desc")
 {
 	$SO = "Asc";
+}
+
+if(
+	$RowsPerPage != "25"			&&
+	$RowsPerPage != "50"			&&
+	$RowsPerPage != "100")
+{
+	$RowsPerPage = "25";
+}
+
+$Page = filter_var($Page, FILTER_VALIDATE_INT);
+if ($Page === false || $Page < 1)
+{
+	$Page = 1;
 }
 
 // Read CustomSearch Field (CSField), CustomSearch Modifier (CSMod), CustomSearch Input (CSInput), and FLAGS variables -- These come from POST or SESSION
@@ -1009,6 +721,75 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST')
 	if (isset($_POST["CSInput"]))
 	{
 		$CSInput = $_POST["CSInput"];
+	}
+}
+
+// GET
+else if ($_SERVER['REQUEST_METHOD'] == 'GET')
+{
+	if (isset($_GET["FAuthority"]))
+	{
+		$FAuthority = $_GET["FAuthority"];
+	}
+	if (isset($_GET["FBadDirectory"]))
+	{
+		$FBadDirectory = $_GET["FBadDirectory"];
+	}
+	if (isset($_GET["FBadExit"]))
+	{
+		$FBadExit = $_GET["FBadExit"];
+	}
+	if (isset($_GET["FExit"]))
+	{
+		$FExit = $_GET["FExit"];
+	}
+	if (isset($_GET["FFast"]))
+	{
+		$FFast = $_GET["FFast"];
+	}
+	if (isset($_GET["FGuard"]))
+	{
+		$FGuard = $_GET["FGuard"];
+	}
+	if (isset($_GET["FHibernating"]))
+	{
+		$FHibernating = $_GET["FHibernating"];
+	}
+	if (isset($_GET["FNamed"]))
+	{
+		$FNamed = $_GET["FNamed"];
+	}
+	if (isset($_GET["FStable"]))
+	{
+		$FStable = $_GET["FStable"];
+	}
+	if (isset($_GET["FRunning"]))
+	{
+		$FRunning = $_GET["FRunning"];
+	}
+	if (isset($_GET["FValid"]))
+	{
+		$FValid = $_GET["FValid"];
+	}
+	if (isset($_GET["FV2Dir"]))
+	{
+		$FV2Dir = $_GET["FV2Dir"];
+	}
+	if (isset($_GET["FHSDir"]))
+	{
+		$FHSDir = $_GET["FHSDir"];
+	}
+	if (isset($_GET["CSField"]))
+	{
+		$CSField = $_GET["CSField"];
+	}
+	if (isset($_GET["CSMod"]))
+	{
+		$CSMod = $_GET["CSMod"];
+	}
+	if (isset($_GET["CSInput"]))
+	{
+		$CSInput = $_GET["CSInput"];
 	}
 }
 
@@ -1236,6 +1017,26 @@ else
 {
 	unset($_SESSION['SO']);
 	$_SESSION['SO'] = $SO;
+}
+
+if (!isset($_SESSION['RowsPerPage']))
+{
+	$_SESSION['RowsPerPage'] = $RowsPerPage;
+}
+else
+{
+	unset($_SESSION['RowsPerPage']);
+	$_SESSION['RowsPerPage'] = $RowsPerPage;
+}
+
+if (!isset($_SESSION['Page']))
+{
+	$_SESSION['Page'] = $Page;
+}
+else
+{
+	unset($_SESSION['Page']);
+	$_SESSION['Page'] = $Page;
 }
 
 if (!isset($_SESSION['FAuthority']))
@@ -2049,47 +1850,35 @@ else
 	$query = $query . " order by " . $SR . " " . $SO . ", Name Asc";
 }
 
+// Count total results for pagination (same WHERE clauses)
+// Wrap the grouped query as a subquery so COUNT(*) gives the number of distinct groups
+$countQuery = "SELECT COUNT(*) AS Count FROM (" . $query . ") AS countQuery";
+$countResult = $mysqli->query($countQuery);
+if (!$countResult) {
+	die_503('Count query failed: ' . $mysqli->error);
+}
+$countRecord = $countResult->fetch_assoc();
+$TotalResults = $countRecord['Count'];
+$countResult->free();
+
+$TotalPages = max(1, ceil($TotalResults / (int)$RowsPerPage));
+if ($Page > $TotalPages) {
+	$Page = $TotalPages;
+}
+$Offset = ($Page - 1) * (int)$RowsPerPage;
+
+$query .= " LIMIT " . (int)$RowsPerPage . " OFFSET " . (int)$Offset;
+
 $result = $mysqli->query($query);
 if(!$result) {
 	die_503('Query failed: ' . $mysqli->error);
 }
 
-
+$routers = build_router_rows($result);
+$result->free();
+$CurrentResultSet = $TotalResults;
 
 $pageTitle = "Tor Network Status";
-
-// Router table block
-ob_start();
-?>
-<table width='100%' cellspacing='0' cellpadding='0' border='0' align='center' class='displayTable'>
-<?php
-GenerateHeaderRow();
-echo $HeaderRowString;
-
-while ($record = $result->fetch_assoc())
-{
-	if ($RowCounter < $ColumnHeaderInterval)
-	{
-		DisplayRouterRow();
-
-		$CurrentResultSet++;
-		$RowCounter++;
-	}
-	else
-	{
-		echo $HeaderRowString;
-		DisplayRouterRow();
-
-		$CurrentResultSet++;
-		$RowCounter = 1;
-	}
-}
-$result->free();
-?>
-</table>
-<?php
-$routerTableHtml = ob_get_clean();
-$router_table_block = $routerTableHtml;
 
 // stats block
 ob_start();
@@ -2524,7 +2313,32 @@ echo "</tr>\n";
 $appserver_block = ob_get_clean();
 
 $context = [
-	'router_table_block' => $router_table_block,
+	'routers' => $routers,
+	'columns_active' => $ColumnList_ACTIVE,
+	'sr' => $SR,
+	'so' => $SO,
+	'page' => $Page,
+	'total_pages' => $TotalPages,
+	'total_results' => $TotalResults,
+	'rows_per_page' => (int)$RowsPerPage,
+	'self' => $Self,
+	'country_codes' => $country_codes,
+	'FAuthority' => $FAuthority,
+	'FBadDirectory' => $FBadDirectory,
+	'FBadExit' => $FBadExit,
+	'FExit' => $FExit,
+	'FFast' => $FFast,
+	'FGuard' => $FGuard,
+	'FHibernating' => $FHibernating,
+	'FNamed' => $FNamed,
+	'FStable' => $FStable,
+	'FRunning' => $FRunning,
+	'FValid' => $FValid,
+	'FV2Dir' => $FV2Dir,
+	'FHSDir' => $FHSDir,
+	'CSField' => $CSField,
+	'CSMod' => $CSMod,
+	'CSInput' => $CSInput,
 	'stats_block' => $stats_block,
 	'nsos_block' => $nsos_block,
 	'query_block' => $query_block,

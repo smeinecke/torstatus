@@ -29,6 +29,7 @@ function render(string $template, array $context = []): void {
         'CSInput' => $CSInput ?? null,
         'Self' => $Self ?? $_SERVER['PHP_SELF'] ?? '',
         'version' => $appVersion ?? '4.0',
+        'WHOISPath' => defined('WHOISPath') ? WHOISPath : null,
     ];
     $context = array_merge($default, $context);
     echo $twig->render($template, $context);

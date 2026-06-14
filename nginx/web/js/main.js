@@ -24,6 +24,13 @@
         });
     }
 
+    var rowsPerPageSelect = document.getElementById('rows-per-page-select');
+    if (rowsPerPageSelect) {
+        rowsPerPageSelect.addEventListener('change', function() {
+            this.form.submit();
+        });
+    }
+
     // --- Infobar ---
     var infobar = document.getElementById('infobar');
     var expandcollapseLink = document.getElementById('expandcollapse-link');
