@@ -27,11 +27,18 @@ $CurrentResultSet = 0;
 $RowCounter = 0;
 
 $Self = $_SERVER['PHP_SELF'];
+$RemoteIP = $_SERVER['REMOTE_ADDR'];
+// Only honor X-Forwarded-For from trusted proxies (configurable list)
 $forwardedFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
-$xff = array_map( 'trim', explode( ',',$forwardedFor ) );
-$xff = array_reverse( $xff );
+if ($forwardedFor != '' && in_array($_SERVER['REMOTE_ADDR'], $TrustedProxies ?? [])) {
+	$xff = array_map('trim', explode(',', $forwardedFor));
+	$xff = array_reverse($xff);
+	$clientIP = filter_var($xff[0], FILTER_VALIDATE_IP);
+	if ($clientIP !== false) {
+		$RemoteIP = $clientIP;
+	}
+}
 $ServerIP = ($forwardedFor != '') ? $RealServerIP : $_SERVER['SERVER_ADDR'];
-$RemoteIP = ($forwardedFor != '') ? $xff[0] : $_SERVER['REMOTE_ADDR'];
 $ServerPort = $_SERVER['SERVER_PORT'];
 $RemoteIPDBCount = null;
 $PositiveMatch_IP = 0;
@@ -601,7 +608,7 @@ function DisplayRouterRow()
 	}
 	echo "<div class='flags_$countrycode' title='".$country_codes[strtolower($record['CountryCode'])]."'></div>&nbsp;";
 #	echo "<img src='img/flags/".$countrycode.".gif' class='flag' width='18px' alt='".$record['CountryCode']."' title='".$country_codes[strtolower($record['CountryCode'])]."'/>&nbsp;";
-	echo "<a href='router_detail.php?FP=" . $record['Fingerprint'] . "'>" . $record['Name'] . "</a></td>";
+	echo "<a href='router_detail.php?FP=" . htmlspecialchars($record['Fingerprint'], ENT_QUOTES) . "'>" . htmlspecialchars($record['Name'], ENT_QUOTES) . "</a></td>";
 
 	foreach($ColumnList_ACTIVE as $value)
 	{
@@ -616,16 +623,16 @@ function DisplayRouterRow()
 				$innerTable = 1;
 				echo "<table class='iT'><tr><td class='iT'>";
 			}
-			echo $record[$value];
+			echo htmlspecialchars($record[$value], ENT_QUOTES);
 			if (isset($record['IP']))
 			{
 				if (defined("WHOISPath"))
 				{
-				echo " [<a class='who' href='".WHOISPath.$record['IP']."'>".$record['IP']."</a>]";
+				echo " [<a class='who' href='".htmlspecialchars(WHOISPath.$record['IP'], ENT_QUOTES)."'>".htmlspecialchars($record['IP'], ENT_QUOTES)."</a>]";
 				}
 				else
 				{
-				echo " [".$record['IP']."]";
+				echo " [".htmlspecialchars($record['IP'], ENT_QUOTES)."]";
 				}
 			}
 			if (isset($record['Fast']) && $record['Fast'] == 1)
@@ -1418,9 +1425,11 @@ $SigningKey = $record ? $record['SigningKey'] : '';
 $Contact = $record ? $record['Contact'] : '';
 $DescriptorSignature = $record ? $record['DescriptorSignature'] : '';
 
+$RemoteIP_ESC = $mysqli->real_escape_string($RemoteIP);
+
 if ($Fingerprint)
 {
-	$query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '$Fingerprint'";
+	$query = "select Hostname, CountryCode from $ActiveNetworkStatusTable where Fingerprint = '" . $mysqli->real_escape_string($Fingerprint) . "'";
 	$record = db_query_single_row($query, 1800);
 
 	$Hostname = $record['Hostname'];
@@ -1428,7 +1437,7 @@ if ($Fingerprint)
 }
 
 // Determine if client IP exists in database as a Tor server
-$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP' and FExit = 1";
+$query = "select count(*) as Count from $ActiveNetworkStatusTable where IP = '$RemoteIP_ESC' and FExit = 1";
 $record = db_query_single_row($query, 1800);
 
 $RemoteIPDBCount = $record['Count'];
@@ -1442,7 +1451,7 @@ else {
 		from $ActiveORAddressesTable
 			join $ActiveDescriptorTable on $ActiveDescriptorTable.ID = $ActiveORAddressesTable.descriptor_id
 			join $ActiveNetworkStatusTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint
-		where address = '$RemoteIP'
+		where address = '$RemoteIP_ESC'
 			and $ActiveNetworkStatusTable.FExit = 1";
 	$record = db_query_single_row($query, 1800);
 
@@ -1461,7 +1470,7 @@ if ($PositiveMatch_IP == 1)
 		from $ActiveNetworkStatusTable
 			inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint
 			left join $ActiveORAddressesTable on $ActiveDescriptorTable.ID = $ActiveORAddressesTable.descriptor_id
-		where ($ActiveNetworkStatusTable.IP = '$RemoteIP' or $ActiveORAddressesTable.address = '$RemoteIP')
+		where ($ActiveNetworkStatusTable.IP = '$RemoteIP_ESC' or $ActiveORAddressesTable.address = '$RemoteIP_ESC')
 		group by Name, Fingerprint, ExitPolicySERDATA";
 	$result = $mysqli->query($query);
 	if(!$result) {
@@ -1474,7 +1483,7 @@ if ($PositiveMatch_IP == 1)
 
 		$TorNodeName[$Count] = $record['Name'];
 		$TorNodeFP[$Count] = $record['Fingerprint'];
-		$TorNodeExitPolicy = unserialize($record['ExitPolicySERDATA']);
+		$TorNodeExitPolicy = unserialize($record['ExitPolicySERDATA'], ['allowed_classes' => false]);
 
 		foreach($TorNodeExitPolicy as $ExitPolicyLine)
 		{
@@ -2174,7 +2183,7 @@ else
 	echo "<tr><td class='tab'>";
 	echo "<img alt='You are not using Tor' src='/img/notusingtor.png'/>";
 	echo "</td><td class='content' style='text-align: center;'>";
-	echo "<span class='notUsingTor'>You do not appear to be using Tor</span><br/>Your IP Address is: $RemoteIP";
+	echo "<span class='notUsingTor'>You do not appear to be using Tor</span><br/>Your IP Address is: " . htmlspecialchars($RemoteIP, ENT_QUOTES);
 	echo "</td></tr>";
 }
 
@@ -2432,19 +2441,19 @@ function toggleANSS()
 
 if($Fingerprint)
 {
-	echo "<b>Nickname:</b><br/><a class='plainbox' href='router_detail.php?FP=$Fingerprint'>" . $Name . "</a><br/>\n";
-	echo "<b>Fingerprint:</b><br/>" . chunk_split(strtoupper($Fingerprint), 4, " ") . "<br/>\n";
-	echo "<b>Country Code:</b><br/>"; if($CountryCode == null){echo "Unknown";}else{echo $CountryCode;} echo "<br/>\n";
-	echo "<b>Contact:</b><br/>"; if($Contact == null){echo "None Given";} else{$Contact = htmlspecialchars($Contact, ENT_QUOTES); echo "$Contact";} echo "<br/>\n";
-	echo "<b>Platform:</b><br/>" . $Platform . "<br/>\n";
-	echo "<b>IP Address:</b><br/>" . $IP . "<br/>\n";
-	echo "<b>Hostname:</b><br/>"; if ($IP == $Hostname){echo "Unavailable";} else{echo "$Hostname";} echo "<br/>\n";
-	echo "<b>Onion Router Port:</b><br/>" . $ORPort . "<br/>\n";
-	echo "<b>Directory Server Port:</b><br/>"; if($DirPort == 0){echo "None";} else {echo $DirPort;} echo "<br/>\n";
-	echo "<b>Last Published Descriptor (GMT):</b><br/>" . $LastDescriptorPublished . "<br/><br/>\n";
-	echo "<b>Onion Key:</b><pre>" . $OnionKey . "</pre>\n";
-	echo "<b>Signing Key:</b><pre>" . $SigningKey . "</pre>\n";
-	echo "<b>Descriptor Signature:</b><pre>" . $DescriptorSignature . "</pre>\n";
+	echo "<b>Nickname:</b><br/><a class='plainbox' href='router_detail.php?FP=" . htmlspecialchars($Fingerprint, ENT_QUOTES) . "'>" . htmlspecialchars($Name, ENT_QUOTES) . "</a><br/>\n";
+	echo "<b>Fingerprint:</b><br/>" . chunk_split(strtoupper(htmlspecialchars($Fingerprint, ENT_QUOTES)), 4, " ") . "<br/>\n";
+	echo "<b>Country Code:</b><br/>"; if($CountryCode == null){echo "Unknown";}else{echo htmlspecialchars($CountryCode, ENT_QUOTES);} echo "<br/>\n";
+	echo "<b>Contact:</b><br/>"; if($Contact == null){echo "None Given";} else{echo htmlspecialchars($Contact, ENT_QUOTES);} echo "<br/>\n";
+	echo "<b>Platform:</b><br/>" . htmlspecialchars($Platform, ENT_QUOTES) . "<br/>\n";
+	echo "<b>IP Address:</b><br/>" . htmlspecialchars($IP, ENT_QUOTES) . "<br/>\n";
+	echo "<b>Hostname:</b><br/>"; if ($IP == $Hostname){echo "Unavailable";} else{echo htmlspecialchars($Hostname, ENT_QUOTES);} echo "<br/>\n";
+	echo "<b>Onion Router Port:</b><br/>" . htmlspecialchars($ORPort, ENT_QUOTES) . "<br/>\n";
+	echo "<b>Directory Server Port:</b><br/>"; if($DirPort == 0){echo "None";} else {echo htmlspecialchars($DirPort, ENT_QUOTES);} echo "<br/>\n";
+	echo "<b>Last Published Descriptor (GMT):</b><br/>" . htmlspecialchars($LastDescriptorPublished, ENT_QUOTES) . "<br/><br/>\n";
+	echo "<b>Onion Key:</b><pre>" . htmlspecialchars($OnionKey, ENT_QUOTES) . "</pre>\n";
+	echo "<b>Signing Key:</b><pre>" . htmlspecialchars($SigningKey, ENT_QUOTES) . "</pre>\n";
+	echo "<b>Descriptor Signature:</b><pre>" . htmlspecialchars($DescriptorSignature, ENT_QUOTES) . "</pre>\n";
 }
 else {
 	echo "Data source is a client, not a relay, therefore no detailled information is available";

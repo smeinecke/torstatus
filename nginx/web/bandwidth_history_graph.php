@@ -51,10 +51,10 @@ if ($Fingerprint && preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 
 	if ($record)
 	{
-		$WriteHistory_DATA_ARRAY = unserialize($record['WriteHistorySERDATA']);
+		$WriteHistory_DATA_ARRAY = unserialize($record['WriteHistorySERDATA'], ['allowed_classes' => false]);
 		$WriteHistory_INC = $record['WriteHistoryINC'];
 		$WriteHistory_LAST = $record['WriteHistoryLAST'];
-		$ReadHistory_DATA_ARRAY = unserialize($record['ReadHistorySERDATA']);
+		$ReadHistory_DATA_ARRAY = unserialize($record['ReadHistorySERDATA'], ['allowed_classes' => false]);
 		$ReadHistory_INC = $record['ReadHistoryINC'];
 		$ReadHistory_LAST = $record['ReadHistoryLAST'];
 	}
@@ -64,7 +64,7 @@ else
 	// Fall back to session data for backwards compatibility
 	if (isset($_SESSION["WriteHistory_DATA_ARRAY_SERIALIZED"]))
 	{
-		$WriteHistory_DATA_ARRAY = unserialize($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED']);
+		$WriteHistory_DATA_ARRAY = unserialize($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
 	}
 	if (isset($_SESSION["WriteHistory_INC"]))
 	{
@@ -77,7 +77,7 @@ else
 
 	if (isset($_SESSION["ReadHistory_DATA_ARRAY_SERIALIZED"]))
 	{
-		$ReadHistory_DATA_ARRAY = unserialize($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED']);
+		$ReadHistory_DATA_ARRAY = unserialize($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'], ['allowed_classes' => false]);
 	}
 	if (isset($_SESSION["ReadHistory_INC"]))
 	{

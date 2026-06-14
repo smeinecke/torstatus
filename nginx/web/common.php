@@ -19,7 +19,7 @@ function db_query_single_row($query, $cache_expiration = -1) {
 	$query_database = true;
 	if($cache_expiration > -1) {
 		$cache_key = "torstatus_query_" . sha1($query);
-		$cache_data = unserialize($memcached->get($cache_key));
+		$cache_data = unserialize($memcached->get($cache_key), ['allowed_classes' => false]);
 		if($cache_data) {
 			$query_database = false;
 			$record = $cache_data['content'];

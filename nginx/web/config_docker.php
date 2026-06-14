@@ -19,6 +19,7 @@ $LocalTorServerPassword = "torstatus";
 // ++++++++++ Squid and SSL ++++++++++ {{{
 
 $RealServerIP = isset($_ENV['REAL_SERVER_IP']) ? $_ENV['REAL_SERVER_IP'] : '';
+$TrustedProxies = array();
 
 // }}}
 

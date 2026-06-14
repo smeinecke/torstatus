@@ -51,7 +51,9 @@ else {
 $Fingerprint = strip_tags($Fingerprint);
 if (!preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 {
-	$Fingerprint = null;
+	http_response_code(400);
+	echo('Invalid fingerprint');
+	die();
 }
 
 // Populate variables from database
@@ -85,8 +87,8 @@ $Bandwidth_BURST = $record['BandwidthBURST'];
 $Bandwidth_OBSERVED = $record['BandwidthOBSERVED'];
 $OnionKey = $record['OnionKey'];
 $SigningKey = $record['SigningKey'];
-$ExitPolicy_DATA_ARRAY = unserialize($record['ExitPolicySERDATA']);
-$Family_DATA_ARRAY = unserialize($record['FamilySERDATA']);
+$ExitPolicy_DATA_ARRAY = unserialize($record['ExitPolicySERDATA'], ['allowed_classes' => false]);
+$Family_DATA_ARRAY = unserialize($record['FamilySERDATA'], ['allowed_classes' => false]);
 $CountryCode = $record['CountryCode'];
 $FAuthority = $record['FAuthority'];
 $FBadDirectory = $record['FBadDirectory'];
@@ -153,61 +155,61 @@ include("header.php");
 	// Display router name
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Router Name:</b></td>\n";
-	echo "<td class='TRSB'>$Name</td>\n";
+	echo "<td class='TRSB'>" . htmlspecialchars($Name, ENT_QUOTES) . "</td>\n";
 	echo "</tr>\n";
 
 	// Display router Fingerprint
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Fingerprint:</b></td>\n";
-	echo "<td class='TRSB'>" . chunk_split(strtoupper($Fingerprint), 4, " ") . "</td>\n";
+	echo "<td class='TRSB'>" . chunk_split(strtoupper(htmlspecialchars($Fingerprint, ENT_QUOTES)), 4, " ") . "</td>\n";
 	echo "</tr>\n";
 
 	// Display router Contact
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Contact:</b></td>\n";
-	echo "<td class='TRSB'>"; if($Contact == null){echo "None Given";} else{$Contact = htmlspecialchars($Contact, ENT_QUOTES); echo "$Contact";} echo "</td>\n";
+	echo "<td class='TRSB'>"; if($Contact == null){echo "None Given";} else{echo htmlspecialchars($Contact, ENT_QUOTES);} echo "</td>\n";
 	echo "</tr>\n";
 
 	// Display router IP
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>IP Address:</b></td>\n";
-	echo "<td class='TRSB'>$IP</td>\n";
+	echo "<td class='TRSB'>" . htmlspecialchars($IP, ENT_QUOTES) . "</td>\n";
 	echo "</tr>\n";
 
 	// Display router Hostname
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Hostname:</b></td>\n";
-	echo "<td class='TRSB'>"; if($Hostname == $IP){echo "Unavailable";} else{echo "$Hostname";} echo "</td>\n";
+	echo "<td class='TRSB'>"; if($Hostname == $IP){echo "Unavailable";} else{echo htmlspecialchars($Hostname, ENT_QUOTES);} echo "</td>\n";
 	echo "</tr>\n";
 
 	// Display ORPort
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Onion Router Port:</b></td>\n";
-	echo "<td class='TRSB'>$ORPort</td>\n";
+	echo "<td class='TRSB'>" . htmlspecialchars($ORPort, ENT_QUOTES) . "</td>\n";
 	echo "</tr>\n";
 
 	// Display DirPort
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Directory Server Port:</b></td>\n";
-	echo "<td class='TRSB'>"; if($DirPort == 0){echo "None";} else{echo "$DirPort";} echo "</td>\n";
+	echo "<td class='TRSB'>"; if($DirPort == 0){echo "None";} else{echo htmlspecialchars($DirPort, ENT_QUOTES);} echo "</td>\n";
 	echo "</tr>\n";
 
 	// Display CountryCode
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Country Code:</b></td>\n";
-	echo "<td class='TRSB'>"; if($CountryCode == null){echo "Unknown";} else{echo "$CountryCode";} echo "</td>\n";
+	echo "<td class='TRSB'>"; if($CountryCode == null){echo "Unknown";} else{echo htmlspecialchars($CountryCode, ENT_QUOTES);} echo "</td>\n";
 	echo "</tr>\n";
 
 	// Display Platform
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Platform / Version:</b></td>\n";
-	echo "<td class='TRSB'>$Platform</td>\n";
+	echo "<td class='TRSB'>" . htmlspecialchars($Platform, ENT_QUOTES) . "</td>\n";
 	echo "</tr>\n";
 
 	// Display LastDescriptorPublished
 	echo "<tr>\n";
 	echo "<td class='TRAR'><b>Last Descriptor Published (GMT):</b></td>\n";
-	echo "<td class='TRSB'>$LastDescriptorPublished</td>\n";
+	echo "<td class='TRSB'>" . htmlspecialchars($LastDescriptorPublished, ENT_QUOTES) . "</td>\n";
 	echo "</tr>\n";
 
 	if ($Uptime > -1)
@@ -249,7 +251,7 @@ include("header.php");
 	{
 		for ($i=0 ; $i < count($Family_DATA_ARRAY) ; $i++)
 		{
-			echo "$Family_DATA_ARRAY[$i]<br/>";
+			echo htmlspecialchars($Family_DATA_ARRAY[$i], ENT_QUOTES) . "<br/>";
 		}
 	}
 	echo "</td>\n";
@@ -266,7 +268,7 @@ include("header.php");
 
 	for ($i=0 ; $i<count($ExitPolicy_DATA_ARRAY) ; $i++)
 	{
-		echo "$ExitPolicy_DATA_ARRAY[$i]<br/>\n";
+		echo htmlspecialchars($ExitPolicy_DATA_ARRAY[$i], ENT_QUOTES) . "<br/>\n";
 	}
 
 	echo "<br/>\n";
