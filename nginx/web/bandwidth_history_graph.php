@@ -1,13 +1,9 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
-// Start new session
-@session_start() or die();
-
-// Include configuration settings
-include("config.php");
+require_once('common.php');
 
 // Include JPGraph items
 require_once($JPGraph_Path . "jpgraph.php");
@@ -16,6 +12,7 @@ require_once($JPGraph_Path . "jpgraph_date.php");
 
 // Declare and initialize variables
 $MODE = null;
+$Fingerprint = null;
 
 $WriteHistory_DATA_ARRAY = null;
 $WriteHistory_INC = null;
@@ -30,6 +27,10 @@ if (isset($_GET["MODE"]))
 {
 	$MODE = $_GET["MODE"];
 }
+if (isset($_GET["FP"]))
+{
+	$Fingerprint = $_GET["FP"];
+}
 
 // Perform variable scrubbing
 if($MODE != 'WriteHistory' && $MODE != 'ReadHistory')
@@ -37,44 +38,66 @@ if($MODE != 'WriteHistory' && $MODE != 'ReadHistory')
 	$MODE = null;
 }
 
-// Get variables from session
-if (isset($_SESSION["WriteHistory_DATA_ARRAY_SERIALIZED"]))
+// If a fingerprint is provided, query the database directly to avoid session race conditions
+if ($Fingerprint && preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 {
-	$WriteHistory_DATA_ARRAY = unserialize($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED']);
-}
-if (isset($_SESSION["WriteHistory_INC"]))
-{
-	$WriteHistory_INC = $_SESSION['WriteHistory_INC'];
-}
-if (isset($_SESSION["WriteHistory_LAST"]))
-{
-	$WriteHistory_LAST = $_SESSION['WriteHistory_LAST'];
-}
+	$query = "select WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA from $ActiveDescriptorTable where Fingerprint = ?";
+	$stmt = $mysqli->prepare($query);
+	$stmt->bind_param('s', $Fingerprint);
+	$stmt->execute();
+	$result = $stmt->get_result();
+	$record = $result->fetch_assoc();
+	$stmt->close();
 
-if (isset($_SESSION["ReadHistory_DATA_ARRAY_SERIALIZED"]))
-{
-	$ReadHistory_DATA_ARRAY = unserialize($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED']);
+	if ($record)
+	{
+		$WriteHistory_DATA_ARRAY = unserialize($record['WriteHistorySERDATA']);
+		$WriteHistory_INC = $record['WriteHistoryINC'];
+		$WriteHistory_LAST = $record['WriteHistoryLAST'];
+		$ReadHistory_DATA_ARRAY = unserialize($record['ReadHistorySERDATA']);
+		$ReadHistory_INC = $record['ReadHistoryINC'];
+		$ReadHistory_LAST = $record['ReadHistoryLAST'];
+	}
 }
-if (isset($_SESSION["ReadHistory_INC"]))
+else
 {
-	$ReadHistory_INC = $_SESSION['ReadHistory_INC'];
-}
-if (isset($_SESSION["ReadHistory_LAST"]))
-{
-	$ReadHistory_LAST = $_SESSION['ReadHistory_LAST'];
+	// Fall back to session data for backwards compatibility
+	if (isset($_SESSION["WriteHistory_DATA_ARRAY_SERIALIZED"]))
+	{
+		$WriteHistory_DATA_ARRAY = unserialize($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED']);
+	}
+	if (isset($_SESSION["WriteHistory_INC"]))
+	{
+		$WriteHistory_INC = $_SESSION['WriteHistory_INC'];
+	}
+	if (isset($_SESSION["WriteHistory_LAST"]))
+	{
+		$WriteHistory_LAST = $_SESSION['WriteHistory_LAST'];
+	}
+
+	if (isset($_SESSION["ReadHistory_DATA_ARRAY_SERIALIZED"]))
+	{
+		$ReadHistory_DATA_ARRAY = unserialize($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED']);
+	}
+	if (isset($_SESSION["ReadHistory_INC"]))
+	{
+		$ReadHistory_INC = $_SESSION['ReadHistory_INC'];
+	}
+	if (isset($_SESSION["ReadHistory_LAST"]))
+	{
+		$ReadHistory_LAST = $_SESSION['ReadHistory_LAST'];
+	}
 }
 
 // Deal with no data situations
-if (count($WriteHistory_DATA_ARRAY) < 2)
+if (!is_array($WriteHistory_DATA_ARRAY) || count($WriteHistory_DATA_ARRAY) < 2)
 {
-	$WriteHistory_DATA_ARRAY[0] = 0;
-	$WriteHistory_DATA_ARRAY[1] = 0;
+	$WriteHistory_DATA_ARRAY = array(0, 0);
 }
 
-if (count($ReadHistory_DATA_ARRAY) < 2)
+if (!is_array($ReadHistory_DATA_ARRAY) || count($ReadHistory_DATA_ARRAY) < 2)
 {
-	$ReadHistory_DATA_ARRAY[0] = 0;
-	$ReadHistory_DATA_ARRAY[1] = 0;
+	$ReadHistory_DATA_ARRAY = array(0, 0);
 }
 
 if (intval($WriteHistory_INC) < 10)
@@ -91,12 +114,12 @@ if ($MODE == "WriteHistory")
 {
 	// Return WriteData History Graph
 	DEFINE('NDATAPOINTS', count($WriteHistory_DATA_ARRAY));
-	DEFINE('SAMPLERATE', intval($WriteHistory_INC)); 
+	DEFINE('SAMPLERATE', intval($WriteHistory_INC));
 	$end = (strtotime($WriteHistory_LAST) + SAMPLERATE);
 	$start = $end-NDATAPOINTS*SAMPLERATE;
 	$data = array();
 	$xdata = array();
-	for($i=0; $i < NDATAPOINTS; ++$i) 
+	for($i=0; $i < NDATAPOINTS; ++$i)
 	{
 	    $data[$i] = intval($WriteHistory_DATA_ARRAY[$i] / intval($WriteHistory_INC));
 	    $xdata[$i] = $start + $i * SAMPLERATE;
@@ -118,12 +141,12 @@ if ($MODE == "ReadHistory")
 {
 	// Prepare ReadData History Graph
 	DEFINE('NDATAPOINTS', count($ReadHistory_DATA_ARRAY));
-	DEFINE('SAMPLERATE', intval($ReadHistory_INC)); 
+	DEFINE('SAMPLERATE', intval($ReadHistory_INC));
 	$end = (strtotime($ReadHistory_LAST) + SAMPLERATE);
 	$start = $end-NDATAPOINTS*SAMPLERATE;
 	$data = array();
 	$xdata = array();
-	for($i=0; $i < NDATAPOINTS; ++$i) 
+	for($i=0; $i < NDATAPOINTS; ++$i)
 	{
 	    $data[$i] = intval($ReadHistory_DATA_ARRAY[$i] / intval($ReadHistory_INC));
 	    $xdata[$i] = $start + $i * SAMPLERATE;

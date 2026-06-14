@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 require_once('common.php');
 
@@ -14,7 +14,7 @@ if(!($output = $memcached->get("torstatus_ip_list_all_csv"))) {
 	}
 
 	$output = '';
-	while ($record = $result->fetch_assoc()) 
+	while ($record = $result->fetch_assoc())
 	{
 		$output .= "{$record['IP']}\n";
 	}
@@ -29,7 +29,7 @@ $mysqli->close();
 // Output CSV file to browser
 header('Content-Transfer-Encoding: Binary');
 header('Content-type: application/force-download');
-header('Content-disposition: inline; filename=Tor_ip_list_EXIT.csv');
+header('Content-disposition: inline; filename=Tor_ip_list_ALL.csv');
 
 print($output);
 

@@ -8,7 +8,7 @@
 #    This program is part of TorStatus
 #
 #    This program is free software: you can redistribute it and/or modify
-#    it under the terms of the GNU Affero General Public License as published 
+#    it under the terms of the GNU Affero General Public License as published
 #    by the Free Software Foundation, either version 3 of the License, or
 #    (at your option) any later version.
 #
@@ -49,8 +49,12 @@ use Cache::Memcached;
 use IO::Handle;
 use Data::Dumper;
 use Net::IP;
+use Getopt::Long;
 
-print gettimeofday() . "\n";
+my $debug = 0;
+GetOptions('debug' => \$debug);
+
+print gettimeofday() . "\n" if $debug;
 
 # Set the constant to break out of getting the hostnames
 use constant TIMEOUT => 1;
@@ -72,7 +76,7 @@ while (<$config_handle>)
 {
 	# A regular expression is going to try to pull out the configuration
 	# items
-	
+
 	chomp (my $line = $_);
 	if ($line =~ /^\$(.*?) = (.*?);/)
 	{
@@ -133,12 +137,12 @@ sub get_country {
 
 		if($from <= $intip && $to >= $intip) {
 			my $country = $array[2];
-			print($country);
+			print($country) if $debug;
 			if ($country eq '??') {
-				print("country: 2");
+				print("country: 2") if $debug;
 				return '';
 			}
-			print("country: 1");
+			print("country: 1") if $debug;
 			return $country;
 		}
 
@@ -179,7 +183,7 @@ print { $torLogfile } strftime("UPDATE STARTED: %Y-%m-%d %H:%M:%S", localtime) .
 
 # Prepare all of the database information, which Descriptor table, make sure
 # database is installed, etc
-$query = "SElECT count(*) AS Count FROM Status;";
+$query = "SELECT count(*) AS Count FROM Status;";
 $dbresponse = $dbh->prepare($query);
 $dbresponse->execute();
 $record = $dbresponse->fetchrow();
@@ -217,6 +221,9 @@ if ($response !~ /250/)
 	die "Unable to authenticate with the Tor server.";
 }
 
+# Wake Tor from dormant mode so descriptors are available
+print $torSocket "SIGNAL ACTIVE\r\n";
+my $active_response = <$torSocket>;
 
 ############ Updating router descriptions ####################################
 
@@ -260,7 +267,7 @@ while (<$torSocket>)
 
 	# print "x: $line\n";
 	# Trim the line so as to remove odd data
-	
+
 	if ($line =~ /250 OK/) { last; } # Break when done
 
 #	print "b\n";
@@ -274,7 +281,7 @@ while (<$torSocket>)
 		my $dir = $5;
 
 		$router_count++;
-		
+
 		if($router == 1) {
 			print "Now " . $currentRouter{'nickname'} . " and " . $nickname . " get mixed up.\n";
 		}
@@ -342,14 +349,14 @@ while (<$torSocket>)
 	{
 		$currentRouter{'Hibernating'} = $1;
 	}
-	
+
 	# Format for the uptime line
 	# "uptime" number NL
 	if ($line =~ /uptime (.*?)$/)
 	{
 		$currentRouter{'Uptime'} = $1;
 	}
-	
+
 	# Format for the onion-key line
 	# "onion-key" NL a public key in PEM format
 	if ($line =~ /onion-key/ && $line !~ /ntor-onion-key/ && $line !~ /crosscert/)
@@ -419,7 +426,7 @@ while (<$torSocket>)
 	if ($line =~ /contact (.*?)$/)
 	{
 		$currentRouter{'Contact'} = $1;
-		print(length($1) . "\n");
+		print(length($1) . "\n") if $debug;
 	}
 
 	# Format for the extra-info-digest line
@@ -442,7 +449,7 @@ while (<$torSocket>)
 	# "reject" exitpattern NL
 	if ($line =~ /^reject/ || $line =~ /^accept/)
 	{
-		$line =~ s/[^\w\d :\.\*\/\-]//g; 
+		$line =~ s/[^\w\d :\.\*\/\-]//g;
 		$currentRouter{'exitpolicy'} = $currentRouter{'exitpolicy'} . $line . "!";
 	}
 
@@ -496,7 +503,7 @@ while (<$torSocket>)
 			$offset -= $increment;
 		}
 		$currentRouter{'write'} = join(';',@writehistory);
-		
+
 		# TEMPORARY FOR BACKWARDS COMPATIBILITY
 		$currentRouter{'WriteHistoryLAST'} = "$1 $2";
 		$currentRouter{'WriteHistoryINC'} = $3;
@@ -570,7 +577,7 @@ while (<$torSocket>)
 			chop($dline);
 			if ($dline =~ /^250 OK/) { last; } # Break when done
 			if ($dline =~ /^552 /) { last; } # Break on error
-			
+
 			# Format for the read-history line
 			# "read-history" YYYY-MM-DD HH:MM:SS (NSEC s) NUM,NUM,NUM,NUM,NUM... NL
 			# TODO dirrec-read-history!
@@ -593,7 +600,7 @@ while (<$torSocket>)
 				}
 				# TODO wtf?
 				$currentRouter{'read'} = join(';',@readhistory);
-			
+
 				# TEMPORARY FOR BACKWARDS COMPATIBILITY
 				$currentRouter{'ReadHistoryLAST'} = "$1 $2";
 				$currentRouter{'ReadHistoryINC'} = $3;
@@ -601,7 +608,7 @@ while (<$torSocket>)
 				@readhistory = split(/,/,$4);
 				$currentRouter{'ReadHistorySERDATA'} = serialize(\@readhistory);
 			}
-		
+
 			# Format for the write-history line
 			# "write-history" YYYY-MM-DD HH:MM:SS (NSEC s) NUM,NUM,NUM,NUM,NUM... NL
 			# TODO dirrec-write-history!
@@ -624,7 +631,7 @@ while (<$torSocket>)
 				}
 				# TODO wtf?
 				$currentRouter{'write'} = join(';',@writehistory);
-				
+
 				# TEMPORARY FOR BACKWARDS COMPATIBILITY
 				$currentRouter{'WriteHistoryLAST'} = "$1 $2";
 				$currentRouter{'WriteHistoryINC'} = $3;
@@ -636,12 +643,12 @@ while (<$torSocket>)
 		# Close the new Tor connection
 		close ($digestSocket);
 		}
-	
-		if($currentRouter{'SigningKey'} == '')
+
+		if($currentRouter{'SigningKey'} eq '')
 		{
 #			$currentRouter{'SigningKey'} = $currentRouter{'OnionKey'};
 		}
-		if($currentRouter{'OnionKey'} == '')
+		if($currentRouter{'OnionKey'} eq '')
 		{
 #			$currentRouter{'OnionKey'} = $currentRouter{'SigningKey'};
 		}
@@ -728,15 +735,15 @@ while (<$torSocket>)
 
 	print { $torLogfile } "$line\n";
 
-#	print "y: $line\n";	
+#	print "y: $line\n";
 	if ($line =~ /250 OK/) { last; } # Break when done
 
-	print gettimeofday() . "\n";
+	print gettimeofday() . "\n" if $debug;
 
 	# Format for the "r" line
 	# "r" SP nickname SP identity SP digest SP publication SP IP SP ORPort
 	# SP DirPort NL
-	
+
 	if ($line =~ /^r (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?) (.*?)$/ || $line =~ /^\./)
 	{
 		# If there is previous data, it should be saved now
@@ -771,7 +778,7 @@ while (<$torSocket>)
 			 ($currentRouter{'HSDir'}?1:0),
 			 $currentRouter{'Country'}
 			);
-		
+
 			# Clear the old data
 			%currentRouter = ();
 		}
@@ -779,7 +786,7 @@ while (<$torSocket>)
 		# This makes sure that it is not the last router
 		if ($1)
 		{
-		
+
 		$currentRouter{'Nickname'} = $1;
 		$currentRouter{'Identity'} = unpack('H*',decode_base64($2));
 		$currentRouter{'Digest'} = $3;
@@ -815,7 +822,7 @@ while (<$torSocket>)
 			$currentRouter{$flag} = 1;
 		}
 	}
-	print gettimeofday() . "\n";
+	print gettimeofday() . "\n" if $debug;
 }
 
 $query = "SELECT Fingerprint, IP FROM NetworkStatus${descriptorTable}";
@@ -829,38 +836,36 @@ while(@record = $dbresponse->fetchrow_array) {
 	$ip = $record[1];
 
 	$lookup_counter++;
-	print gettimeofday() . ": Looking up $ip ($lookup_counter/$router_count)\n";
+	print gettimeofday() . ": Looking up $ip ($lookup_counter/$router_count)\n" if $debug;
 
 	my $cache_key = "torstatus_host_$ip";
 	my $hostname = $memcached->get($cache_key);
 	my $cached = 0;
 	if($hostname) {
-		print gettimeofday() . " Cached entry in memcache found!\n";
-	}
-	if($hostname) {
+		print gettimeofday() . " Cached entry in memcache found!\n" if $debug;
 		$cached = 1;
 	}
 	unless ($hostname) {
-		print gettimeofday() . " No cached entry found, executing lookup\n";
+		print gettimeofday() . " No cached entry found, executing lookup\n" if $debug;
 		$hostname = lookup($ip);
 	}
 	# If the hostname was not found, it should be an IP
 	unless ($hostname) {
 		$hostname = $ip;
 	}
+	print gettimeofday() . " Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n" if $debug;
 
-	print gettimeofday() . " Hostname: $hostname, fingerprint: $fingerprint, ip: $ip\n";
 	$query2 = "UPDATE NetworkStatus${descriptorTable} SET Hostname = ? WHERE Fingerprint = ?";
 
 	my $dbresponse = $dbh->prepare($query2);
 	$dbresponse->execute(($hostname, $fingerprint));
 	$dbresponse->finish();
 
-	print gettimeofday() . "\n";
+	print gettimeofday() . "\n" if $debug;
 
 	$memcached->set($cache_key, $hostname, 86400);
 
-	print gettimeofday() . ": Looked up $ip\n";
+	print gettimeofday() . ": Looked up $ip\n" if $debug;
 }
 
 # exit;
@@ -885,7 +890,7 @@ my $sourceQuery = "Name = '$nickname'";
 if ($config{'SourceFingerprint'})
 {
 	$sourceQuery = "Fingerprint = '" . $config{'SourceFingerprint'} . "'";
-}	
+}
 $dbh->do("INSERT INTO NetworkStatusSource SELECT * FROM Descriptor${descriptorTable} WHERE $sourceQuery LIMIT 1;");
 # Set the ID back to one
 $dbh->do("UPDATE NetworkStatusSource SET ID=1;");

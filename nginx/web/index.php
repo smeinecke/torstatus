@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 require_once('common.php');
 
@@ -348,7 +348,7 @@ function IsIPInSubnet($IP,$Subnet)
 	/* always return true if ip is an exact match as is */
 	if ($Subnet == $IP)
 	{
-		return false;
+		return true;
 	}
 
 	/* always return false if only an ip was provided, and it's not an exact match */
@@ -362,10 +362,10 @@ function IsIPInSubnet($IP,$Subnet)
 
 function GenerateHeaderRow()
 {
-	global 	
-			$HeaderRowString, 
+	global
+			$HeaderRowString,
 			$Self,
-			$ColumnList_ACTIVE, 
+			$ColumnList_ACTIVE,
 			$SR,
 			$SO,
 			$FAuthority,
@@ -387,7 +387,7 @@ function GenerateHeaderRow()
 	$ccso = "&nbsp;<a class='header' href='$Self?SR=CountryCode&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/></a>&nbsp;&nbsp;";
 	if ($SR == 'CountryCode' && $SO == 'Asc') { $ccso = "&nbsp;<a class='header' href='$Self?SR=CountryCode&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/></a>&nbsp;&nbsp;"; }
 
-	if($SR == 'Name'){$HeaderRowString .= "<td class='HRS'>$ccso";} else{$HeaderRowString .= "<td class='HRN'>$ccso";} 
+	if($SR == 'Name'){$HeaderRowString .= "<td class='HRS'>$ccso";} else{$HeaderRowString .= "<td class='HRN'>$ccso";}
 	if ($SR == 'Name' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Desc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 	else if ($SR == 'Name' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Asc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 	else $HeaderRowString .= "<a class='header' href='$Self?SR=Name&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
@@ -398,7 +398,7 @@ function GenerateHeaderRow()
 		switch ($value)
 		{
 			case "Fingerprint":
-   			if($SR == 'Fingerprint'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+   			if($SR == 'Fingerprint'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'Fingerprint' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Desc'>";}
 			else if ($SR == 'Fingerprint' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Asc'>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=Fingerprint&amp;SO=Asc'>";
@@ -406,7 +406,7 @@ function GenerateHeaderRow()
    			break;
 
 			case "Bandwidth":
-			if($SR == 'Bandwidth'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'Bandwidth'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'Bandwidth' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 			else if ($SR == 'Bandwidth' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=Bandwidth&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";
@@ -414,7 +414,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "Uptime":
-			if($SR == 'Uptime'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'Uptime'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'Uptime' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 			else if ($SR == 'Uptime' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=Uptime&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";
@@ -422,7 +422,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "LastDescriptorPublished":
-			if($SR == 'LastDescriptorPublished'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'LastDescriptorPublished'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'LastDescriptorPublished' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Desc'>";}
 			else if ($SR == 'LastDescriptorPublished' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Asc'>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=LastDescriptorPublished&amp;SO=Asc'>";
@@ -430,7 +430,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "Hostname":
-			if($SR == 'Hostname'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'Hostname'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'Hostname' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 			else if ($SR == 'Hostname' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=Hostname&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
@@ -438,7 +438,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "ORPort":
-			if($SR == 'ORPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'ORPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'ORPort' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 			else if ($SR == 'ORPort' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=ORPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
@@ -446,7 +446,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "DirPort":
-			if($SR == 'DirPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'DirPort'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'DirPort' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Desc'><img src='img/sortingarrowup.png' alt='&#9652;' class='sorting'/>";}
 			else if ($SR == 'DirPort' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";}
 			else $HeaderRowString .= "<a class='header' href='$Self?SR=DirPort&amp;SO=Asc'><img src='img/sortingarrowdown.png' alt='&#9662;' class='sorting'/>";
@@ -454,7 +454,7 @@ function GenerateHeaderRow()
 			break;
 
 			case "Contact":
-			if($SR == 'Contact'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";} 
+			if($SR == 'Contact'){$HeaderRowString .= "<td class='HRS'>";} else{$HeaderRowString .= "<td class='HRN'>";}
 			if ($SR == 'Contact' && $SO == 'Asc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Contact&amp;SO=Desc'>";}
 			else if ($SR == 'Contact' && $SO == 'Desc'){$HeaderRowString .= "<a class='header' href='$Self?SR=Contact&amp;SO=Asc'>";}
 			else $HeaderRowString .= "<a href='$Self?SR=Contact&amp;SO=Asc'>";
@@ -465,7 +465,7 @@ function GenerateHeaderRow()
 			if(($FBadDirectory == '0') && ($SR == 'FBadDirectory'))
 			{
 				$HeaderRowString .= "<td class='HRFNOS'>";
-			} 
+			}
 			else if(($FBadDirectory == '0') && ($SR != 'FBadDirectory'))
 			{
 				$HeaderRowString .= "<td class='HRFNO'>";
@@ -496,7 +496,7 @@ function GenerateHeaderRow()
 			if(($FBadExit == '0') && ($SR == 'FBadExit'))
 			{
 				$HeaderRowString .= "<td class='HRFNOS'>";
-			} 
+			}
 			else if(($FBadExit == '0') && ($SR != 'FBadExit'))
 			{
 				$HeaderRowString .= "<td class='HRFNO'>";
@@ -525,7 +525,7 @@ function GenerateHeaderRow()
 
 		}
 	}
-	
+
 	$HeaderRowString .= "</tr>\n";
 }
 
@@ -605,7 +605,7 @@ function DisplayRouterRow()
 
 	foreach($ColumnList_ACTIVE as $value)
 	{
-		switch (TRUE) 
+		switch (TRUE)
 		{
 			case
 			($value == "Hostname"):
@@ -664,51 +664,51 @@ function DisplayRouterRow()
 			{
 				$image = "NotAvailable";
 				// Map the platform to something we know
-				if (strpos($record['Platform'],'Linux') || strpos($record['Platform'],'linux'))
+				if (strpos($record['Platform'],'Linux') !== false || strpos($record['Platform'],'linux') !== false)
 				{
 					$image = "Linux";
 				}
-				if (strpos($record['Platform'],'Windows XP'))
+				if (strpos($record['Platform'],'Windows XP') !== false)
 				{
 					$image = "WindowsXP";
 				}
-				else if (strpos($record['Platform'],'Windows') && strpos($record['Platform'],'server'))
+				else if (strpos($record['Platform'],'Windows') !== false && strpos($record['Platform'],'server') !== false)
 				{
 					$image = "WindowsServer";
 				}
-				else if (strpos($record['Platform'],'Windows'))
+				else if (strpos($record['Platform'],'Windows') !== false)
 				{
 					$image = "WindowsOther";
 				}
-				if (strpos($record['Platform'],'Darwin'))
+				if (strpos($record['Platform'],'Darwin') !== false)
 				{
 					$image = "Darwin";
 				}
-				if (strpos($record['Platform'],'DragonFly'))
+				if (strpos($record['Platform'],'DragonFly') !== false)
 				{
 					$image = "DragonFly";
 				}
-				if (strpos($record['Platform'],'FreeBSD'))
+				if (strpos($record['Platform'],'FreeBSD') !== false)
 				{
 					$image = "FreeBSD";
 				}
-				if (strpos($record['Platform'],'NetBSD'))
+				if (strpos($record['Platform'],'NetBSD') !== false)
 				{
 					$image = "NetBSD";
 				}
-				if (strpos($record['Platform'],'IRIX'))
+				if (strpos($record['Platform'],'IRIX') !== false)
 				{
 					$image = "IRIX64";
 				}
-				if (strpos($record['Platform'],'Cygwin'))
+				if (strpos($record['Platform'],'Cygwin') !== false)
 				{
 					$image = "Cygwin";
 				}
-				if (strpos($record['Platform'],'SunOS'))
+				if (strpos($record['Platform'],'SunOS') !== false)
 				{
 					$image = "SunOS";
 				}
-				if (strpos($record['Platform'],'OpenBSD'))
+				if (strpos($record['Platform'],'OpenBSD') !== false)
 				{
 					$image = "OpenBSD";
 				}
@@ -782,7 +782,7 @@ function DisplayRouterRow()
 
   			case
 			(
-				$value == "Fingerprint" 		||  
+				$value == "Fingerprint" 		||
 				$value == "LastDescriptorPublished"	||
 				$value == "Contact"
 			):
@@ -792,7 +792,7 @@ function DisplayRouterRow()
 
   			case
 			(
-				$value == "BadDir" 			|| 
+				$value == "BadDir" 			||
 				$value == "BadExit"
 			):
 
@@ -801,7 +801,7 @@ function DisplayRouterRow()
 
   			case
 			($value == "Uptime"):
-			
+
 			if ($record[$value] > -1 && $record[$value] < 5*24)
 			{
 				echo "<td class='TDc'>";
@@ -840,7 +840,7 @@ function DisplayRouterRow()
 
   			case
 			($value == "ORPort" || $value == "DirPort"):
-			
+
 			if ($record[$value] > 0 && $record[$value] != 80 && $record[$value] != 443)
 			{
 				echo "<td class='TDc'>" . $record[$value] . "</td>";
@@ -930,14 +930,14 @@ if(
 	$SR != "FHSDir")
 {
 	$SR = "Name";
-} 
+}
 
 if(
 	$SO != "Asc"				&&
 	$SO != "Desc")
 {
 	$SO = "Asc";
-} 
+}
 
 // Read CustomSearch Field (CSField), CustomSearch Modifier (CSMod), CustomSearch Input (CSInput), and FLAGS variables -- These come from POST or SESSION
 
@@ -1063,7 +1063,7 @@ else
 	}
 	if (isset($_SESSION["FHSDir"]))
 	{
-		$FV2Dir = $_SESSION["FHSDir"];
+		$FHSDir = $_SESSION["FHSDir"];
 	}
 	if (isset($_SESSION["CSField"]))
 	{
@@ -1176,7 +1176,7 @@ if(
 	$CSField != "Contact")
 {
 	$CSField = "Fingerprint";
-} 
+}
 
 if(
 	$CSMod != "Equals"		&&
@@ -1196,200 +1196,200 @@ if ($CSInput != null)
 }
 
 // Register variables in SESSION
-if (!isset($_SESSION['ColumnList_ACTIVE'])) 
+if (!isset($_SESSION['ColumnList_ACTIVE']))
 {
 	$_SESSION['ColumnList_ACTIVE'] = $ColumnList_ACTIVE;
-} 
+}
 else
 {
 	unset($_SESSION['ColumnList_ACTIVE']);
 	$_SESSION['ColumnList_ACTIVE'] = $ColumnList_ACTIVE;
 }
 
-if (!isset($_SESSION['ColumnList_INACTIVE'])) 
+if (!isset($_SESSION['ColumnList_INACTIVE']))
 {
 	$_SESSION['ColumnList_INACTIVE'] = $ColumnList_INACTIVE;
-} 
+}
 else
 {
 	unset($_SESSION['ColumnList_INACTIVE']);
 	$_SESSION['ColumnList_INACTIVE'] = $ColumnList_INACTIVE;
 }
 
-if (!isset($_SESSION['SR'])) 
+if (!isset($_SESSION['SR']))
 {
 	$_SESSION['SR'] = $SR;
-} 
+}
 else
 {
 	unset($_SESSION['SR']);
 	$_SESSION['SR'] = $SR;
 }
 
-if (!isset($_SESSION['SO'])) 
+if (!isset($_SESSION['SO']))
 {
 	$_SESSION['SO'] = $SO;
-} 
+}
 else
 {
 	unset($_SESSION['SO']);
 	$_SESSION['SO'] = $SO;
 }
 
-if (!isset($_SESSION['FAuthority'])) 
+if (!isset($_SESSION['FAuthority']))
 {
 	$_SESSION['FAuthority'] = $FAuthority;
-} 
+}
 else
 {
 	unset($_SESSION['FAuthority']);
 	$_SESSION['FAuthority'] = $FAuthority;
 }
 
-if (!isset($_SESSION['FBadDirectory'])) 
+if (!isset($_SESSION['FBadDirectory']))
 {
 	$_SESSION['FBadDirectory'] = $FBadDirectory;
-} 
+}
 else
 {
 	unset($_SESSION['FBadDirectory']);
 	$_SESSION['FBadDirectory'] = $FBadDirectory;
 }
 
-if (!isset($_SESSION['FBadExit'])) 
+if (!isset($_SESSION['FBadExit']))
 {
 	$_SESSION['FBadExit'] = $FBadExit;
-} 
+}
 else
 {
 	unset($_SESSION['FBadExit']);
 	$_SESSION['FBadExit'] = $FBadExit;
 }
 
-if (!isset($_SESSION['FExit'])) 
+if (!isset($_SESSION['FExit']))
 {
 	$_SESSION['FExit'] = $FExit;
-} 
+}
 else
 {
 	unset($_SESSION['FExit']);
 	$_SESSION['FExit'] = $FExit;
 }
 
-if (!isset($_SESSION['FFast'])) 
+if (!isset($_SESSION['FFast']))
 {
 	$_SESSION['FFast'] = $FFast;
-} 
+}
 else
 {
 	unset($_SESSION['FFast']);
 	$_SESSION['FFast'] = $FFast;
 }
 
-if (!isset($_SESSION['FGuard'])) 
+if (!isset($_SESSION['FGuard']))
 {
 	$_SESSION['FGuard'] = $FGuard;
-} 
+}
 else
 {
 	unset($_SESSION['FGuard']);
 	$_SESSION['FGuard'] = $FGuard;
 }
 
-if (!isset($_SESSION['FHibernating'])) 
+if (!isset($_SESSION['FHibernating']))
 {
 	$_SESSION['FHibernating'] = $FHibernating;
-} 
+}
 else
 {
 	unset($_SESSION['FHibernating']);
 	$_SESSION['FHibernating'] = $FHibernating;
 }
 
-if (!isset($_SESSION['FNamed'])) 
+if (!isset($_SESSION['FNamed']))
 {
 	$_SESSION['FNamed'] = $FNamed;
-} 
+}
 else
 {
 	unset($_SESSION['FNamed']);
 	$_SESSION['FNamed'] = $FNamed;
 }
 
-if (!isset($_SESSION['FStable'])) 
+if (!isset($_SESSION['FStable']))
 {
 	$_SESSION['FStable'] = $FStable;
-} 
+}
 else
 {
 	unset($_SESSION['FStable']);
 	$_SESSION['FStable'] = $FStable;
 }
 
-if (!isset($_SESSION['FRunning'])) 
+if (!isset($_SESSION['FRunning']))
 {
 	$_SESSION['FRunning'] = $FRunning;
-} 
+}
 else
 {
 	unset($_SESSION['FRunning']);
 	$_SESSION['FRunning'] = $FRunning;
 }
 
-if (!isset($_SESSION['FValid'])) 
+if (!isset($_SESSION['FValid']))
 {
 	$_SESSION['FValid'] = $FValid;
-} 
+}
 else
 {
 	unset($_SESSION['FValid']);
 	$_SESSION['FValid'] = $FValid;
 }
 
-if (!isset($_SESSION['FV2Dir'])) 
+if (!isset($_SESSION['FV2Dir']))
 {
 	$_SESSION['FV2Dir'] = $FV2Dir;
-} 
+}
 else
 {
 	unset($_SESSION['FV2Dir']);
 	$_SESSION['FV2Dir'] = $FV2Dir;
 }
 
-if (!isset($_SESSION['FHSDir'])) 
+if (!isset($_SESSION['FHSDir']))
 {
 	$_SESSION['FHSDir'] = $FHSDir;
-} 
+}
 else
 {
 	unset($_SESSION['FHSDir']);
 	$_SESSION['FHSDir'] = $FHSDir;
 }
 
-if (!isset($_SESSION['CSField'])) 
+if (!isset($_SESSION['CSField']))
 {
 	$_SESSION['CSField'] = $CSField;
-} 
+}
 else
 {
 	unset($_SESSION['CSField']);
 	$_SESSION['CSField'] = $CSField;
 }
 
-if (!isset($_SESSION['CSMod'])) 
+if (!isset($_SESSION['CSMod']))
 {
 	$_SESSION['CSMod'] = $CSMod;
-} 
+}
 else
 {
 	unset($_SESSION['CSMod']);
 	$_SESSION['CSMod'] = $CSMod;
 }
 
-if (!isset($_SESSION['CSInput'])) 
+if (!isset($_SESSION['CSInput']))
 {
 	$_SESSION['CSInput'] = $CSInput;
-} 
+}
 else
 {
 	unset($_SESSION['CSInput']);
@@ -1435,7 +1435,7 @@ $RemoteIPDBCount = $record['Count'];
 
 if ($RemoteIPDBCount > 0)
 {
-	$PositiveMatch_IP = 1;	
+	$PositiveMatch_IP = 1;
 }
 else {
 	$query = "select count(*) as Count
@@ -1450,7 +1450,7 @@ else {
 
 	if ($RemoteIPDBCount > 0)
 	{
-		$PositiveMatch_IP = 1;	
+		$PositiveMatch_IP = 1;
 	}
 }
 
@@ -1469,7 +1469,7 @@ if ($PositiveMatch_IP == 1)
 	}
 
 	while ($record = $result->fetch_assoc())
-	{ 
+	{
 		$Count++;
 
 		$TorNodeName[$Count] = $record['Name'];
@@ -1518,7 +1518,7 @@ if ($PositiveMatch_IP == 1)
 					if(strpos($CurrentPortExpression, '-') !== FALSE)
 					{
 						list($LowerPort,$UpperPort) = explode('-', $CurrentPortExpression);
-	
+
 						if (($ServerPort >= $LowerPort && $ServerPort <= $UpperPort) && ($Condition == 'accept'))
 						{
 							$PositiveMatch_ExitPolicy[$Count] = 1;
@@ -1534,7 +1534,7 @@ if ($PositiveMatch_IP == 1)
 							continue;
 						}
 					}
-	
+
 					// $CurrentPortExpression is a single port number
 					else
 					{
@@ -1761,7 +1761,7 @@ if ($CSInput != null)
 
 	if (strpos($query, "where") === false)
 	{
-		$QueryPrepend = " where "; 
+		$QueryPrepend = " where ";
 	}
 	else
 	{
@@ -1831,7 +1831,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'Bandwidth')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -1856,7 +1856,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'Uptime')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -1938,7 +1938,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'ORPort')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -1963,7 +1963,7 @@ if ($CSInput != null)
 	}
 	else if ($CSField == 'DirPort')
 	{
-		if(!(is_numeric($CSInput_SAFE))) 
+		if(!(is_numeric($CSInput_SAFE)))
 		{
 			$CSInput = 0;
 			$CSInput_SAFE = 0;
@@ -2056,7 +2056,7 @@ if(!$onion_service) {
 	header("onion-location: $Hidden_Service_URL");
 }
 
-?><!DOCTYPE html 
+?><!DOCTYPE html
      PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
@@ -2210,13 +2210,13 @@ GenerateHeaderRow();
 echo $HeaderRowString;
 
 // Loop through and display all routers returned by query
-while ($record = $result->fetch_assoc()) 
+while ($record = $result->fetch_assoc())
 {
 
 	if ($RowCounter < $ColumnHeaderInterval)
 	{
 		// Display router row
-		DisplayRouterRow();	
+		DisplayRouterRow();
 
 		$CurrentResultSet++;
 		$RowCounter++;
@@ -2225,10 +2225,10 @@ while ($record = $result->fetch_assoc())
 	{
 		// Display header row
 		echo $HeaderRowString;
-	
+
 		// Display router row
 		DisplayRouterRow();
-	
+
 		$CurrentResultSet++;
 		$RowCounter = 1;
 	}
@@ -2408,7 +2408,7 @@ function toggleANSS()
 	{
 		document.getElementById('anssTable').style.display='none';
 		document.getElementById('anssTableLink').innerHTML='Show Aggregate Network Statistic Summary  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		anssToggle = 0;	
+		anssToggle = 0;
 	}
 }
 // -->
@@ -2470,7 +2470,7 @@ function toggleNSOS()
 	{
 		document.getElementById('nsosTable').style.display='none';
 		document.getElementById('nsosTableLink').innerHTML='Show Network Status Opinion Source  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		nsosToggle = 0;	
+		nsosToggle = 0;
 	}
 }
 // -->
@@ -2683,7 +2683,7 @@ function toggleCAQO()
 	{
 		document.getElementById('caqoTable').style.display='none';
 		document.getElementById('caqoTableLink').innerHTML='Show Custom / Advanced Query Options  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		caqoToggle = 0;	
+		caqoToggle = 0;
 	}
 }
 // -->
@@ -2720,7 +2720,7 @@ function toggleLGND()
 	{
 		document.getElementById('lgndTable').style.display='none';
 		document.getElementById('lgndTableLink').innerHTML='Show Table Legend  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		lgndToggle = 0;	
+		lgndToggle = 0;
 	}
 }
 // -->
@@ -2788,7 +2788,7 @@ function toggleASD()
 	{
 		document.getElementById('asdTable').style.display='none';
 		document.getElementById('asdTableLink').innerHTML='Show Application Server Details  <img src="img/blackinfobarexpand.png" class="infobarbutton"/>';
-		asdToggle = 0;	
+		asdToggle = 0;
 	}
 }
 // -->
@@ -2812,9 +2812,9 @@ function toggleASD()
 $mysqli->close();
 
 // Register session variable to mark that this page has been loaded
-if (!isset($_SESSION['IndexVisited'])) 
+if (!isset($_SESSION['IndexVisited']))
 {
 	$_SESSION['IndexVisited'] = 1;
-} 
+}
 
 ?>

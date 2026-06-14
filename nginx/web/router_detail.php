@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 // Copyright (c) 2006-2007, Joseph B. Kowalski
-// See LICENSE for licensing information 
+// See LICENSE for licensing information
 
 require_once('common.php');
 
@@ -49,14 +49,19 @@ else {
 
 // Perform variable scrubbing
 $Fingerprint = strip_tags($Fingerprint);
-if (strlen($Fingerprint) != 40)
+if (!preg_match('/^[a-fA-F0-9]{40}$/', $Fingerprint))
 {
 	$Fingerprint = null;
 }
 
 // Populate variables from database
-$query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) AS SIGNED) + $OffsetFromGMT + CAST($ActiveDescriptorTable.Uptime AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.WriteHistoryLAST, $ActiveDescriptorTable.WriteHistoryINC, $ActiveDescriptorTable.WriteHistorySERDATA, $ActiveDescriptorTable.ReadHistoryLAST, $ActiveDescriptorTable.ReadHistoryINC, $ActiveDescriptorTable.ReadHistorySERDATA, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = '$Fingerprint'";
-$record = db_query_single_row($query);
+$query = "select $ActiveNetworkStatusTable.Name, $ActiveDescriptorTable.LastDescriptorPublished, $ActiveNetworkStatusTable.IP, $ActiveNetworkStatusTable.Hostname, $ActiveNetworkStatusTable.ORPort, $ActiveNetworkStatusTable.DirPort, $ActiveDescriptorTable.Platform, $ActiveDescriptorTable.Contact, CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($ActiveDescriptorTable.LastDescriptorPublished) AS SIGNED) + $OffsetFromGMT + CAST($ActiveDescriptorTable.Uptime AS SIGNED) as Uptime, $ActiveDescriptorTable.BandwidthMAX, $ActiveDescriptorTable.BandwidthBURST, $ActiveDescriptorTable.BandwidthOBSERVED, $ActiveDescriptorTable.OnionKey, $ActiveDescriptorTable.SigningKey, $ActiveDescriptorTable.WriteHistoryLAST, $ActiveDescriptorTable.WriteHistoryINC, $ActiveDescriptorTable.WriteHistorySERDATA, $ActiveDescriptorTable.ReadHistoryLAST, $ActiveDescriptorTable.ReadHistoryINC, $ActiveDescriptorTable.ReadHistorySERDATA, $ActiveDescriptorTable.ExitPolicySERDATA, $ActiveDescriptorTable.FamilySERDATA, $ActiveNetworkStatusTable.CountryCode, $ActiveDescriptorTable.Hibernating, $ActiveNetworkStatusTable.FAuthority, $ActiveNetworkStatusTable.FBadDirectory, $ActiveNetworkStatusTable.FBadExit, $ActiveNetworkStatusTable.FExit, $ActiveNetworkStatusTable.FFast, $ActiveNetworkStatusTable.FGuard, $ActiveNetworkStatusTable.FNamed, $ActiveNetworkStatusTable.FStable, $ActiveNetworkStatusTable.FRunning, $ActiveNetworkStatusTable.FValid, $ActiveNetworkStatusTable.FV2Dir from $ActiveNetworkStatusTable inner join $ActiveDescriptorTable on $ActiveNetworkStatusTable.Fingerprint = $ActiveDescriptorTable.Fingerprint where $ActiveNetworkStatusTable.Fingerprint = ?";
+$stmt = $mysqli->prepare($query);
+$stmt->bind_param('s', $Fingerprint);
+$stmt->execute();
+$result = $stmt->get_result();
+$record = $result->fetch_assoc();
+$stmt->close();
 
 if(!$record) {
 	http_response_code(404);
@@ -98,63 +103,12 @@ $FV2Dir = $record['FV2Dir'];
 
 // Register necessary variables in session
 // TODO get rid of this
-if (!isset($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'])) 
-{
-	$_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'] = $record['WriteHistorySERDATA'];
-} 
-else
-{
-	unset($_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED']);
-	$_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'] = $record['WriteHistorySERDATA'];
-}
-
-if (!isset($_SESSION['WriteHistory_INC'])) 
-{
-	$_SESSION['WriteHistory_INC'] = $record['WriteHistoryINC'];
-} 
-else
-{
-	unset($_SESSION['WriteHistory_INC']);
-	$_SESSION['WriteHistory_INC'] = $record['WriteHistoryINC'];
-}
-if (!isset($_SESSION['WriteHistory_LAST'])) 
-{
-	$_SESSION['WriteHistory_LAST'] = $record['WriteHistoryLAST'];
-} 
-else
-{
-	unset($_SESSION['WriteHistory_LAST']);
-	$_SESSION['WriteHistory_LAST'] = $record['WriteHistoryLAST'];
-}
-
-// Do the same for the read history
-if (!isset($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'])) 
-{
-	$_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'] = $record['ReadHistorySERDATA'];
-} 
-else
-{
-	unset($_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED']);
-	$_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'] = $record['ReadHistorySERDATA'];
-}
-if (!isset($_SESSION['ReadHistory_INC'])) 
-{
-	$_SESSION['ReadHistory_INC'] = $record['ReadHistoryINC'];
-} 
-else
-{
-	unset($_SESSION['ReadHistory_INC']);
-	$_SESSION['ReadHistory_INC'] = $record['ReadHistoryINC'];
-}
-if (!isset($_SESSION['ReadHistory_LAST'])) 
-{
-	$_SESSION['ReadHistory_LAST'] = $record['ReadHistoryLAST'];
-} 
-else
-{
-	unset($_SESSION['ReadHistory_LAST']);
-	$_SESSION['ReadHistory_LAST'] = $record['ReadHistoryLAST'];
-}
+$_SESSION['WriteHistory_DATA_ARRAY_SERIALIZED'] = $record['WriteHistorySERDATA'];
+$_SESSION['WriteHistory_INC'] = $record['WriteHistoryINC'];
+$_SESSION['WriteHistory_LAST'] = $record['WriteHistoryLAST'];
+$_SESSION['ReadHistory_DATA_ARRAY_SERIALIZED'] = $record['ReadHistorySERDATA'];
+$_SESSION['ReadHistory_INC'] = $record['ReadHistoryINC'];
+$_SESSION['ReadHistory_LAST'] = $record['ReadHistoryLAST'];
 
 $noindex = true;
 
@@ -308,7 +262,7 @@ include("header.php");
 
 <td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'><b>
 <?php
-	
+
 
 	for ($i=0 ; $i<count($ExitPolicy_DATA_ARRAY) ; $i++)
 	{
@@ -323,7 +277,7 @@ include("header.php");
 
 </tr>
 <tr>
-<?php if(0): ?>
+<?php if(1): ?>
 <td class='HRN' colspan='2'>Bandwidth</td>
 <?php else: ?>
 <td class='HRN' colspan='2'></td>
@@ -331,12 +285,12 @@ include("header.php");
 <td class='HRN' style='border-left-color: #000072; border-left-style: solid; border-left-width: 1px;'>Router Flags</td>
 </tr>
 <tr>
-<?php if(0): ?>
+<?php if(1): ?>
 <td class='TRS' style="text-align: center;">
-<img src='bandwidth_history_graph.php?MODE=WriteHistory' />
+<img src='bandwidth_history_graph.php?MODE=WriteHistory&amp;FP=<?php echo $Fingerprint; ?>' />
 </td>
 <td class='TRSB' style="text-align: center;">
-<img src='bandwidth_history_graph.php?MODE=ReadHistory' />
+<img src='bandwidth_history_graph.php?MODE=ReadHistory&amp;FP=<?php echo $Fingerprint; ?>' />
 </td>
 <?php else: ?>
 <td class='TRS' style="text-align: center;"></td>
@@ -430,10 +384,10 @@ include("header.php");
 <tr>
 <td class='TRS' colspan='3'>
 <?php
-	
+
 	echo "<br/>\n";
-	echo "<b>Onion Key:</b><pre>" . $OnionKey . "</pre>\n";
-	echo "<b>Signing Key:</b><pre>" . $SigningKey . "</pre><br/>\n";
+	echo "<b>Onion Key:</b><pre>" . htmlspecialchars($OnionKey, ENT_QUOTES) . "</pre>\n";
+	echo "<b>Signing Key:</b><pre>" . htmlspecialchars($SigningKey, ENT_QUOTES) . "</pre><br/>\n";
 ?>
 </td>
 </tr>
