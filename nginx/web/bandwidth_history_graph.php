@@ -6,9 +6,9 @@
 require_once('common.php');
 
 // Include JPGraph items
-require_once($JPGraph_Path . "jpgraph.php");
-require_once($JPGraph_Path . "jpgraph_line.php");
-require_once($JPGraph_Path . "jpgraph_date.php");
+require_once 'vendor/autoload.php';
+use mitoteam\jpgraph\MtJpGraph;
+MtJpGraph::load(['line', 'date']);
 
 // Declare and initialize variables
 $MODE = null;

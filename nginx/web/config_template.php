@@ -33,7 +33,6 @@ $SQL_Catalog = "torstatus";
 // }}}
 
 // ++++++++++ Paths ++++++++++ {{{
-$JPGraph_Path = "jpgraph/";
 if(isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.onion') === false)
 {
 	define("WHOISPath","https://www.whois.com/whois/");

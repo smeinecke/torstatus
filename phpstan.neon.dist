@@ -4,11 +4,8 @@ parameters:
     paths:
         - nginx/web
     excludePaths:
-        - nginx/web/jpgraph/*
         - nginx/web/config.php (?)
         - nginx/web/*_graph.php
-    scanDirectories:
-        - nginx/web/jpgraph
     ignoreErrors:
         -
             message: '#might not be defined#'

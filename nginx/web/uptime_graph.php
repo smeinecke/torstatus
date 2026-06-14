@@ -10,8 +10,9 @@
 include("config.php");
 
 // Include JPGraph items
-require_once($JPGraph_Path . "jpgraph.php");
-require_once($JPGraph_Path . "jpgraph_bar.php");
+require_once 'vendor/autoload.php';
+use mitoteam\jpgraph\MtJpGraph;
+MtJpGraph::load('bar');
 
 // Declare and initialize variables
 $DATA_ARRAY = null;
