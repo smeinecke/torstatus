@@ -1,18 +1,18 @@
 #!/bin/bash
 
 DIRECTORY=`dirname "$0"`
-SCRIPT="$DIRECTORY/tns_update.pl"
+SCRIPT="$DIRECTORY/tns_update.py"
 
 cd "$DIRECTORY"
 
 rm -f .shutdown
 
-trap 'touch .shutdown ; killall perl' SIGTERM
+trap 'touch .shutdown ; pkill -f tns_update.py' SIGTERM
 
 while true; do
 	ERROR=0
-	perl "$SCRIPT" &
-	wait -f $! || ERROR=1
+	python3 "$SCRIPT" &
+	wait $! || ERROR=1
 
 	if [ -e .shutdown ]; then
 		break

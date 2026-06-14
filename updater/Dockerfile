@@ -1,16 +1,16 @@
-FROM perl:5
+FROM python:3.12-slim
 
-RUN apt-get update
-RUN apt-get -y dist-upgrade
-RUN apt-get -y install monitoring-plugins-basic psmisc
-RUN apt-get -y autoremove
-RUN apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}')
-RUN apt-get clean
+RUN apt-get update && \
+    apt-get -y dist-upgrade && \
+    apt-get -y install monitoring-plugins-basic psmisc && \
+    apt-get -y autoremove && \
+    apt-get -y purge $(dpkg -l | grep '^rc' | awk '{print $2}') && \
+    apt-get clean
 
-RUN cpanm DBI PHP::Serialization LWP::Simple File::Touch Parallel::ForkManager Cache::Memcached Net::IP DBD::MariaDB
+RUN pip install --no-cache-dir pymysql pymemcache phpserialize
 RUN mkdir /opt/torstatus
 
-ADD tns_update.pl /opt/torstatus
+ADD tns_update.py /opt/torstatus
 ADD updater.sh /opt/torstatus
 
 RUN addgroup --gid 1026 updater && adduser --disabled-password --ingroup updater --system updater && chown -R updater:updater /opt/torstatus
