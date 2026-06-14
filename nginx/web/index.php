@@ -26,7 +26,7 @@ $DescriptorCount = 0;
 $CurrentResultSet = 0;
 $RowCounter = 0;
 
-$Self = $_SERVER['PHP_SELF'];
+$Self = 'index.php';
 $RemoteIP = $_SERVER['REMOTE_ADDR'];
 // Only honor X-Forwarded-For from trusted proxies (configurable list)
 $forwardedFor = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '';
@@ -784,7 +784,8 @@ function DisplayRouterRow()
 			if ($bandwidth > 85) { $bandwidth = 85; }
 			if ($bandwidth == 0) { $bandwidth = 1; }
 			#echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><img src='img/bar/${foreground}.png' width='${bandwidth}px' height='16px' alt='".$record[$value]."' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
-			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='".$record[$value]." KBs'><td class='$background'><div class='fg{$foreground}' style='width: {$bandwidth}px; height: 16px;' /></td><td>&nbsp;<small>&nbsp;".$record[$value]."</small></td></tr></table></td>";
+			$recordValue = htmlspecialchars((string) $record[$value], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+			echo "<td class='TDb'><table cellspacing='0' cellpadding='0' class='bwb'><tr title='" . $recordValue . " KBs'><td class='$background'><div class='fg{$foreground}' style='width: {$bandwidth}px; height: 16px;'></div></td><td>&nbsp;<small>&nbsp;" . $recordValue . "</small></td></tr></table></td>";
 			break;
 
   			case
@@ -2242,7 +2243,7 @@ $stats_block = ob_get_clean();
 // nsos block
 ob_start();
 ?>
-<table width='*' cellspacing='0' cellpadding='0' class='displayTable' id='nsosTable'>
+<table width='100%' cellspacing='0' cellpadding='0' class='displayTable' id='nsosTable'>
 <tr>
 <td class='HRN'>Network Status Opinion Source</td>
 </tr>
@@ -2280,7 +2281,7 @@ $nsos_block = ob_get_clean();
 // query block
 ob_start();
 ?>
-<table width='*' cellspacing='0' cellpadding='0' class='displayTable' id='caqoTable'>
+<table width='100%' cellspacing='0' cellpadding='0' class='displayTable' id='caqoTable'>
 <tr>
 <td class='HRN'>Custom / Advanced Query Options</td>
 </tr>
@@ -2322,7 +2323,7 @@ echo "<option value='Asc'"; if ($SO == 'Asc'){echo " selected='selected'";} echo
 echo "<option value='Desc'"; if ($SO == 'Desc'){echo " selected='selected'";} echo ">Descending</option>\n";
 echo "</select><br/><br/>\n";
 echo "<b>Require Flags:</b><br/><span class='TRSM'>(Columns flagged YES will have <font color='#00dd00'>green</font> background)<br/>(Columns flagged NO will have <font color='#ff0000'>red</font> background)</span><br/>\n";
-echo "<table width='*' cellspacing='0' cellpadding='0' border='0' align='left'>\n";
+echo "<table width='100%' cellspacing='0' cellpadding='0' border='0' align='left'>\n";
 echo "<tr>\n";
 echo "<td class='TRS'>&nbsp;Authority:</td>\n";
 echo "<td class='TRS'>\n";

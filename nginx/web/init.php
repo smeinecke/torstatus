@@ -2,7 +2,6 @@
 
 require_once __DIR__ . '/../vendor/autoload.php';
 // Include configuration settings
-// @phpstan-ignore-next-line (runtime-generated from config_template.php)
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/common.php';
 

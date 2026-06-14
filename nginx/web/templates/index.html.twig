@@ -38,10 +38,10 @@ Server name: <a class='tab' href='router_detail.php?FP={{ TorNodeFP[i]|e }}'>{{ 
 </td></tr>
 {% endif %}
 
-{% if Hidden_Service_URL %}
+{% if Hidden_Service_URL and Hidden_Service_URL matches '#^https?://[a-z2-7]{56}\.onion/?#i' %}
 <tr>
 <td colspan='2' style='border-top: solid 1px black; text-align: center;'><br />
-<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='{{ Hidden_Service_URL|e }}'>{{ Hidden_Service_URL|e }}</a><br/><br/>
+<font color='#3344ee'>This site is available as an Onion V3 Service at:</font><br/><a style='text-decoration: underline; color: #3344ee;' href='{{ Hidden_Service_URL|e('html_attr') }}'>{{ Hidden_Service_URL|e }}</a><br/><br/>
 </td>
 </tr>
 {% endif %}
