@@ -1071,3 +1071,12 @@ summary:focus-visible {
   .ts-chart-canvas-wrap,
   .ts-graph-card-wide .ts-chart-canvas-wrap { min-height: 260px; }
 }
+
+/* Keep list/table pages full-width. The router table has many columns, so a
+   global page max-width would reduce usable horizontal space and force earlier
+   horizontal scrolling. */
+.ts-page {
+  width: auto;
+  max-width: none;
+  margin-inline: 0;
+}
