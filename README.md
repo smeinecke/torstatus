@@ -138,7 +138,7 @@ php nginx/web/apply_migration.php
 The script tracks applied migrations in `nginx/web/.applied_migrations.json` (ignored by Git). To skip a migration that was already applied manually:
 
 ```bash
-php nginx/web/apply_migration.php --skip migration_20250614_add_missing_indexes.sql
+php nginx/web/apply_migration.php --skip 20250614_add_missing_indexes.sql
 ```
 
 ### Web application

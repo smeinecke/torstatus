@@ -53,7 +53,7 @@ if (file_exists($trackFile)) {
 $appliedMap = array_flip($applied);
 
 // Discover migration files
-$migrations = glob($migrationDir . '/migration_*.sql');
+$migrations = glob($migrationDir . '/202*.sql');
 if ($migrations === false || $migrations === []) {
     echo "No migration files found.\n";
     exit(0);
