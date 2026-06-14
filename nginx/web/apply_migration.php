@@ -30,6 +30,8 @@ if ($server === '' || $catalog === '') {
 }
 
 // Parse CLI arguments
+/** @var int<1, max> $argc */
+/** @var array<int, string> $argv */
 $skipped = [];
 for ($i = 1; $i < $argc; $i++) {
     if ($argv[$i] === '--skip' && isset($argv[$i + 1])) {

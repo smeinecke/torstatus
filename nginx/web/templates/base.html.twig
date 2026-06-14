@@ -32,6 +32,9 @@
 		</nav>
 
 		<div class="ts-topbar-actions">
+			<button type="button" class="ts-icon-button" id="theme-toggle" title="Toggle light/dark mode" aria-label="Toggle light/dark mode">
+				<i class="ti ti-moon" aria-hidden="true" id="theme-icon"></i>
+			</button>
 {% if showFilterButton|default(false) %}
 			<button type="button" class="ts-button ts-button-secondary" data-dialog-open="filters-dialog" title="Open router sort, search and flag filters">
 				<i class="ti ti-adjustments-horizontal" aria-hidden="true"></i><span>Filters</span>
