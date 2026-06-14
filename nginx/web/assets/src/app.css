@@ -704,7 +704,9 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
   gap: .65rem;
   align-content: start;
 }
+.ts-column-pane h2 { color: var(--ts-text); }
 .ts-column-pane select { min-height: 20rem; }
+.BOXCOLSEL option { color: var(--ts-text); }
 .ts-form-actions-left { justify-content: flex-start; }
 @media (max-width: 760px) {
   .ts-column-editor { grid-template-columns: 1fr; }
