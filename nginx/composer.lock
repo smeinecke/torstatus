@@ -4,63 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1500fca7b1d284ae5d1a6e10cf4cb3c8",
+    "content-hash": "6b58be47aa834b237040f7c68f3895b7",
     "packages": [
-        {
-            "name": "mitoteam/jpgraph",
-            "version": "10.5.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mitoteam/jpgraph.git",
-                "reference": "62658af06f619bd65a40fb4a2b26df7bdc36818a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mitoteam/jpgraph/zipball/62658af06f619bd65a40fb4a2b26df7bdc36818a",
-                "reference": "62658af06f619bd65a40fb4a2b26df7bdc36818a",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5"
-            },
-            "replace": {
-                "jpgraph/jpgraph": "4.0.2",
-                "rulin132/jpgraph": "4.3.5"
-            },
-            "type": "library",
-            "autoload": {
-                "classmap": [
-                    "src/MtJpGraph.php"
-                ]
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "QPL-1.0"
-            ],
-            "authors": [
-                {
-                    "name": "JpGraph team",
-                    "homepage": "https://jpgraph.net",
-                    "role": "Original Library Developers"
-                },
-                {
-                    "name": "MiTo Team",
-                    "email": "info@mito-team.com",
-                    "homepage": "https://www.mito-team.com",
-                    "role": "Composer package maintenance, PHP-compatibility patches"
-                }
-            ],
-            "description": "JpGraph library composer package with PHP 8.5 support",
-            "homepage": "https://github.com/mitoteam/jpgraph",
-            "keywords": [
-                "jpgraph"
-            ],
-            "support": {
-                "issues": "https://github.com/mitoteam/jpgraph/issues",
-                "source": "https://github.com/mitoteam/jpgraph/tree/10.5.4"
-            },
-            "time": "2026-04-06T04:38:38+00:00"
-        },
         {
             "name": "symfony/deprecation-contracts",
             "version": "v3.7.0",

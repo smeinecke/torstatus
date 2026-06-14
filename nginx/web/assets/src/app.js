@@ -1,4 +1,5 @@
 import './app.css';
+import { initCharts } from './charts.js';
 
 function setupThemeToggle() {
   const btn = document.getElementById('theme-toggle');
@@ -56,3 +57,4 @@ function setupAutoSubmit() {
 setupThemeToggle();
 setupDialogs();
 setupAutoSubmit();
+initCharts();

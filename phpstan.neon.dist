@@ -3,13 +3,9 @@ parameters:
     level: 5
     paths:
         - nginx/web
-    scanFiles:
-        - nginx/web/src/Graph/SessionBarGraphRenderer.php
     excludePaths:
         - nginx/web/config.php (?)
-        - nginx/web/public/*_graph.php
-        - nginx/web/src/Graph/SessionBarGraphRenderer.php
-        - nginx/web/src/Graph/BandwidthHistoryGraphRenderer.php
+        - nginx/web/public/graphs.php
     ignoreErrors:
         -
             message: '#might not be defined#'

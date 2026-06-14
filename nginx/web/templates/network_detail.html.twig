@@ -13,27 +13,27 @@
 <div class="ts-graph-grid">
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers by country code</h2>
-		<img src="/cc_graph.php" alt="Number of Routers by Country Code">
+		<canvas data-chart-endpoint="graphs.php?type=cc" data-chart-type="bar"></canvas>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Exit routers by country code</h2>
-		<img src="/cc_exit_graph.php" alt="Number of Exit Routers by Country Code">
+		<canvas data-chart-endpoint="graphs.php?type=cc_exit" data-chart-type="bar"></canvas>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers by uptime</h2>
-		<img src="/uptime_graph.php" alt="Number of Routers by Uptime">
+		<canvas data-chart-endpoint="graphs.php?type=uptime" data-chart-type="bar"></canvas>
 	</section>
 	<section class="ts-card ts-graph-card">
 		<h2>Routers by observed bandwidth</h2>
-		<img src="/bandwidth_graph.php" alt="Number of Routers by Bandwidth">
+		<canvas data-chart-endpoint="graphs.php?type=bandwidth" data-chart-type="bar"></canvas>
 	</section>
 	<section class="ts-card ts-graph-card">
 		<h2>Routers by platform</h2>
-		<img src="/platform_graph.php" alt="Number of Routers by Platform">
+		<canvas data-chart-endpoint="graphs.php?type=platform" data-chart-type="bar"></canvas>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers matching specified criteria</h2>
-		<img src="/summary_graph.php" alt="Summary Graph">
+		<canvas data-chart-endpoint="graphs.php?type=summary" data-chart-type="bar"></canvas>
 	</section>
 </div>
 {% endblock %}

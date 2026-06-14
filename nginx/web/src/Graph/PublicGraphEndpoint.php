@@ -8,8 +8,7 @@ use TorStatus\Http\Response;
 
 final class PublicGraphEndpoint
 {
-    /** @param array{0:int,1:int,2:int,3:int} $margin */
-    public static function renderSessionBarGraph(string $prefix, int $width, int $height, array $margin, bool $rotateLabels = false): void
+    public static function renderSessionBarGraphJson(string $prefix): void
     {
         if (session_status() !== PHP_SESSION_ACTIVE && !@session_start()) {
             Response::badRequest();
@@ -17,6 +16,13 @@ final class PublicGraphEndpoint
 
         /** @var array<string, mixed> $session */
         $session = $_SESSION;
-        (new SessionBarGraphRenderer($session))->render($prefix, $width, $height, $margin, $rotateLabels);
+        $graphData = GraphSessionStore::get($session, $prefix);
+        header('Content-Type: application/json');
+        echo json_encode([
+            'labels' => $graphData['labels'],
+            'data' => $graphData['data'],
+            'title' => $graphData['title'],
+            'legend' => $graphData['legend'],
+        ]);
     }
 }

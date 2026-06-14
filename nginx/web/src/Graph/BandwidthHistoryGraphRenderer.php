@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace TorStatus\Graph;
 
-use mitoteam\jpgraph\MtJpGraph;
 use TorStatus\Database\QueryExecutor;
 use TorStatus\Database\SqlIdentifier;
 use TorStatus\Http\Response;
@@ -12,7 +11,7 @@ use TorStatus\Http\Response;
 final class BandwidthHistoryGraphRenderer
 {
     /** @param array<string, mixed> $get */
-    public function render(QueryExecutor $db, string $descriptorTable, array $get): void
+    public function renderJson(QueryExecutor $db, string $descriptorTable, array $get): void
     {
         $mode = $this->mode($get['MODE'] ?? null);
         $fingerprint = $this->fingerprint($get['FP'] ?? null);
@@ -26,7 +25,27 @@ final class BandwidthHistoryGraphRenderer
             ? 'Recent Write History (Bytes/Sec Average) (GMT)'
             : 'Recent Read History (Bytes/Sec Average) (GMT)';
 
-        $this->renderLineGraph($series['data'], $series['increment'], $series['last'], $title);
+        $pointCount = count($series['data']);
+        $end = strtotime($series['last']);
+        if ($end === false) {
+            $end = time();
+        }
+        $end += $series['increment'];
+        $start = $end - ($pointCount * $series['increment']);
+
+        $labels = [];
+        $data = [];
+        foreach ($series['data'] as $i => $sample) {
+            $data[$i] = (int)((float)$sample / $series['increment']);
+            $labels[$i] = gmdate('c', $start + ($i * $series['increment']));
+        }
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'labels' => $labels,
+            'data' => $data,
+            'title' => $title,
+        ]);
     }
 
     private function mode($value): ?string
@@ -82,39 +101,5 @@ final class BandwidthHistoryGraphRenderer
         }
 
         return ['data' => $data, 'increment' => $increment, 'last' => $last];
-    }
-
-    /** @param array<int, int|float> $samples */
-    private function renderLineGraph(array $samples, int $sampleRate, string $last, string $title): void
-    {
-        MtJpGraph::load(['line', 'date']);
-
-        $pointCount = count($samples);
-        $end = strtotime($last);
-        if ($end === false) {
-            $end = time();
-        }
-        $end += $sampleRate;
-        $start = $end - ($pointCount * $sampleRate);
-
-        $data = [];
-        $xdata = [];
-        foreach ($samples as $i => $sample) {
-            $data[$i] = (int)((float)$sample / $sampleRate);
-            $xdata[$i] = $start + ($i * $sampleRate);
-        }
-
-        $graph = new \Graph(480, 300);
-        $graph->SetMargin(80, 30, 30, 140);
-        $graph->SetScale('datlin');
-        $graph->title->Set($title);
-        $graph->title->SetFont(FF_FONT2, FS_BOLD);
-        $graph->xaxis->SetLabelAngle(90);
-        $graph->xaxis->scale->SetTimeAlign(MINADJ_15);
-
-        $line = new \LinePlot($data, $xdata);
-        $line->SetFillColor('lightblue@0.5');
-        $graph->Add($line);
-        $graph->Stroke();
     }
 }
