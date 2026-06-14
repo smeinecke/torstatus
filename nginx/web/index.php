@@ -13,6 +13,7 @@ use TorStatus\Index\ExitPolicyMatcher;
 use TorStatus\Index\IndexRepository;
 use TorStatus\Index\IndexRequest;
 use TorStatus\Index\RouterRowBuilder;
+use TorStatus\Index\RouterTablePresenter;
 use TorStatus\Index\TableNames;
 use TorStatus\Index\TorUsageService;
 
@@ -51,6 +52,8 @@ $request->page = $routerPage->page;
 
 $rowBuilder = new RouterRowBuilder($db, CountryCodes::all(), __DIR__ . '/img/flags');
 $routers = $rowBuilder->build($routerPage->result, $request->columnListActive);
+$tablePresenter = new RouterTablePresenter();
+$baseUrl = $request->toBaseUrl($Self);
 $routerPage->result->free();
 
 $currentResultSet = $routerPage->totalResults;
@@ -61,12 +64,22 @@ $context = array_merge(
     $request->toTemplateContext(),
     $torUsage,
     [
+        'pageTitle' => $pageTitle,
         'routers' => $routers,
+        'name_header' => $tablePresenter->nameHeader($request, $baseUrl),
+        'table_headers' => $tablePresenter->headers($request, $baseUrl),
+        'query_hidden_inputs' => $request->toHiddenInputs(),
+        'rows_per_page_options' => $request->rowsPerPageOptions(),
+        'pagination' => $request->pagination($Self, $routerPage->page, $routerPage->totalPages),
+        'sort_options' => IndexRequest::sortOptions(),
+        'filter_options' => IndexRequest::filterOptions(),
+        'search_options' => IndexRequest::searchOptions(),
+        'search_mod_options' => IndexRequest::searchModifierOptions(),
         'page' => $routerPage->page,
         'total_pages' => $routerPage->totalPages,
         'total_results' => $routerPage->totalResults,
         'Self' => $Self,
-        'base_url' => $request->toBaseUrl($Self),
+        'base_url' => $baseUrl,
         'base_q' => $request->toBaseQuery(),
         'RemoteIP' => $clientContext->remoteIp,
         'stats_rows' => $statsRows,
@@ -93,7 +106,7 @@ $context = array_merge(
     ]
 );
 
-render('index.html.twig', $context);
+$renderer->render('index.html.twig', $context);
 
 $mysqli->close();
 $_SESSION['IndexVisited'] = 1;

@@ -25,8 +25,9 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
 }
 $preferences->persist($_SESSION);
 
-render('column_set.html.twig', array_merge(
+$renderer->render('column_set.html.twig', array_merge(
     [
+        'pageTitle' => $pageTitle,
         'Self' => $Self,
         'ColumnList_ACTIVE' => $preferences->active(),
         'ColumnList_INACTIVE' => $preferences->inactive(),

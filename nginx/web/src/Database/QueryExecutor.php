@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\Database;
 
+use TorStatus\Http\Response;
+
 final class QueryExecutor
 {
     /** @var \mysqli */
@@ -26,7 +28,7 @@ final class QueryExecutor
         $stmt->close();
 
         if (!$result instanceof \mysqli_result) {
-            \die_503($errorMessage . ': no result set returned');
+            Response::serviceUnavailable($errorMessage . ': no result set returned');
         }
 
         return $result;
@@ -106,7 +108,7 @@ final class QueryExecutor
     {
         $stmt = $this->mysqli->prepare($query);
         if (!$stmt) {
-            \die_503($errorMessage . ': ' . $this->mysqli->error);
+            Response::serviceUnavailable($errorMessage . ': ' . $this->mysqli->error);
         }
 
         if ($params !== []) {
@@ -126,7 +128,7 @@ final class QueryExecutor
         if (!$stmt->execute()) {
             $error = $stmt->error ?: $this->mysqli->error;
             $stmt->close();
-            \die_503($errorMessage . ': ' . $error);
+            Response::serviceUnavailable($errorMessage . ': ' . $error);
         }
 
         return $stmt;

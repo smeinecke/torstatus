@@ -15,6 +15,6 @@ $pageTitle = 'Network Detail';
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
 (new NetworkDetailService($db, $tables, (int)$OffsetFromGMT))->prepareGraphs($_SESSION);
 
-render('network_detail.html.twig');
+$renderer->render('network_detail.html.twig', ['pageTitle' => $pageTitle]);
 
 $mysqli->close();

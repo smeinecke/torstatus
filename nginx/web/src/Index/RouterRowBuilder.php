@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TorStatus\Index;
 
 use TorStatus\Database\QueryExecutor;
+use TorStatus\Http\Response;
 
 final class RouterRowBuilder
 {
@@ -88,7 +89,7 @@ final class RouterRowBuilder
             return;
         }
         if (!in_array($table, ['missing_countries', 'missing_flags'], true)) {
-            \die_503('Invalid notification table');
+            Response::serviceUnavailable('Invalid notification table');
         }
 
         $this->db->execute("INSERT INTO $table (country_code) VALUES (?) ON DUPLICATE KEY UPDATE country_code = country_code", [$countryCode]);

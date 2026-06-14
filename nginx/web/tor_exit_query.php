@@ -23,8 +23,9 @@ $repository = new IndexRepository(
 );
 $request = TorExitQueryRequest::fromGlobals($_SERVER, $_POST);
 $context = (new TorExitQueryService($repository, new ExitPolicyMatcher()))->evaluate($request);
+$context['pageTitle'] = $pageTitle;
 $context['Self'] = $Self;
 
-render('tor_exit_query.html.twig', $context);
+$renderer->render('tor_exit_query.html.twig', $context);
 
 $mysqli->close();

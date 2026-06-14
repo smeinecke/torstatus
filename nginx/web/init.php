@@ -1,9 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 require_once __DIR__ . '/../vendor/autoload.php';
-// Include configuration settings
 require_once __DIR__ . '/config.php';
-require_once __DIR__ . '/common.php';
 
 spl_autoload_register(static function (string $class): void {
     $prefix = 'TorStatus\\';
@@ -18,35 +18,44 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
-use TorStatus\Database\QueryExecutor;
-use Twig\Environment;
-use Twig\Loader\FilesystemLoader;
+require_once __DIR__ . '/common.php';
 
+use TorStatus\Common;
+use TorStatus\Database\QueryExecutor;
+
+Common::startSession();
+
+$TimeStart = microtime(true);
+$memcached = Common::memcached((string)$memcached_host);
+$mysqli = Common::database((string)$SQL_Server, (string)$SQL_User, (string)$SQL_Pass, (string)$SQL_Catalog);
 $db = new QueryExecutor($mysqli, $memcached);
 
-$composerJson = json_decode(file_get_contents(__DIR__ . '/../composer.json'), true);
-$appVersion = $composerJson['version'] ?? '4.0';
+$status = Common::status($db);
+$LastUpdate = (string)($status['LastUpdate'] ?? '');
+$LastUpdateElapsed = (string)($status['LastUpdateElapsed'] ?? '');
+$ActiveNetworkStatusTable = (string)($status['ActiveNetworkStatusTable'] ?? '');
+$ActiveDescriptorTable = (string)($status['ActiveDescriptorTable'] ?? '');
+$ActiveORAddressesTable = (string)($status['ActiveORAddressesTable'] ?? '');
 
-$loader = new FilesystemLoader(__DIR__ . '/templates');
-$twig = new Environment($loader, [
-    'cache' => false,
-    'debug' => false,
-    'autoescape' => 'html',
+$timestamp = time();
+$year = date('Y', $timestamp);
+$month = date('n', $timestamp);
+$day = date('j', $timestamp);
+$hour = date('G', $timestamp);
+$minute = date('i', $timestamp);
+$second = date('s', $timestamp);
+
+$Host = isset($_SERVER['HTTP_HOST']) ? (string)$_SERVER['HTTP_HOST'] : '';
+$onion_service = Common::isOnionHost($Host);
+$appVersion = Common::appVersion(__DIR__ . '/../composer.json');
+$renderer = Common::renderer(__DIR__ . '/templates', [
+    'pageTitle' => '',
+    'noindex' => false,
+    'footerText' => $footerText ?? '',
+    'onion_service' => $onion_service,
+    'Hidden_Service_URL' => $Hidden_Service_URL ?? null,
+    'CSInput' => null,
+    'Self' => $_SERVER['SCRIPT_NAME'] ?? '',
+    'version' => $appVersion,
+    'WHOISPath' => defined('WHOISPath') ? WHOISPath . '?q=' : null,
 ]);
-
-function render(string $template, array $context = []): void {
-    global $twig, $pageTitle, $noindex, $footerText, $onion_service, $Hidden_Service_URL, $CSInput, $Self, $appVersion;
-    $default = [
-        'pageTitle' => $pageTitle ?? '',
-        'noindex' => $noindex ?? false,
-        'footerText' => $footerText ?? '',
-        'onion_service' => $onion_service ?? false,
-        'Hidden_Service_URL' => $Hidden_Service_URL ?? null,
-        'CSInput' => $CSInput ?? null,
-        'Self' => $Self ?? $_SERVER['PHP_SELF'] ?? '',
-        'version' => $appVersion ?? '4.0',
-        'WHOISPath' => defined('WHOISPath') ? WHOISPath : null,
-    ];
-    $context = array_merge($default, $context);
-    echo $twig->render($template, $context);
-}

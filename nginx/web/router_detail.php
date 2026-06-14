@@ -38,9 +38,9 @@ if ($context === null) {
 }
 
 if (($context['Name'] ?? null) === null) {
-    render('router_detail.html.twig', ['error' => 'No Descriptor Available']);
+    $renderer->render('router_detail.html.twig', ['pageTitle' => $pageTitle, 'noindex' => $noindex, 'error' => 'No Descriptor Available']);
 } else {
-    render('router_detail.html.twig', $context);
+    $renderer->render('router_detail.html.twig', array_merge(['pageTitle' => $pageTitle, 'noindex' => $noindex], $context));
 }
 
 $mysqli->close();

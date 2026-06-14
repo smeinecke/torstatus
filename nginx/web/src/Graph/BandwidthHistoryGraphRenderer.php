@@ -7,6 +7,7 @@ namespace TorStatus\Graph;
 use mitoteam\jpgraph\MtJpGraph;
 use TorStatus\Database\QueryExecutor;
 use TorStatus\Database\SqlIdentifier;
+use TorStatus\Http\Response;
 
 final class BandwidthHistoryGraphRenderer
 {
@@ -16,7 +17,7 @@ final class BandwidthHistoryGraphRenderer
         $mode = $this->mode($get['MODE'] ?? null);
         $fingerprint = $this->fingerprint($get['FP'] ?? null);
         if ($mode === null || $fingerprint === null) {
-            \die_400();
+            Response::badRequest();
         }
 
         $history = $this->fetchHistory($db, $descriptorTable, $fingerprint);

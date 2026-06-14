@@ -60,39 +60,21 @@ Server name: <a class="tab" href="router_detail.php?FP={{ TorNodeFP[i]|e('url') 
 
 <div style="margin: 5px 0;">
 <form action="{{ Self|e }}" method="get" style="display: inline;">
-<input type="hidden" name="SR" value="{{ sr|e }}" />
-<input type="hidden" name="SO" value="{{ so|e }}" />
-<input type="hidden" name="Page" value="1" />
-<input type="hidden" name="FAuthority" value="{{ FAuthority|default('OFF')|e }}" />
-<input type="hidden" name="FBadDirectory" value="{{ FBadDirectory|default('OFF')|e }}" />
-<input type="hidden" name="FBadExit" value="{{ FBadExit|default('OFF')|e }}" />
-<input type="hidden" name="FExit" value="{{ FExit|default('OFF')|e }}" />
-<input type="hidden" name="FFast" value="{{ FFast|default('OFF')|e }}" />
-<input type="hidden" name="FGuard" value="{{ FGuard|default('OFF')|e }}" />
-<input type="hidden" name="FHibernating" value="{{ FHibernating|default('OFF')|e }}" />
-<input type="hidden" name="FNamed" value="{{ FNamed|default('OFF')|e }}" />
-<input type="hidden" name="FStable" value="{{ FStable|default('OFF')|e }}" />
-<input type="hidden" name="FRunning" value="{{ FRunning|default('OFF')|e }}" />
-<input type="hidden" name="FValid" value="{{ FValid|default('OFF')|e }}" />
-<input type="hidden" name="FV2Dir" value="{{ FV2Dir|default('OFF')|e }}" />
-<input type="hidden" name="FHSDir" value="{{ FHSDir|default('OFF')|e }}" />
-{% if CSInput %}
-<input type="hidden" name="CSField" value="{{ CSField|default('Fingerprint')|e }}" />
-<input type="hidden" name="CSMod" value="{{ CSMod|default('Contains')|e }}" />
-<input type="hidden" name="CSInput" value="{{ CSInput|e }}" />
-{% endif %}
+{% for name, value in query_hidden_inputs %}
+<input type="hidden" name="{{ name|e }}" value="{{ value|e }}" />
+{% endfor %}
 Rows per page:
 <select name="RowsPerPage" id="rows-per-page-select">
-<option value="25"{% if rows_per_page == 25 %} selected="selected"{% endif %}>25</option>
-<option value="50"{% if rows_per_page == 50 %} selected="selected"{% endif %}>50</option>
-<option value="100"{% if rows_per_page == 100 %} selected="selected"{% endif %}>100</option>
+{% for option in rows_per_page_options %}
+<option value="{{ option.value }}"{% if option.selected %} selected="selected"{% endif %}>{{ option.value }}</option>
+{% endfor %}
 </select>
 <noscript><input type="submit" value="Apply" /></noscript>
 </form>
 <span style="float: right;">
-{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
-| Page {{ page }} of {{ total_pages }}
-| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
+{% if pagination.first %}<a href="{{ pagination.first|e }}">First</a> | <a href="{{ pagination.prev|e }}">Prev</a>{% else %}First | Prev{% endif %}
+| Page {{ pagination.page }} of {{ pagination.total_pages }}
+| {% if pagination.next %}<a href="{{ pagination.next|e }}">Next</a> | <a href="{{ pagination.last|e }}">Last</a>{% else %}Next | Last{% endif %}
 </span>
 </div>
 
@@ -100,9 +82,9 @@ Rows per page:
 
 <div style="margin: 5px 0;">
 <span style="float: right;">
-{% if page > 1 %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page=1">First</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page - 1 }}">Prev</a>{% else %}First | Prev{% endif %}
-| Page {{ page }} of {{ total_pages }}
-| {% if page < total_pages %}<a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ page + 1 }}">Next</a> | <a href="{{ Self|e }}?{{ base_q|raw }}&Page={{ total_pages }}">Last</a>{% else %}Next | Last{% endif %}
+{% if pagination.first %}<a href="{{ pagination.first|e }}">First</a> | <a href="{{ pagination.prev|e }}">Prev</a>{% else %}First | Prev{% endif %}
+| Page {{ pagination.page }} of {{ pagination.total_pages }}
+| {% if pagination.next %}<a href="{{ pagination.next|e }}">Next</a> | <a href="{{ pagination.last|e }}">Last</a>{% else %}Next | Last{% endif %}
 </span>
 </div>
 

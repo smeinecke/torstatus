@@ -171,6 +171,89 @@ final class IndexRequest
         );
     }
 
+
+    /** @return array<string, string> */
+    public static function sortOptions(): array
+    {
+        return [
+            'Name' => 'Router Name',
+            'Fingerprint' => 'Fingerprint',
+            'CountryCode' => 'Country Code',
+            'Bandwidth' => 'Bandwidth',
+            'Uptime' => 'Uptime',
+            'LastDescriptorPublished' => 'Last Descriptor Published',
+            'Hostname' => 'Hostname',
+            'IP' => 'IP Address',
+            'ORPort' => 'ORPort',
+            'DirPort' => 'DirPort',
+            'Platform' => 'Platform',
+            'Contact' => 'Contact',
+            'FAuthority' => 'Authority',
+            'FBadDirectory' => 'Bad Directory',
+            'FBadExit' => 'Bad Exit',
+            'FExit' => 'Exit',
+            'FFast' => 'Fast',
+            'FGuard' => 'Guard',
+            'Hibernating' => 'Hibernating',
+            'FNamed' => 'Named',
+            'FStable' => 'Stable',
+            'FRunning' => 'Running',
+            'FValid' => 'Valid',
+            'FV2Dir' => 'V2Dir',
+            'FHSDir' => 'HSDir',
+        ];
+    }
+
+    /** @return array<string, string> */
+    public static function filterOptions(): array
+    {
+        return [
+            'FAuthority' => 'Authority',
+            'FBadDirectory' => 'Bad Directory',
+            'FBadExit' => 'BadExit',
+            'FExit' => 'Exit',
+            'FFast' => 'Fast',
+            'FGuard' => 'Guard',
+            'FHibernating' => 'Hibernating',
+            'FNamed' => 'Named',
+            'FStable' => 'Stable',
+            'FRunning' => 'Running',
+            'FValid' => 'Valid',
+            'FV2Dir' => 'V2Dir',
+            'FHSDir' => 'HSDir',
+        ];
+    }
+
+    /** @return array<string, string> */
+    public static function searchOptions(): array
+    {
+        return [
+            'Fingerprint' => 'Fingerprint',
+            'Name' => 'Router Name',
+            'CountryCode' => 'Country Code',
+            'Bandwidth' => 'Bandwidth (KB/s)',
+            'Uptime' => 'Uptime (Days)',
+            'LastDescriptorPublished' => 'Last Descriptor Published',
+            'IP' => 'IP Address',
+            'Hostname' => 'Hostname',
+            'ORPort' => 'Onion Router Port',
+            'DirPort' => 'Directory Server Port',
+            'Platform' => 'Platform',
+            'Contact' => 'Contact',
+        ];
+    }
+
+    /** @return array<string, string> */
+    public static function searchModifierOptions(): array
+    {
+        return [
+            'Equals' => 'Equals',
+            'Contains' => 'Contains',
+            'LessThan' => 'Is Less Than',
+            'GreaterThan' => 'Is Greater Than',
+        ];
+    }
+
     /** @param array<string, mixed> $session */
     public function persist(array &$session): void
     {
@@ -201,6 +284,53 @@ final class IndexRequest
             'CSMod' => $this->customSearchModifier,
             'CSInput' => $this->customSearchInput,
         ]);
+    }
+
+
+    /** @return array<string, string> */
+    public function toHiddenInputs(): array
+    {
+        $params = [
+            'SR' => $this->sortRequest,
+            'SO' => $this->sortOrder,
+            'Page' => '1',
+        ];
+        foreach ($this->filters as $field => $value) {
+            $params[$field] = $value;
+        }
+        if ($this->customSearchInput !== null) {
+            $params['CSField'] = $this->customSearchField;
+            $params['CSMod'] = $this->customSearchModifier;
+            $params['CSInput'] = $this->customSearchInput;
+        }
+
+        return $params;
+    }
+
+    /** @return array<int, array{value: int, selected: bool}> */
+    public function rowsPerPageOptions(): array
+    {
+        return array_map(function (int $value): array {
+            return ['value' => $value, 'selected' => $this->rowsPerPage === $value];
+        }, [25, 50, 100]);
+    }
+
+    /** @return array<string, mixed> */
+    public function pagination(string $self, int $page, int $totalPages): array
+    {
+        $baseQuery = $this->toBaseQuery();
+        $url = static function (int $targetPage) use ($self, $baseQuery): string {
+            return $self . '?' . $baseQuery . '&Page=' . $targetPage;
+        };
+
+        return [
+            'page' => $page,
+            'total_pages' => $totalPages,
+            'first' => $page > 1 ? $url(1) : null,
+            'prev' => $page > 1 ? $url($page - 1) : null,
+            'next' => $page < $totalPages ? $url($page + 1) : null,
+            'last' => $page < $totalPages ? $url($totalPages) : null,
+        ];
     }
 
     public function toBaseUrl(string $self): string

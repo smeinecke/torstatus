@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Network\IpAddress;
+
 final class ClientContext
 {
     /** @var string */
@@ -28,20 +30,23 @@ final class ClientContext
      */
     public static function fromServer(array $server, array $trustedProxies, string $realServerIp): self
     {
-        $remoteAddr = isset($server['REMOTE_ADDR']) ? (string)$server['REMOTE_ADDR'] : '';
+        $remoteAddr = IpAddress::normalize(isset($server['REMOTE_ADDR']) ? (string)$server['REMOTE_ADDR'] : '') ?? '';
         $forwardedFor = isset($server['HTTP_X_FORWARDED_FOR']) ? (string)$server['HTTP_X_FORWARDED_FOR'] : '';
         $remoteIp = $remoteAddr;
 
-        if ($forwardedFor !== '' && in_array($remoteAddr, $trustedProxies, true)) {
-            $xff = array_map('trim', explode(',', $forwardedFor));
-            $xff = array_reverse($xff);
-            $clientIp = filter_var($xff[0], FILTER_VALIDATE_IP);
-            if ($clientIp !== false) {
-                $remoteIp = (string)$clientIp;
+        $trusted = array_filter(array_map(static function (string $proxy): ?string {
+            return IpAddress::normalize($proxy);
+        }, $trustedProxies));
+
+        if ($forwardedFor !== '' && in_array($remoteAddr, $trusted, true)) {
+            $xff = array_reverse(array_map('trim', explode(',', $forwardedFor)));
+            $clientIp = IpAddress::normalize(reset($xff));
+            if ($clientIp !== null) {
+                $remoteIp = $clientIp;
             }
         }
 
-        $serverIp = $forwardedFor !== '' ? $realServerIp : (string)($server['SERVER_ADDR'] ?? '');
+        $serverIp = IpAddress::normalize($forwardedFor !== '' ? $realServerIp : (string)($server['SERVER_ADDR'] ?? '')) ?? '';
         $serverPort = (string)($server['SERVER_PORT'] ?? '');
 
         return new self($remoteIp, $serverIp, $serverPort);

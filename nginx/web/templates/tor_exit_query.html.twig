@@ -47,10 +47,10 @@ Server name: <a class='tab' href='router_detail.php?FP={{ result.fingerprint|e }
 <br/>
 
 <form action='{{ Self|e }}' method='post'>
-<b>IP Address to Query:<br/><span class='TRSM'>(Required)</span></b><br/>
-<input type='text' name='QueryIP' class='BOX' maxlength='15' size='20' value='{{ QueryIP|default('')|e }}' /><br/><br/><br/>
-<b>Destination IP Address:<br/><span class='TRSM'>(Optional)</span></b><br/>
-<input type='text' name='DestinationIP' class='BOX' maxlength='15' size='20' value='{{ DestinationIP|default('')|e }}' /><br/><br/>
+<b>IP Address to Query:<br/><span class='TRSM'>(IPv4 or IPv6, required)</span></b><br/>
+<input type='text' name='QueryIP' class='BOX' maxlength='64' size='40' value='{{ QueryIP|default('')|e }}' /><br/><br/><br/>
+<b>Destination IP Address:<br/><span class='TRSM'>(IPv4 or IPv6, optional)</span></b><br/>
+<input type='text' name='DestinationIP' class='BOX' maxlength='64' size='40' value='{{ DestinationIP|default('')|e }}' /><br/><br/>
 <b>Destination Port:<br/><span class='TRSM'>(Optional)</span></b><br/>
 <input type='text' name='DestinationPort' class='BOX' maxlength='5' size='6' value='{{ DestinationPort|default('')|e }}' /><br/><br/><br/>
 <input type='submit' value='Submit Query' /><br/><br/>

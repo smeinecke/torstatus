@@ -34,16 +34,34 @@ final class IpListExporter
 
     private function buildOutput(bool $exitOnly): string
     {
+        $networkStatus = $this->tables->networkStatus;
+        $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
         $where = $exitOnly ? ' where FExit = ?' : '';
         $params = $exitOnly ? [1] : [];
-        $query = "select IP, INET_ATON(IP) as NIP from {$this->tables->networkStatus}{$where} order by NIP Asc";
-        $rows = $this->db->rows($query, $params, 1800);
 
-        $output = '';
-        foreach ($rows as $record) {
-            $output .= (string)$record['IP'] . "\n";
+        $rows = $this->db->rows("select IP from $networkStatus$where", $params, 1800);
+        $orRows = $this->db->rows(
+            "select $orAddresses.address as IP
+                from $orAddresses
+                    inner join $descriptor on $descriptor.ID = $orAddresses.descriptor_id
+                    inner join $networkStatus on $networkStatus.Fingerprint = $descriptor.Fingerprint$where",
+            $params,
+            1800
+        );
+
+        $ips = [];
+        foreach (array_merge($rows, $orRows) as $record) {
+            $ip = IpAddress::normalize((string)($record['IP'] ?? ''));
+            if ($ip !== null) {
+                $ips[$ip] = $ip;
+            }
         }
 
-        return $output;
+        uasort($ips, static function (string $a, string $b): int {
+            return strcmp(IpAddress::sortKey($a), IpAddress::sortKey($b));
+        });
+
+        return implode("\n", $ips) . ($ips === [] ? '' : "\n");
     }
 }

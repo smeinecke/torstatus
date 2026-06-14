@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\Export;
 
+use TorStatus\Http\Response;
+
 final class RouterCsvExporter
 {
     public const HEADERS = [
@@ -38,7 +40,7 @@ final class RouterCsvExporter
     {
         $stream = fopen('php://output', 'wb');
         if ($stream === false) {
-            \die_503('Unable to open CSV output stream');
+            Response::serviceUnavailable('Unable to open CSV output stream');
         }
 
         $this->writeRow($stream, $this->headerRow($activeColumns));

@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Network\IpAddress;
+
 final class ExitPolicyMatcher
 {
+    /** @param array<int, mixed> $exitPolicy */
     public function wouldAllowExit(array $exitPolicy, string $serverIp, string $serverPort): ?bool
     {
+        $serverIp = IpAddress::normalize($serverIp) ?? $serverIp;
+
         foreach ($exitPolicy as $exitPolicyLine) {
             if (!is_string($exitPolicyLine) || trim($exitPolicyLine) === '') {
                 continue;
@@ -18,51 +23,30 @@ final class ExitPolicyMatcher
                 continue;
             }
 
-            [$condition, $networkLine] = $parts;
-            $matches = [];
-            if (!preg_match('/(.*):([^:]*)$/', $networkLine, $matches)) {
+            [$condition, $target] = $parts;
+            $target = trim($target);
+            $separator = strrpos($target, ':');
+            if ($separator === false) {
                 continue;
             }
 
-            $subnet = trim($matches[1], '[]');
-            $portExpressions = explode(',', $matches[2]);
+            $subnet = trim(substr($target, 0, $separator), '[]');
+            $portExpressions = explode(',', substr($target, $separator + 1));
 
             if (!$this->isIpInSubnet($serverIp, $subnet)) {
                 continue;
             }
 
             foreach ($portExpressions as $currentPortExpression) {
-                $currentPortExpression = trim($currentPortExpression);
-                if ($currentPortExpression === '*') {
-                    if ($condition === 'accept' || $condition === 'accept6') {
-                        return true;
-                    }
-                    if ($condition === 'reject' || $condition === 'reject6') {
-                        return false;
-                    }
+                if (!$this->portMatches($serverPort, trim($currentPortExpression))) {
                     continue;
                 }
 
-                if (strpos($currentPortExpression, '-') !== false) {
-                    [$lowerPort, $upperPort] = explode('-', $currentPortExpression, 2);
-                    if ((int)$serverPort >= (int)$lowerPort && (int)$serverPort <= (int)$upperPort) {
-                        if ($condition === 'accept' || $condition === 'accept6') {
-                            return true;
-                        }
-                        if ($condition === 'reject' || $condition === 'reject6') {
-                            return false;
-                        }
-                    }
-                    continue;
+                if ($condition === 'accept' || $condition === 'accept6') {
+                    return true;
                 }
-
-                if ($serverPort === $currentPortExpression) {
-                    if ($condition === 'accept' || $condition === 'accept6') {
-                        return true;
-                    }
-                    if ($condition === 'reject' || $condition === 'reject6') {
-                        return false;
-                    }
+                if ($condition === 'reject' || $condition === 'reject6') {
+                    return false;
                 }
             }
         }
@@ -72,18 +56,32 @@ final class ExitPolicyMatcher
 
     public function isIpInSubnet(string $ip, string $subnet): bool
     {
+        $ip = IpAddress::normalize($ip) ?? $ip;
+        $subnet = trim($subnet, '[]');
+
         if ($subnet === '*') {
             return true;
         }
 
-        if ($subnet === $ip) {
-            return true;
-        }
-
         if (strpos($subnet, '/') === false) {
-            return false;
+            $normalizedSubnet = IpAddress::normalize($subnet);
+            return $normalizedSubnet !== null && $normalizedSubnet === $ip;
         }
 
         return \IpUtils::checkIp($ip, $subnet);
+    }
+
+    private function portMatches(string $serverPort, string $expression): bool
+    {
+        if ($expression === '*') {
+            return true;
+        }
+
+        if (strpos($expression, '-') !== false) {
+            [$lowerPort, $upperPort] = explode('-', $expression, 2);
+            return (int)$serverPort >= (int)$lowerPort && (int)$serverPort <= (int)$upperPort;
+        }
+
+        return $serverPort === $expression;
     }
 }

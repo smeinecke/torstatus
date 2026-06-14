@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TorStatus\Index;
 
 use TorStatus\Database\QueryExecutor;
+use TorStatus\Network\IpAddress;
 
 final class IndexRepository
 {
@@ -52,23 +53,19 @@ final class IndexRepository
 
     public function countExitRoutersByIp(string $remoteIp): int
     {
-        $record = $this->db->singleRow(
-            "select count(*) as Count from {$this->tables->networkStatus} where IP = ? and FExit = ?",
-            [$remoteIp, 1],
-            1800
-        );
-        $count = (int)($record['Count'] ?? 0);
-        if ($count > 0) {
-            return $count;
-        }
+        $networkStatus = $this->tables->networkStatus;
+        $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
+        $params = [];
+        $ipPredicate = $this->buildIpPredicate("$networkStatus.IP", "$orAddresses.address", $remoteIp, $params);
+        $params[] = 1;
 
-        $query = "select count(*) as Count
-            from {$this->tables->orAddresses}
-                join {$this->tables->descriptor} on {$this->tables->descriptor}.ID = {$this->tables->orAddresses}.descriptor_id
-                join {$this->tables->networkStatus} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint
-            where address = ?
-                and {$this->tables->networkStatus}.FExit = ?";
-        $record = $this->db->singleRow($query, [$remoteIp, 1], 1800);
+        $query = "select count(distinct $networkStatus.Fingerprint) as Count
+            from $networkStatus
+                inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
+                left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id
+            where $ipPredicate and $networkStatus.FExit = ?";
+        $record = $this->db->singleRow($query, $params, 1800);
 
         return (int)($record['Count'] ?? 0);
     }
@@ -76,14 +73,19 @@ final class IndexRepository
     /** @return array<int, array<string, mixed>> */
     public function fetchExitPolicyCandidates(string $remoteIp): array
     {
-        $query = "select {$this->tables->networkStatus}.Name Name, {$this->tables->networkStatus}.Fingerprint Fingerprint, {$this->tables->descriptor}.ExitPolicySERDATA ExitPolicySERDATA
-            from {$this->tables->networkStatus}
-                inner join {$this->tables->descriptor} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint
-                left join {$this->tables->orAddresses} on {$this->tables->descriptor}.ID = {$this->tables->orAddresses}.descriptor_id
-            where ({$this->tables->networkStatus}.IP = ? or {$this->tables->orAddresses}.address = ?)
+        $networkStatus = $this->tables->networkStatus;
+        $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
+        $params = [];
+        $ipPredicate = $this->buildIpPredicate("$networkStatus.IP", "$orAddresses.address", $remoteIp, $params);
+        $query = "select $networkStatus.Name Name, $networkStatus.Fingerprint Fingerprint, $descriptor.ExitPolicySERDATA ExitPolicySERDATA
+            from $networkStatus
+                inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
+                left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id
+            where $ipPredicate
             group by Name, Fingerprint, ExitPolicySERDATA";
 
-        return $this->db->rows($query, [$remoteIp, $remoteIp], 1800);
+        return $this->db->rows($query, $params, 1800);
     }
 
     /** @return array<string, mixed> */
@@ -142,11 +144,17 @@ final class IndexRepository
 
     public function countRoutersByIp(string $ip): int
     {
-        $record = $this->db->singleRow(
-            "select count(*) as Count from {$this->tables->networkStatus} where IP = ?",
-            [$ip],
-            1800
-        );
+        $networkStatus = $this->tables->networkStatus;
+        $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
+        $params = [];
+        $ipPredicate = $this->buildIpPredicate("$networkStatus.IP", "$orAddresses.address", $ip, $params);
+        $query = "select count(distinct $networkStatus.Fingerprint) as Count
+            from $networkStatus
+                inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
+                left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id
+            where $ipPredicate";
+        $record = $this->db->singleRow($query, $params, 1800);
 
         return (int)($record['Count'] ?? 0);
     }
@@ -156,19 +164,19 @@ final class IndexRepository
     {
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
+        $params = [];
+        $ipPredicate = $this->buildIpPredicate("$networkStatus.IP", "$orAddresses.address", $ip, $params);
+        $selectExitPolicy = $includeExitPolicy ? ", $descriptor.ExitPolicySERDATA" : '';
+        $groupExitPolicy = $includeExitPolicy ? ", $descriptor.ExitPolicySERDATA" : '';
+        $query = "select $networkStatus.Name, $networkStatus.Fingerprint$selectExitPolicy
+            from $networkStatus
+                inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
+                left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id
+            where $ipPredicate
+            group by $networkStatus.Name, $networkStatus.Fingerprint$groupExitPolicy";
 
-        if ($includeExitPolicy) {
-            $query = "select $networkStatus.Name, $networkStatus.Fingerprint, $descriptor.ExitPolicySERDATA
-                from $networkStatus
-                    inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
-                where $networkStatus.IP = ?";
-        } else {
-            $query = "select $networkStatus.Name, $networkStatus.Fingerprint
-                from $networkStatus
-                where $networkStatus.IP = ?";
-        }
-
-        $result = $this->db->result($query, [$ip]);
+        $result = $this->db->result($query, $params);
         $rows = [];
         while ($record = $result->fetch_assoc()) {
             $exitPolicy = null;
@@ -231,6 +239,7 @@ final class IndexRepository
     {
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
 
         $query = "select $networkStatus.Name, $networkStatus.Fingerprint";
         $query .= ", $networkStatus.CountryCode";
@@ -256,7 +265,7 @@ final class IndexRepository
         $query .= ", $networkStatus.FValid as Valid";
         $query .= ", $networkStatus.FV2Dir as V2Dir";
         $query .= ", $networkStatus.FHSDir as HSDir";
-        $query .= ", INET_ATON($networkStatus.IP) as NIP from $networkStatus inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint";
+        $query .= ", INET_ATON($networkStatus.IP) as NIP from $networkStatus inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id";
 
         $params = [$this->offsetFromGmt];
         $where = $this->buildWhereClauses($request, $params);
@@ -319,6 +328,7 @@ final class IndexRepository
 
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
         $fieldMap = [
             'Fingerprint' => "$networkStatus.Fingerprint",
             'Name' => "$networkStatus.Name",
@@ -341,6 +351,10 @@ final class IndexRepository
             $value = '0';
         }
 
+        if ($field === 'IP') {
+            return $this->buildIpSearchPredicate($request->customSearchModifier, $value, "$networkStatus.IP", "$orAddresses.address", $params);
+        }
+
         $column = $fieldMap[$field] ?? $fieldMap['Fingerprint'];
 
         switch ($request->customSearchModifier) {
@@ -358,6 +372,40 @@ final class IndexRepository
                 $params[] = $value;
                 return "$column = ?";
         }
+    }
+
+
+    /** @param array<int, mixed> $params */
+    private function buildIpSearchPredicate(string $modifier, string $value, string $networkIpColumn, string $orAddressColumn, array &$params): string
+    {
+        if ($modifier === 'Contains') {
+            $params[] = '%' . $value . '%';
+            $params[] = '%' . $value . '%';
+            return "($networkIpColumn like ? or $orAddressColumn like ?)";
+        }
+
+        $normalized = IpAddress::normalize($value);
+        if ($normalized !== null && $modifier === 'Equals') {
+            return $this->buildIpPredicate($networkIpColumn, $orAddressColumn, $normalized, $params);
+        }
+
+        $params[] = $value;
+        return $networkIpColumn . ($modifier === 'LessThan' ? ' < ?' : ($modifier === 'GreaterThan' ? ' > ?' : ' = ?'));
+    }
+
+    /** @param array<int, mixed> $params */
+    private function buildIpPredicate(string $networkIpColumn, string $orAddressColumn, string $ip, array &$params): string
+    {
+        $normalized = IpAddress::normalize($ip) ?? $ip;
+        $variants = IpAddress::databaseVariants($normalized);
+        $placeholders = implode(', ', array_fill(0, count($variants), '?'));
+
+        $params[] = $normalized;
+        foreach ($variants as $variant) {
+            $params[] = $variant;
+        }
+
+        return "($networkIpColumn = ? or $orAddressColumn in ($placeholders))";
     }
 
     private function appendOrderBy(string $query, IndexRequest $request): string

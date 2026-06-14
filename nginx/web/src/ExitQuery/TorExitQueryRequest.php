@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\ExitQuery;
 
+use TorStatus\Network\IpAddress;
+
 final class TorExitQueryRequest
 {
     /** @var string|null */
@@ -45,21 +47,16 @@ final class TorExitQueryRequest
 
     private static function sanitizeIp($value): ?string
     {
-        if (!is_string($value) || strlen($value) > 15) {
+        if (!is_string($value) || strlen($value) > 64) {
             return null;
         }
 
-        $long = ip2long($value);
-        if ($long === false || $long === -1) {
-            return null;
-        }
-
-        return long2ip($long);
+        return IpAddress::normalize($value);
     }
 
     private static function sanitizePort($value): ?string
     {
-        if (!is_string($value) || strlen($value) > 5 || !is_numeric($value)) {
+        if (!is_string($value) || strlen($value) > 5 || !ctype_digit($value)) {
             return null;
         }
 

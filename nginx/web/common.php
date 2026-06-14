@@ -1,134 +1,82 @@
 <?php
 
-function die_503($text) {
-	error_log("HTTP 503 returned to client; reason: $text");
-	header('HTTP/1.1 503 Service Temporarily Unavailable');
-	header('Status: 503 Service Temporarily Unavailable');
-	die();
+declare(strict_types=1);
+
+namespace TorStatus;
+
+use TorStatus\Database\QueryExecutor;
+use TorStatus\Http\Response;
+use TorStatus\Template\Renderer;
+use Twig\Environment;
+use Twig\Loader\FilesystemLoader;
+
+final class Common
+{
+    public static function startSession(): void
+    {
+        @session_start() or Response::badRequest();
+    }
+
+    public static function memcached(string $host): \Memcached
+    {
+        $memcached = new \Memcached();
+        $memcached->addServer($host, 11211);
+        return $memcached;
+    }
+
+    public static function database(string $server, string $user, string $password, string $catalog): \mysqli
+    {
+        mysqli_report(MYSQLI_REPORT_STRICT);
+        try {
+            $mysqli = new \mysqli($server, $user, $password, $catalog);
+            if ($mysqli->connect_error) {
+                Response::serviceUnavailable('Could not connect to: ' . $mysqli->connect_error);
+            }
+        } catch (\Throwable $e) {
+            Response::serviceUnavailable('Could not connect to: ' . $e->getMessage());
+        }
+        mysqli_report(MYSQLI_REPORT_ALL ^ MYSQLI_REPORT_STRICT ^ MYSQLI_REPORT_INDEX);
+
+        return $mysqli;
+    }
+
+    /** @return array<string, mixed> */
+    public static function status(QueryExecutor $db): array
+    {
+        return $db->singleRow(
+            'select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status',
+            [],
+            60
+        );
+    }
+
+    public static function fetchMirrors(QueryExecutor $db): string
+    {
+        $row = $db->singleRow('SELECT mirrors FROM `Mirrors` WHERE id = ?', [1], 86400);
+        return (string)($row['mirrors'] ?? '');
+    }
+
+    public static function appVersion(string $composerJsonPath): string
+    {
+        $composerJson = json_decode((string)file_get_contents($composerJsonPath), true);
+        return is_array($composerJson) && isset($composerJson['version']) ? (string)$composerJson['version'] : '4.0';
+    }
+
+    /** @param array<string, mixed> $defaultContext */
+    public static function renderer(string $templateDirectory, array $defaultContext): Renderer
+    {
+        $loader = new FilesystemLoader($templateDirectory);
+        $twig = new Environment($loader, [
+            'cache' => false,
+            'debug' => false,
+            'autoescape' => 'html',
+        ]);
+
+        return new Renderer($twig, $defaultContext);
+    }
+
+    public static function isOnionHost(string $host): bool
+    {
+        return preg_match('/^[0-9a-z]+\.onion$/', $host) === 1;
+    }
 }
-
-function die_400() {
-	header('HTTP/1.1 400 Bad Request');
-	header('Status: 400 Bad Request');
-	die();
-}
-
-function db_query_single_row($query, $cache_expiration = -1, array $params = []) {
-	global $mysqli, $memcached;
-
-	$cache_key = null;
-	if($cache_expiration > -1) {
-		$cache_key = "torstatus_query_" . sha1($query . "\0" . serialize($params));
-		$cache_raw = $memcached->get($cache_key);
-		if(is_string($cache_raw) && $cache_raw !== '') {
-			$record = unserialize($cache_raw, ['allowed_classes' => false]);
-			if(is_array($record)) {
-				return $record;
-			}
-		}
-	}
-
-	$stmt = $mysqli->prepare($query);
-	if(!$stmt) {
-		die_503('Query prepare failed: ' . $mysqli->error);
-	}
-
-	if($params) {
-		$types = '';
-		$values = [];
-		foreach($params as $param) {
-			if(is_int($param) || is_bool($param)) {
-				$types .= 'i';
-			}
-			elseif(is_float($param)) {
-				$types .= 'd';
-			}
-			else {
-				$types .= 's';
-			}
-			$values[] = $param;
-		}
-		$refs = [];
-		foreach($values as $key => &$value) {
-			$refs[$key] =& $value;
-		}
-		$stmt->bind_param($types, ...$refs);
-	}
-
-	if(!$stmt->execute()) {
-		$error = $stmt->error ?: $mysqli->error;
-		$stmt->close();
-		die_503('Query failed: ' . $error);
-	}
-
-	$result = $stmt->get_result();
-	if(!$result) {
-		$stmt->close();
-		die_503('Query failed: no result set returned');
-	}
-
-	$record = $result->fetch_assoc();
-	$result->free();
-	$stmt->close();
-
-	if(!is_array($record)) {
-		$record = [];
-	}
-	if($cache_key !== null) {
-		$memcached->set($cache_key, serialize($record), $cache_expiration);
-	}
-
-	return $record;
-}
-
-function fetch_mirrors() {
-	global $mirrorList;
-
-	// Retrieve the mirror list from the database
-	$query = "SELECT mirrors FROM `Mirrors` WHERE id=1";
-	$mirrorListRow = db_query_single_row($query, 86400);
-	$mirrorList = $mirrorListRow['mirrors'];
-}
-
-// Start new session
-@session_start() or die_400();
-
-
-$memcached = new Memcached();
-$memcached->addServer($memcached_host, 11211);
-
-// Get script start time
-$TimeStart = microtime(true);
-
-// Connect to database, select schema
-mysqli_report(MYSQLI_REPORT_STRICT);
-try {
-	$mysqli = new mysqli($SQL_Server, $SQL_User, $SQL_Pass, $SQL_Catalog);
-	if($mysqli->connect_error) {
-		die_503('Could not connect to: ' . $mysqli->connect_error);
-	}
-}
-catch (Exception $e) {
-	die_503('Could not connect to: ' . $e->getMessage());
-}
-mysqli_report(MYSQLI_REPORT_ALL ^ MYSQLI_REPORT_STRICT ^ MYSQLI_REPORT_INDEX);
-
-// Get last update and active table information from database
-$query = "select LastUpdate, LastUpdateElapsed, ActiveNetworkStatusTable, ActiveDescriptorTable, ActiveORAddressesTable from Status";
-$record = db_query_single_row($query, 60);
-
-$LastUpdate = $record['LastUpdate'];
-$LastUpdateElapsed = $record['LastUpdateElapsed'];
-$ActiveNetworkStatusTable = $record['ActiveNetworkStatusTable'];
-$ActiveDescriptorTable = $record['ActiveDescriptorTable'];
-$ActiveORAddressesTable = $record['ActiveORAddressesTable'];
-
-$timestamp = time();
-$year = date('Y', $timestamp);
-$month = date('n', $timestamp);
-$day = date('j', $timestamp);
-$hour = date('G', $timestamp);
-$minute = date('i', $timestamp);
-$second = date('s', $timestamp);
-$Host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
-$onion_service = preg_match('/^[0-9a-z]*\.onion$/', $Host);

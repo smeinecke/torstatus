@@ -6,6 +6,7 @@ namespace TorStatus\Router;
 
 use TorStatus\Database\QueryExecutor;
 use TorStatus\Index\TableNames;
+use TorStatus\Network\IpAddress;
 
 final class RouterDetailService
 {
@@ -69,13 +70,43 @@ final class RouterDetailService
             return null;
         }
 
-        return $this->toTemplateContext($fingerprint, $record);
+        $orAddresses = $this->fetchOrAddresses($fingerprint);
+
+        return $this->toTemplateContext($fingerprint, $record, $orAddresses);
+    }
+
+    /** @return array<int, array{address: string, port: int}> */
+    private function fetchOrAddresses(string $fingerprint): array
+    {
+        $descriptor = $this->tables->descriptor;
+        $orAddresses = $this->tables->orAddresses;
+        $query = "select $orAddresses.address, $orAddresses.port
+            from $orAddresses
+                inner join $descriptor on $descriptor.ID = $orAddresses.descriptor_id
+            where $descriptor.Fingerprint = ?
+            order by $orAddresses.address, $orAddresses.port";
+        $rows = $this->db->rows($query, [$fingerprint], 1800);
+        $addresses = [];
+        foreach ($rows as $row) {
+            $address = IpAddress::normalize((string)($row['address'] ?? ''));
+            if ($address === null) {
+                continue;
+            }
+
+            $addresses[] = [
+                'address' => $address,
+                'port' => (int)($row['port'] ?? 0),
+            ];
+        }
+
+        return $addresses;
     }
 
     /** @param array<string, mixed> $record
+     *  @param array<int, array{address: string, port: int}> $orAddresses
      *  @return array<string, mixed>
      */
-    private function toTemplateContext(string $fingerprint, array $record): array
+    private function toTemplateContext(string $fingerprint, array $record, array $orAddresses): array
     {
         $uptime = (int)($record['Uptime'] ?? -1);
         return [
@@ -85,6 +116,7 @@ final class RouterDetailService
             'IP' => $record['IP'] ?? null,
             'Hostname' => $record['Hostname'] ?? null,
             'ORPort' => $record['ORPort'] ?? null,
+            'ORAddresses' => $orAddresses,
             'DirPort' => $record['DirPort'] ?? null,
             'Platform' => $record['Platform'] ?? null,
             'Contact' => $record['Contact'] ?? null,

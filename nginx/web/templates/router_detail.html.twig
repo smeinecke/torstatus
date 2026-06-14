@@ -47,6 +47,18 @@
 		<td class='TRSB'>{{ ORPort|e }}</td>
 	</tr>
 	<tr>
+		<td class='TRAR'><b>Additional OR Addresses:</b></td>
+		<td class='TRSB'>
+		{% if ORAddresses is empty %}
+			None
+		{% else %}
+			{% for item in ORAddresses %}
+				{% if WHOISPath %}<a href="{{ (WHOISPath ~ item.address)|e }}">{{ item.address|e }}</a>{% else %}{{ item.address|e }}{% endif %}:{{ item.port }}<br/>
+			{% endfor %}
+		{% endif %}
+		</td>
+	</tr>
+	<tr>
 		<td class='TRAR'><b>Directory Server Port:</b></td>
 		<td class='TRSB'>{% if DirPort == 0 %}None{% else %}{{ DirPort|e }}{% endif %}</td>
 	</tr>
@@ -106,10 +118,10 @@
 </tr>
 <tr>
 <td class='TRS' style="text-align: center;">
-<img src='{{ BandwidthWriteGraphUrl|raw }}' alt='Write bandwidth history graph' />
+<img src='{{ BandwidthWriteGraphUrl|e }}' alt='Write bandwidth history graph' />
 </td>
 <td class='TRSB' style="text-align: center;">
-<img src='{{ BandwidthReadGraphUrl|raw }}' alt='Read bandwidth history graph' />
+<img src='{{ BandwidthReadGraphUrl|e }}' alt='Read bandwidth history graph' />
 </td>
 <td class='TRS' style='padding: 10px; border-left-color: #59990e; border-left-style: solid; border-left-width: 1px; vertical-align: top;'>
 <table cellspacing='0' cellpadding='0'>
