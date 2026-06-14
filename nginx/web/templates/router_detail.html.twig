@@ -30,7 +30,7 @@
 			<div><dt>Hostname</dt><dd>{% if Hostname == IP %}Unavailable{% else %}{{ Hostname|e }}{% endif %}</dd></div>
 			<div><dt>ORPort</dt><dd>{{ ORPort|e }}</dd></div>
 			<div><dt>DirPort</dt><dd>{% if DirPort == 0 %}None{% else %}{{ DirPort|e }}{% endif %}</dd></div>
-			<div><dt>Country</dt><dd>{% if CountryCode is not null %}{{ CountryCode|e }}{% else %}Unknown{% endif %}</dd></div>
+			<div><dt>Country</dt><dd>{% if CountryCode is not null %}<i class="ti ti-flag-{{ CountryCode|lower }}" aria-hidden="true"></i> {{ CountryCode|e }}{% else %}Unknown{% endif %}</dd></div>
 			<div><dt>Platform</dt><dd>{{ Platform|e }}</dd></div>
 			<div><dt>Last descriptor</dt><dd>{{ LastDescriptorPublished|e }}</dd></div>
 			<div><dt>Current uptime</dt><dd>{% if Uptime > -1 %}{{ uptime_days }} d {{ uptime_hours }} h {{ uptime_minutes }} m {{ uptime_seconds }} s{% else %}Not Available{% endif %}</dd></div>
