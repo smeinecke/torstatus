@@ -1,0 +1,12 @@
+<table width="40%" cellspacing="0" cellpadding="0" class="displayTable" id="anssTable">
+<tr>
+<td class="HRN" colspan="3">Aggregate Network Statistic Summary | <a href="network_detail.php">Graphs / Details</a></td>
+</tr>
+{% for row in stats_rows %}
+<tr>
+<td class="TRAR"><b>{{ row.label }}</b></td>
+<td class="TRS">{{ row.count }}</td>
+<td class="TRS">{{ row.percentage }}%</td>
+</tr>
+{% endfor %}
+</table>

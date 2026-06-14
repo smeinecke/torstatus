@@ -1,0 +1,116 @@
+{% set sort_options = {
+    'Name': 'Router Name',
+    'Fingerprint': 'Fingerprint',
+    'CountryCode': 'Country Code',
+    'Bandwidth': 'Bandwidth',
+    'Uptime': 'Uptime',
+    'LastDescriptorPublished': 'Last Descriptor Published',
+    'Hostname': 'Hostname',
+    'IP': 'IP Address',
+    'ORPort': 'ORPort',
+    'DirPort': 'DirPort',
+    'Platform': 'Platform',
+    'Contact': 'Contact',
+    'FAuthority': 'Authority',
+    'FBadDirectory': 'Bad Directory',
+    'FBadExit': 'Bad Exit',
+    'FExit': 'Exit',
+    'FFast': 'Fast',
+    'FGuard': 'Guard',
+    'Hibernating': 'Hibernating',
+    'FNamed': 'Named',
+    'FStable': 'Stable',
+    'FRunning': 'Running',
+    'FValid': 'Valid',
+    'FV2Dir': 'V2Dir',
+    'FHSDir': 'HSDir'
+} %}
+{% set filter_options = {
+    'FAuthority': 'Authority',
+    'FBadDirectory': 'Bad Directory',
+    'FBadExit': 'BadExit',
+    'FExit': 'Exit',
+    'FFast': 'Fast',
+    'FGuard': 'Guard',
+    'FHibernating': 'Hibernating',
+    'FNamed': 'Named',
+    'FStable': 'Stable',
+    'FRunning': 'Running',
+    'FValid': 'Valid',
+    'FV2Dir': 'V2Dir',
+    'FHSDir': 'HSDir'
+} %}
+{% set search_options = {
+    'Fingerprint': 'Fingerprint',
+    'Name': 'Router Name',
+    'CountryCode': 'Country Code',
+    'Bandwidth': 'Bandwidth (KB/s)',
+    'Uptime': 'Uptime (Days)',
+    'LastDescriptorPublished': 'Last Descriptor Published',
+    'IP': 'IP Address',
+    'Hostname': 'Hostname',
+    'ORPort': 'Onion Router Port',
+    'DirPort': 'Directory Server Port',
+    'Platform': 'Platform',
+    'Contact': 'Contact'
+} %}
+{% set search_mod_options = {
+    'Equals': 'Equals',
+    'Contains': 'Contains',
+    'LessThan': 'Is Less Than',
+    'GreaterThan': 'Is Greater Than'
+} %}
+<table width="100%" cellspacing="0" cellpadding="0" class="displayTable" id="caqoTable">
+<tr>
+<td class="HRN">Custom / Advanced Query Options</td>
+</tr>
+<tr>
+<td class="TRS"><br/>
+<form action="{{ Self|e }}" method="post">
+<input type="hidden" name="RowsPerPage" value="{{ rows_per_page }}" />
+<input type="hidden" name="Page" value="1" />
+<b>Sort Router Listing By:</b><br/><span class="TRSM">(Sorted-by column will be <i>italic</i>)<br/>(Column names can also be clicked to sort)</span><br/>
+<select name="SR" class="BOX">
+{% for value, label in sort_options %}
+<option value="{{ value }}"{% if sr == value %} selected="selected"{% endif %}>{{ label }}</option>
+{% endfor %}
+</select>
+<select name="SO" class="BOX">
+<option value="Asc"{% if so == 'Asc' %} selected="selected"{% endif %}>Ascending</option>
+<option value="Desc"{% if so == 'Desc' %} selected="selected"{% endif %}>Descending</option>
+</select>
+<br/><br/>
+<table cellspacing="0" cellpadding="0">
+{% for name, label in filter_options %}
+<tr>
+<td class="TRS">&nbsp;{{ label }}:</td>
+<td class="TRS">
+{% set current = attribute(_context, name)|default('OFF') %}
+<input type="radio" name="{{ name }}" value="OFF"{% if current == 'OFF' %} checked="checked"{% endif %} />Off&nbsp;
+<input type="radio" name="{{ name }}" value="1"{% if current == '1' %} checked="checked"{% endif %} />Yes&nbsp;
+<input type="radio" name="{{ name }}" value="0"{% if current == '0' %} checked="checked"{% endif %} />No
+</td>
+</tr>
+{% endfor %}
+<tr>
+<td class="TRS" colspan="2"><br/>
+<b>Advanced Search:</b><br/><span class="TRSM">(Clear search box to disable)</span><br/>
+<select name="CSField" class="BOX">
+{% for value, label in search_options %}
+<option value="{{ value }}"{% if CSField == value %} selected="selected"{% endif %}>{{ label }}</option>
+{% endfor %}
+</select>
+<select name="CSMod" class="BOX">
+{% for value, label in search_mod_options %}
+<option value="{{ value }}"{% if CSMod == value %} selected="selected"{% endif %}>{{ label }}</option>
+{% endfor %}
+</select><br/>
+<input type="text" name="CSInput" class="BOX" maxlength="128" size="45" value="{{ CSInput|default('')|e }}" /><br/><br/>
+&nbsp;&nbsp;<input type="submit" value="Apply Options" /><br/><br/>
+</td>
+</tr>
+</table>
+</form>
+</td>
+</tr>
+</table>

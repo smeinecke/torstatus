@@ -1,0 +1,26 @@
+<table width="100%" cellspacing="0" cellpadding="0" class="displayTable" id="nsosTable">
+<tr>
+<td class="HRN">Network Status Opinion Source</td>
+</tr>
+<tr>
+<td class="TRSB">
+{% if SourceFingerprint %}
+<b>Nickname:</b><br/><a class="plainbox" href="router_detail.php?FP={{ SourceFingerprint|e('url') }}">{{ SourceName|e }}</a><br/>
+<b>Fingerprint:</b><br/>{{ SourceFingerprint_formatted|e }}<br/>
+<b>Country Code:</b><br/>{% if SourceCountryCode is empty %}Unknown{% else %}{{ SourceCountryCode|e }}{% endif %}<br/>
+<b>Contact:</b><br/>{% if SourceContact is empty %}None Given{% else %}{{ SourceContact|e }}{% endif %}<br/>
+<b>Platform:</b><br/>{{ SourcePlatform|e }}<br/>
+<b>IP Address:</b><br/>{{ SourceIP|e }}<br/>
+<b>Hostname:</b><br/>{% if SourceIP == SourceHostname %}Unavailable{% else %}{{ SourceHostname|e }}{% endif %}<br/>
+<b>Onion Router Port:</b><br/>{{ SourceORPort|e }}<br/>
+<b>Directory Server Port:</b><br/>{% if SourceDirPort == 0 %}None{% else %}{{ SourceDirPort|e }}{% endif %}<br/>
+<b>Last Published Descriptor (GMT):</b><br/>{{ SourceLastDescriptorPublished|e }}<br/><br/>
+<b>Onion Key:</b><pre>{{ SourceOnionKey|e }}</pre>
+<b>Signing Key:</b><pre>{{ SourceSigningKey|e }}</pre>
+<b>Descriptor Signature:</b><pre>{{ SourceDescriptorSignature|e }}</pre>
+{% else %}
+Data source is a client, not a relay, therefore no detailed information is available
+{% endif %}
+</td>
+</tr>
+</table>
