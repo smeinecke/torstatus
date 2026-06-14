@@ -21,6 +21,7 @@ function setupThemeToggle() {
     html.setAttribute('data-theme', next);
     localStorage.setItem('torstatus-theme', next);
     updateIcon();
+    window.dispatchEvent(new CustomEvent('torstatus:themechange'));
   });
 }
 

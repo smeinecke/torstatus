@@ -13,27 +13,27 @@
 <div class="ts-graph-grid">
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers by country code</h2>
-		<canvas data-chart-endpoint="graphs.php?type=cc" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=cc" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Exit routers by country code</h2>
-		<canvas data-chart-endpoint="graphs.php?type=cc_exit" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=cc_exit" data-chart-type="bar" data-chart-value-label="Exit routers"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers by uptime</h2>
-		<canvas data-chart-endpoint="graphs.php?type=uptime" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=uptime" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card">
 		<h2>Routers by observed bandwidth</h2>
-		<canvas data-chart-endpoint="graphs.php?type=bandwidth" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=bandwidth" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card">
 		<h2>Routers by platform</h2>
-		<canvas data-chart-endpoint="graphs.php?type=platform" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=platform" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card ts-graph-card-wide">
 		<h2>Routers matching specified criteria</h2>
-		<canvas data-chart-endpoint="graphs.php?type=summary" data-chart-type="bar"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=summary" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
 	</section>
 </div>
 {% endblock %}

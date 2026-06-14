@@ -1,6 +1,6 @@
 <dl class="ts-metric-list">
 {% for row in stats_rows %}
-	<div class="ts-metric-card">
+	<div class="ts-metric-card{% if loop.first %} ts-metric-card-primary{% endif %}">
 		<dt>{{ row.label }}</dt>
 		<dd><strong>{{ row.count }}</strong> <span>{{ row.percentage }}%</span></dd>
 	</div>

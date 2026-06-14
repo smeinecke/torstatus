@@ -943,3 +943,129 @@ div.fg8 { background: #f97316; }
   .ts-flag-filter-row { grid-template-columns: 1fr; align-items: stretch; }
   .ts-radio-segment { justify-self: stretch; width: 100%; }
 }
+
+/* UX polish after the dashboard and chart refactor. */
+.ts-page {
+  width: min(100%, 1440px);
+  margin-inline: auto;
+}
+.ts-button:focus-visible,
+.ts-icon-button:focus-visible,
+.ts-header-link:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+  outline: 3px solid var(--ts-ring);
+  outline-offset: 3px;
+}
+.ts-card summary::-webkit-details-marker { display: none; }
+.ts-card summary::after {
+  content: '⌄';
+  margin-left: auto;
+  color: var(--ts-muted);
+  font-size: 1rem;
+  transition: transform .16s ease;
+}
+.ts-card[open] summary::after { transform: rotate(180deg); }
+.ts-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(20rem, .85fr);
+  gap: 1rem;
+  align-items: start;
+  margin-top: 1rem;
+}
+.ts-dashboard-card {
+  min-width: 0;
+  min-height: 0;
+}
+.ts-dashboard-card[open] summary {
+  padding-bottom: .7rem;
+  border-bottom: 1px solid var(--ts-card-border);
+}
+.ts-dashboard-summary {
+  grid-row: span 2;
+}
+.ts-metric-card-primary {
+  grid-column: span 2;
+  background:
+    radial-gradient(circle at top right, rgba(109, 40, 217, .13), transparent 12rem),
+    linear-gradient(180deg, var(--ts-metric-card-gradient-from), var(--ts-metric-card-gradient-to));
+}
+.ts-metric-card-primary strong { font-size: 1.25rem; }
+.ts-description-list div,
+.ts-metric-card {
+  min-width: 0;
+}
+.ts-router-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--ts-table-header-bg) !important;
+}
+.ts-router-table tbody td:first-child,
+.ts-router-table thead th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+}
+.ts-router-table thead th:first-child { z-index: 3; }
+.ts-router-table tbody td:first-child { background: inherit; }
+.ts-chart-canvas-wrap {
+  position: relative;
+  min-height: 280px;
+  border: 1px solid var(--ts-card-border);
+  border-radius: .9rem;
+  background: var(--ts-card-solid);
+  padding: .75rem;
+  overflow: hidden;
+}
+.ts-graph-card-wide .ts-chart-canvas-wrap { min-height: 350px; }
+.ts-chart-canvas-wrap canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: inherit;
+}
+.ts-chart-message {
+  position: absolute;
+  inset: .75rem;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  border: 1px dashed var(--ts-card-border);
+  border-radius: .75rem;
+  background: rgba(148, 163, 184, .08);
+  color: var(--ts-muted);
+  font-weight: 750;
+  text-align: center;
+}
+.ts-chart-canvas-wrap[data-chart-state='loading']::before {
+  content: '';
+  position: absolute;
+  inset: .75rem;
+  border-radius: .75rem;
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, .14), transparent);
+  animation: ts-chart-shimmer 1.15s linear infinite;
+}
+.ts-chart-canvas-wrap[data-chart-state='error'] .ts-chart-message,
+.ts-chart-canvas-wrap[data-chart-state='empty'] .ts-chart-message {
+  border-color: var(--ts-input-border);
+  background: var(--ts-surface-3);
+}
+@keyframes ts-chart-shimmer {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@media (max-width: 1100px) {
+  .ts-dashboard-grid { grid-template-columns: 1fr; }
+  .ts-dashboard-summary { grid-row: auto; }
+}
+
+@media (max-width: 760px) {
+  .ts-metric-card-primary { grid-column: auto; }
+  .ts-table-actions { justify-content: flex-start; }
+  .ts-dialog { width: min(100vw - 1rem, 38rem); }
+  .ts-dialog-wide { width: min(100vw - 1rem, 52rem); }
+  .ts-chart-canvas-wrap,
+  .ts-graph-card-wide .ts-chart-canvas-wrap { min-height: 260px; }
+}

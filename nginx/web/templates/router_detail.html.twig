@@ -69,11 +69,11 @@
 <div class="ts-graph-grid ts-detail-grid">
 	<section class="ts-card ts-graph-card">
 		<h2>Write bandwidth history</h2>
-		<canvas data-chart-endpoint="{{ BandwidthWriteGraphUrl|e('html_attr') }}" data-chart-type="line"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="{{ BandwidthWriteGraphUrl|e('html_attr') }}" data-chart-type="line" data-chart-value-label="Bytes/sec"></canvas></div>
 	</section>
 	<section class="ts-card ts-graph-card">
 		<h2>Read bandwidth history</h2>
-		<canvas data-chart-endpoint="{{ BandwidthReadGraphUrl|e('html_attr') }}" data-chart-type="line"></canvas>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="{{ BandwidthReadGraphUrl|e('html_attr') }}" data-chart-type="line" data-chart-value-label="Bytes/sec"></canvas></div>
 	</section>
 	<section class="ts-card">
 		<h2>Router flags</h2>

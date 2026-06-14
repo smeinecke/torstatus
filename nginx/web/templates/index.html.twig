@@ -87,23 +87,23 @@
 	{% include '_pagination.html.twig' %}
 </section>
 
-<div class="ts-grid-two">
-	<details class="ts-card" open>
+<div class="ts-dashboard-grid">
+	<details class="ts-card ts-dashboard-card ts-dashboard-summary" open>
 		<summary><i class="ti ti-chart-pie" aria-hidden="true"></i>Network summary</summary>
 		{% include '_index_stats.html.twig' %}
 	</details>
 
-	<details class="ts-card" open>
+	<details class="ts-card ts-dashboard-card" open>
 		<summary><i class="ti ti-server" aria-hidden="true"></i>Application server</summary>
 		{% include '_index_appserver.html.twig' %}
 	</details>
 
-	<details class="ts-card" open>
+	<details class="ts-card ts-dashboard-card" open>
 		<summary><i class="ti ti-info-circle" aria-hidden="true"></i>Opinion source</summary>
 		{% include '_index_opinion_source.html.twig' %}
 	</details>
 
-	<details class="ts-card" open>
+	<details class="ts-card ts-dashboard-card" open>
 		<summary><i class="ti ti-legend" aria-hidden="true"></i>Legend</summary>
 		{% include '_index_legend.html.twig' %}
 	</details>
