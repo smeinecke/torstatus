@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Database\SqlIdentifier;
+
 final class TableNames
 {
     /** @var string */
@@ -17,8 +19,8 @@ final class TableNames
 
     public function __construct(string $networkStatus, string $descriptor, string $orAddresses)
     {
-        $this->networkStatus = $networkStatus;
-        $this->descriptor = $descriptor;
-        $this->orAddresses = $orAddresses;
+        $this->networkStatus = SqlIdentifier::table($networkStatus);
+        $this->descriptor = SqlIdentifier::table($descriptor);
+        $this->orAddresses = SqlIdentifier::table($orAddresses);
     }
 }

@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace TorStatus\Graph;
 
 use mitoteam\jpgraph\MtJpGraph;
+use TorStatus\Database\QueryExecutor;
+use TorStatus\Database\SqlIdentifier;
 
 final class BandwidthHistoryGraphRenderer
 {
     /** @param array<string, mixed> $get */
-    public function render(\mysqli $mysqli, string $descriptorTable, array $get): void
+    public function render(QueryExecutor $db, string $descriptorTable, array $get): void
     {
         $mode = $this->mode($get['MODE'] ?? null);
         $fingerprint = $this->fingerprint($get['FP'] ?? null);
@@ -17,7 +19,7 @@ final class BandwidthHistoryGraphRenderer
             \die_400();
         }
 
-        $history = $this->fetchHistory($mysqli, $descriptorTable, $fingerprint);
+        $history = $this->fetchHistory($db, $descriptorTable, $fingerprint);
         $series = $mode === 'WriteHistory' ? $history['write'] : $history['read'];
         $title = $mode === 'WriteHistory'
             ? 'Recent Write History (Bytes/Sec Average) (GMT)'
@@ -41,15 +43,14 @@ final class BandwidthHistoryGraphRenderer
     }
 
     /** @return array{write: array{data: array<int, int|float>, increment: int, last: string}, read: array{data: array<int, int|float>, increment: int, last: string}} */
-    private function fetchHistory(\mysqli $mysqli, string $descriptorTable, string $fingerprint): array
+    private function fetchHistory(QueryExecutor $db, string $descriptorTable, string $fingerprint): array
     {
+        $descriptorTable = SqlIdentifier::table($descriptorTable);
         $query = "select WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA from $descriptorTable where Fingerprint = ?";
-        $stmt = $mysqli->prepare($query);
-        $stmt->bind_param('s', $fingerprint);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $record = $result ? $result->fetch_assoc() : null;
-        $stmt->close();
+        $record = $db->singleRow($query, [$fingerprint], 1800);
+        if ($record === []) {
+            $record = null;
+        }
 
         return [
             'write' => $this->series($record, 'WriteHistory'),

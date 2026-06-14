@@ -18,8 +18,11 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+use TorStatus\Database\QueryExecutor;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
+
+$db = new QueryExecutor($mysqli, $memcached);
 
 $composerJson = json_decode(file_get_contents(__DIR__ . '/../composer.json'), true);
 $appVersion = $composerJson['version'] ?? '4.0';

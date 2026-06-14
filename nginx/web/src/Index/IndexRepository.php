@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Database\QueryExecutor;
+
 final class IndexRepository
 {
-    /** @var \mysqli */
-    private $mysqli;
+    /** @var QueryExecutor */
+    private $db;
 
     /** @var TableNames */
     private $tables;
@@ -15,44 +17,46 @@ final class IndexRepository
     /** @var int */
     private $offsetFromGmt;
 
-    public function __construct(\mysqli $mysqli, TableNames $tables, int $offsetFromGmt)
+    public function __construct(QueryExecutor $db, TableNames $tables, int $offsetFromGmt)
     {
-        $this->mysqli = $mysqli;
+        $this->db = $db;
         $this->tables = $tables;
         $this->offsetFromGmt = $offsetFromGmt;
     }
 
     public function countRouters(): int
     {
-        $record = $this->cachedSingleRow("select count(*) as Count from {$this->tables->networkStatus}", 1800);
+        $record = $this->db->singleRow("select count(*) as Count from {$this->tables->networkStatus}", [], 1800);
         return (int)($record['Count'] ?? 0);
     }
 
     public function countDescriptors(): int
     {
-        $record = $this->cachedSingleRow("select count(*) as Count from {$this->tables->descriptor}", 1800);
+        $record = $this->db->singleRow("select count(*) as Count from {$this->tables->descriptor}", [], 1800);
         return (int)($record['Count'] ?? 0);
     }
 
     /** @return array<string, mixed> */
     public function fetchNetworkStatusSource(): array
     {
-        $query = "select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = 1";
-        return $this->cachedSingleRow($query, 1800) ?: [];
+        $query = 'select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = ?';
+        return $this->db->singleRow($query, [1], 1800);
     }
 
     /** @return array<string, mixed> */
     public function fetchNetworkStatusSourceLocation(string $fingerprint): array
     {
-        $fingerprint = $this->mysqli->real_escape_string($fingerprint);
-        $query = "select Hostname, CountryCode from {$this->tables->networkStatus} where Fingerprint = '$fingerprint'";
-        return $this->cachedSingleRow($query, 1800) ?: [];
+        $query = "select Hostname, CountryCode from {$this->tables->networkStatus} where Fingerprint = ?";
+        return $this->db->singleRow($query, [$fingerprint], 1800);
     }
 
     public function countExitRoutersByIp(string $remoteIp): int
     {
-        $remoteIp = $this->mysqli->real_escape_string($remoteIp);
-        $record = $this->cachedSingleRow("select count(*) as Count from {$this->tables->networkStatus} where IP = '$remoteIp' and FExit = 1", 1800);
+        $record = $this->db->singleRow(
+            "select count(*) as Count from {$this->tables->networkStatus} where IP = ? and FExit = ?",
+            [$remoteIp, 1],
+            1800
+        );
         $count = (int)($record['Count'] ?? 0);
         if ($count > 0) {
             return $count;
@@ -62,9 +66,9 @@ final class IndexRepository
             from {$this->tables->orAddresses}
                 join {$this->tables->descriptor} on {$this->tables->descriptor}.ID = {$this->tables->orAddresses}.descriptor_id
                 join {$this->tables->networkStatus} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint
-            where address = '$remoteIp'
-                and {$this->tables->networkStatus}.FExit = 1";
-        $record = $this->cachedSingleRow($query, 1800);
+            where address = ?
+                and {$this->tables->networkStatus}.FExit = ?";
+        $record = $this->db->singleRow($query, [$remoteIp, 1], 1800);
 
         return (int)($record['Count'] ?? 0);
     }
@@ -72,26 +76,14 @@ final class IndexRepository
     /** @return array<int, array<string, mixed>> */
     public function fetchExitPolicyCandidates(string $remoteIp): array
     {
-        $remoteIp = $this->mysqli->real_escape_string($remoteIp);
         $query = "select {$this->tables->networkStatus}.Name Name, {$this->tables->networkStatus}.Fingerprint Fingerprint, {$this->tables->descriptor}.ExitPolicySERDATA ExitPolicySERDATA
             from {$this->tables->networkStatus}
                 inner join {$this->tables->descriptor} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint
                 left join {$this->tables->orAddresses} on {$this->tables->descriptor}.ID = {$this->tables->orAddresses}.descriptor_id
-            where ({$this->tables->networkStatus}.IP = '$remoteIp' or {$this->tables->orAddresses}.address = '$remoteIp')
+            where ({$this->tables->networkStatus}.IP = ? or {$this->tables->orAddresses}.address = ?)
             group by Name, Fingerprint, ExitPolicySERDATA";
 
-        $result = $this->mysqli->query($query);
-        if (!$result) {
-            \die_503('Query failed: ' . $this->mysqli->error);
-        }
-
-        $rows = [];
-        while ($record = $result->fetch_assoc()) {
-            $rows[] = $record;
-        }
-        $result->free();
-
-        return $rows;
+        return $this->db->rows($query, [$remoteIp, $remoteIp], 1800);
     }
 
     /** @return array<string, mixed> */
@@ -99,66 +91,62 @@ final class IndexRepository
     {
         $query = "select
             (select count(*) from {$this->tables->networkStatus}) as 'Total',
-            (select count(*) from {$this->tables->networkStatus} where FAuthority = '1') as 'Authority',
-            (select count(*) from {$this->tables->networkStatus} where FBadDirectory = '1') as 'BadDirectory',
-            (select count(*) from {$this->tables->networkStatus} where FBadExit = '1') as 'BadExit',
-            (select count(*) from {$this->tables->networkStatus} where FExit = '1') as 'Exit',
-            (select count(*) from {$this->tables->networkStatus} where FFast = '1') as 'Fast',
-            (select count(*) from {$this->tables->networkStatus} where FGuard = '1') as 'Guard',
-            (select count(*) from {$this->tables->descriptor} inner join {$this->tables->networkStatus} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint where Hibernating = '1') as 'Hibernating',
-            (select count(*) from {$this->tables->networkStatus} where FNamed = '1') as 'Named',
-            (select count(*) from {$this->tables->networkStatus} where FStable = '1') as 'Stable',
-            (select count(*) from {$this->tables->networkStatus} where FRunning = '1') as 'Running',
-            (select count(*) from {$this->tables->networkStatus} where FValid = '1') as 'Valid',
-            (select count(*) from {$this->tables->networkStatus} where FV2Dir = '1') as 'V2Dir',
-            (select count(*) from {$this->tables->networkStatus} where FHSDir = '1') as 'HSDir',
-            (select count(*) from {$this->tables->networkStatus} where DirPort > 0) as 'DirMirror'";
+            (select count(*) from {$this->tables->networkStatus} where FAuthority = ?) as 'Authority',
+            (select count(*) from {$this->tables->networkStatus} where FBadDirectory = ?) as 'BadDirectory',
+            (select count(*) from {$this->tables->networkStatus} where FBadExit = ?) as 'BadExit',
+            (select count(*) from {$this->tables->networkStatus} where FExit = ?) as 'Exit',
+            (select count(*) from {$this->tables->networkStatus} where FFast = ?) as 'Fast',
+            (select count(*) from {$this->tables->networkStatus} where FGuard = ?) as 'Guard',
+            (select count(*) from {$this->tables->descriptor} inner join {$this->tables->networkStatus} on {$this->tables->networkStatus}.Fingerprint = {$this->tables->descriptor}.Fingerprint where Hibernating = ?) as 'Hibernating',
+            (select count(*) from {$this->tables->networkStatus} where FNamed = ?) as 'Named',
+            (select count(*) from {$this->tables->networkStatus} where FStable = ?) as 'Stable',
+            (select count(*) from {$this->tables->networkStatus} where FRunning = ?) as 'Running',
+            (select count(*) from {$this->tables->networkStatus} where FValid = ?) as 'Valid',
+            (select count(*) from {$this->tables->networkStatus} where FV2Dir = ?) as 'V2Dir',
+            (select count(*) from {$this->tables->networkStatus} where FHSDir = ?) as 'HSDir',
+            (select count(*) from {$this->tables->networkStatus} where DirPort > ?) as 'DirMirror'";
 
-        return $this->cachedSingleRow($query, 1800) ?: [];
+        return $this->db->singleRow($query, [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0], 1800);
     }
 
     public function fetchRouterPage(IndexRequest $request): RouterPage
     {
-        $baseQuery = $this->buildRouterQuery($request, false);
-        $orderedQuery = $this->appendOrderBy($baseQuery, $request);
+        $base = $this->buildRouterQuery($request);
+        $orderedSql = $this->appendOrderBy($base['sql'], $request);
 
-        $countQuery = "SELECT COUNT(*) AS Count FROM ($baseQuery) AS countQuery";
-        $countResult = $this->mysqli->query($countQuery);
-        if (!$countResult) {
-            \die_503('Count query failed: ' . $this->mysqli->error);
-        }
-        $countRecord = $countResult->fetch_assoc();
+        $countRecord = $this->db->singleRow(
+            "SELECT COUNT(*) AS Count FROM ({$base['sql']}) AS countQuery",
+            $base['params'],
+            -1,
+            'Count query failed'
+        );
         $totalResults = (int)($countRecord['Count'] ?? 0);
-        $countResult->free();
 
         $totalPages = max(1, (int)ceil($totalResults / $request->rowsPerPage));
         $page = min($request->page, $totalPages);
         $offset = ($page - 1) * $request->rowsPerPage;
 
-        $query = $orderedQuery . ' LIMIT ' . $request->rowsPerPage . ' OFFSET ' . $offset;
-        $result = $this->mysqli->query($query);
-        if (!$result) {
-            \die_503('Query failed: ' . $this->mysqli->error);
-        }
+        $query = $orderedSql . ' LIMIT ? OFFSET ?';
+        $params = array_merge($base['params'], [$request->rowsPerPage, $offset]);
+        $result = $this->db->result($query, $params);
 
         return new RouterPage($result, $totalResults, $totalPages, $page);
     }
 
     public function fetchRouterExport(IndexRequest $request): \mysqli_result
     {
-        $query = $this->appendOrderBy($this->buildRouterQuery($request, false), $request);
-        $result = $this->mysqli->query($query);
-        if (!$result) {
-            \die_503('Export query failed: ' . $this->mysqli->error);
-        }
-
-        return $result;
+        $base = $this->buildRouterQuery($request);
+        $query = $this->appendOrderBy($base['sql'], $request);
+        return $this->db->result($query, $base['params'], 'Export query failed');
     }
 
     public function countRoutersByIp(string $ip): int
     {
-        $ip = $this->mysqli->real_escape_string($ip);
-        $record = $this->cachedSingleRow("select count(*) as Count from {$this->tables->networkStatus} where IP = '$ip'", 1800);
+        $record = $this->db->singleRow(
+            "select count(*) as Count from {$this->tables->networkStatus} where IP = ?",
+            [$ip],
+            1800
+        );
 
         return (int)($record['Count'] ?? 0);
     }
@@ -166,7 +154,6 @@ final class IndexRepository
     /** @return array<int, array{name: string, fingerprint: string, exitPolicy: array<int, string>|null}> */
     public function fetchRoutersByIp(string $ip, bool $includeExitPolicy): array
     {
-        $ip = $this->mysqli->real_escape_string($ip);
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
 
@@ -174,18 +161,14 @@ final class IndexRepository
             $query = "select $networkStatus.Name, $networkStatus.Fingerprint, $descriptor.ExitPolicySERDATA
                 from $networkStatus
                     inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
-                where $networkStatus.IP = '$ip'";
+                where $networkStatus.IP = ?";
         } else {
             $query = "select $networkStatus.Name, $networkStatus.Fingerprint
                 from $networkStatus
-                where $networkStatus.IP = '$ip'";
+                where $networkStatus.IP = ?";
         }
 
-        $result = $this->mysqli->query($query);
-        if (!$result) {
-            \die_503('Query failed: ' . $this->mysqli->error);
-        }
-
+        $result = $this->db->result($query, [$ip]);
         $rows = [];
         while ($record = $result->fetch_assoc()) {
             $exitPolicy = null;
@@ -243,7 +226,8 @@ final class IndexRepository
         return $rows;
     }
 
-    private function buildRouterQuery(IndexRequest $request, bool $includeOrder): string
+    /** @return array{sql: string, params: array<int, mixed>} */
+    private function buildRouterQuery(IndexRequest $request): array
     {
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
@@ -251,7 +235,7 @@ final class IndexRepository
         $query = "select $networkStatus.Name, $networkStatus.Fingerprint";
         $query .= ", $networkStatus.CountryCode";
         $query .= ", floor($descriptor.BandwidthOBSERVED / 1024) as Bandwidth";
-        $query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) + {$this->offsetFromGmt})) + CAST($descriptor.Uptime AS DECIMAL)) / 3600) as Uptime";
+        $query .= ", floor(((UNIX_TIMESTAMP() - (UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) + ?)) + CAST($descriptor.Uptime AS DECIMAL)) / 3600) as Uptime";
         $query .= ", $descriptor.LastDescriptorPublished";
         $query .= ", $networkStatus.Hostname";
         $query .= ", $networkStatus.IP";
@@ -274,18 +258,22 @@ final class IndexRepository
         $query .= ", $networkStatus.FHSDir as HSDir";
         $query .= ", INET_ATON($networkStatus.IP) as NIP from $networkStatus inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint";
 
-        $where = $this->buildWhereClauses($request);
+        $params = [$this->offsetFromGmt];
+        $where = $this->buildWhereClauses($request, $params);
         if ($where !== []) {
             $query .= ' where ' . implode(' and ', $where);
         }
 
         $query .= " group by $descriptor.Fingerprint";
 
-        return $includeOrder ? $this->appendOrderBy($query, $request) : $query;
+        return ['sql' => $query, 'params' => $params];
     }
 
-    /** @return array<int, string> */
-    private function buildWhereClauses(IndexRequest $request): array
+    /**
+     * @param array<int, mixed> $params
+     * @return array<int, string>
+     */
+    private function buildWhereClauses(IndexRequest $request, array &$params): array
     {
         $where = [];
         $networkStatus = $this->tables->networkStatus;
@@ -309,11 +297,12 @@ final class IndexRepository
         foreach ($filterColumns as $filterName => $column) {
             $filterValue = $request->filters[$filterName] ?? 'OFF';
             if ($filterValue !== 'OFF') {
-                $where[] = "$column = $filterValue";
+                $where[] = "$column = ?";
+                $params[] = (int)$filterValue;
             }
         }
 
-        $searchPredicate = $this->buildSearchPredicate($request);
+        $searchPredicate = $this->buildSearchPredicate($request, $params);
         if ($searchPredicate !== null) {
             $where[] = $searchPredicate;
         }
@@ -321,7 +310,8 @@ final class IndexRepository
         return $where;
     }
 
-    private function buildSearchPredicate(IndexRequest $request): ?string
+    /** @param array<int, mixed> $params */
+    private function buildSearchPredicate(IndexRequest $request, array &$params): ?string
     {
         if ($request->customSearchInput === null) {
             return null;
@@ -351,19 +341,22 @@ final class IndexRepository
             $value = '0';
         }
 
-        $escapedValue = $this->mysqli->real_escape_string($value);
         $column = $fieldMap[$field] ?? $fieldMap['Fingerprint'];
 
         switch ($request->customSearchModifier) {
             case 'Contains':
-                return "$column like '%$escapedValue%'";
+                $params[] = '%' . $value . '%';
+                return "$column like ?";
             case 'LessThan':
-                return "$column < '$escapedValue'";
+                $params[] = $value;
+                return "$column < ?";
             case 'GreaterThan':
-                return "$column > '$escapedValue'";
+                $params[] = $value;
+                return "$column > ?";
             case 'Equals':
             default:
-                return "$column = '$escapedValue'";
+                $params[] = $value;
+                return "$column = ?";
         }
     }
 
@@ -372,13 +365,21 @@ final class IndexRepository
         $networkStatus = $this->tables->networkStatus;
         $descriptor = $this->tables->descriptor;
         $sortRequest = $request->sortRequest;
-        $sortOrder = $request->sortOrder;
+        $sortOrder = $request->sortOrder === 'Desc' ? 'Desc' : 'Asc';
 
         $fieldMap = [
+            'Name' => 'Name',
             'Fingerprint' => "$networkStatus.Fingerprint",
+            'CountryCode' => "$networkStatus.CountryCode",
+            'Bandwidth' => 'Bandwidth',
+            'Uptime' => 'Uptime',
             'LastDescriptorPublished' => "$networkStatus.LastDescriptorPublished",
+            'IP' => 'NIP',
+            'Hostname' => "$networkStatus.Hostname",
             'ORPort' => "$networkStatus.ORPort",
             'DirPort' => "$networkStatus.DirPort",
+            'Platform' => "$descriptor.Platform",
+            'Contact' => "$descriptor.Contact",
             'FAuthority' => "$networkStatus.FAuthority",
             'FBadDirectory' => "$networkStatus.FBadDirectory",
             'FBadExit' => "$networkStatus.FBadExit",
@@ -394,23 +395,8 @@ final class IndexRepository
             'FHSDir' => "$networkStatus.FHSDir",
         ];
 
-        if ($sortRequest === 'Name') {
-            return $query . " order by Name $sortOrder";
-        }
-        if ($sortRequest === 'IP') {
-            return $query . " order by NIP $sortOrder, Name Asc";
-        }
-        if (isset($fieldMap[$sortRequest])) {
-            return $query . " order by {$fieldMap[$sortRequest]} $sortOrder";
-        }
-
-        return $query . " order by $sortRequest $sortOrder, Name Asc";
-    }
-
-    /** @return array<string, mixed> */
-    private function cachedSingleRow(string $query, int $cacheExpiration): array
-    {
-        $record = \db_query_single_row($query, $cacheExpiration);
-        return is_array($record) ? $record : [];
+        $column = $fieldMap[$sortRequest] ?? 'Name';
+        $tieBreaker = $sortRequest === 'Name' ? '' : ', Name Asc';
+        return $query . " order by $column $sortOrder$tieBreaker";
     }
 }

@@ -26,7 +26,7 @@ if (!preg_match('/^[a-fA-F0-9]{40}$/', $fingerprint)) {
 }
 
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
-$context = (new RouterDetailService($mysqli, $tables, (int)$OffsetFromGMT))->findByFingerprint($fingerprint);
+$context = (new RouterDetailService($db, $tables, (int)$OffsetFromGMT))->findByFingerprint($fingerprint);
 if ($context === null) {
     http_response_code(404);
     echo 'Unknown fingerprint';

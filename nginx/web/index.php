@@ -32,7 +32,7 @@ $CSInput = $request->customSearchInput;
 
 $clientContext = ClientContext::fromServer($_SERVER, $TrustedProxies ?? [], $RealServerIP ?? '');
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
-$repository = new IndexRepository($mysqli, $tables, (int)$OffsetFromGMT);
+$repository = new IndexRepository($db, $tables, (int)$OffsetFromGMT);
 
 $routerCount = $repository->countRouters();
 $source = $repository->fetchNetworkStatusSource();
@@ -49,7 +49,7 @@ $descriptorCount = $repository->countDescriptors();
 $routerPage = $repository->fetchRouterPage($request);
 $request->page = $routerPage->page;
 
-$rowBuilder = new RouterRowBuilder($mysqli, CountryCodes::all(), __DIR__ . '/img/flags');
+$rowBuilder = new RouterRowBuilder($db, CountryCodes::all(), __DIR__ . '/img/flags');
 $routers = $rowBuilder->build($routerPage->result, $request->columnListActive);
 $routerPage->result->free();
 

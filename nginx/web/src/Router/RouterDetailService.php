@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace TorStatus\Router;
 
+use TorStatus\Database\QueryExecutor;
 use TorStatus\Index\TableNames;
 
 final class RouterDetailService
 {
-    /** @var \mysqli */
-    private $mysqli;
+    /** @var QueryExecutor */
+    private $db;
 
     /** @var TableNames */
     private $tables;
@@ -17,9 +18,9 @@ final class RouterDetailService
     /** @var int */
     private $offsetFromGmt;
 
-    public function __construct(\mysqli $mysqli, TableNames $tables, int $offsetFromGmt)
+    public function __construct(QueryExecutor $db, TableNames $tables, int $offsetFromGmt)
     {
-        $this->mysqli = $mysqli;
+        $this->db = $db;
         $this->tables = $tables;
         $this->offsetFromGmt = $offsetFromGmt;
     }
@@ -38,7 +39,7 @@ final class RouterDetailService
                 $networkStatus.DirPort,
                 $descriptor.Platform,
                 $descriptor.Contact,
-                CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) AS SIGNED) + {$this->offsetFromGmt} + CAST($descriptor.Uptime AS SIGNED) as Uptime,
+                CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) AS SIGNED) + ? + CAST($descriptor.Uptime AS SIGNED) as Uptime,
                 $descriptor.BandwidthMAX,
                 $descriptor.BandwidthBURST,
                 $descriptor.BandwidthOBSERVED,
@@ -63,14 +64,8 @@ final class RouterDetailService
                 inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint
             where $networkStatus.Fingerprint = ?";
 
-        $stmt = $this->mysqli->prepare($query);
-        $stmt->bind_param('s', $fingerprint);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $record = $result ? $result->fetch_assoc() : null;
-        $stmt->close();
-
-        if (!$record) {
+        $record = $this->db->singleRow($query, [$this->offsetFromGmt, $fingerprint], 1800);
+        if ($record === []) {
             return null;
         }
 

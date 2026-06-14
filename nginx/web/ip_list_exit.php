@@ -11,6 +11,6 @@ use TorStatus\Index\TableNames;
 use TorStatus\Network\IpListExporter;
 
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
-(new IpListExporter($mysqli, $memcached, $tables))->output(true);
+(new IpListExporter($db, $tables))->output(true);
 
 $mysqli->close();

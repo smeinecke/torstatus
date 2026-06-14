@@ -13,30 +13,69 @@ function die_400() {
 	die();
 }
 
-function db_query_single_row($query, $cache_expiration = -1) {
+function db_query_single_row($query, $cache_expiration = -1, array $params = []) {
 	global $mysqli, $memcached;
 
-	$query_database = true;
+	$cache_key = null;
 	if($cache_expiration > -1) {
-		$cache_key = "torstatus_query_" . sha1($query);
-		$cache_data = unserialize($memcached->get($cache_key), ['allowed_classes' => false]);
-		if($cache_data) {
-			$query_database = false;
-			$record = $cache_data['content'];
+		$cache_key = "torstatus_query_" . sha1($query . "\0" . serialize($params));
+		$cache_raw = $memcached->get($cache_key);
+		if(is_string($cache_raw) && $cache_raw !== '') {
+			$record = unserialize($cache_raw, ['allowed_classes' => false]);
+			if(is_array($record)) {
+				return $record;
+			}
 		}
 	}
-	if($query_database) {
-		$result = $mysqli->query($query);
-		if(!$result) {
-			die_503('Query failed: ' . $mysqli->error);
-		}
-		$record = $result->fetch_assoc();
-		$result->free();
 
-		if($cache_expiration > -1) {
-			$cache_data = array('content' => $record);
-			$memcached->set($cache_key, serialize($cache_data), $cache_expiration);
+	$stmt = $mysqli->prepare($query);
+	if(!$stmt) {
+		die_503('Query prepare failed: ' . $mysqli->error);
+	}
+
+	if($params) {
+		$types = '';
+		$values = [];
+		foreach($params as $param) {
+			if(is_int($param) || is_bool($param)) {
+				$types .= 'i';
+			}
+			elseif(is_float($param)) {
+				$types .= 'd';
+			}
+			else {
+				$types .= 's';
+			}
+			$values[] = $param;
 		}
+		$refs = [];
+		foreach($values as $key => &$value) {
+			$refs[$key] =& $value;
+		}
+		$stmt->bind_param($types, ...$refs);
+	}
+
+	if(!$stmt->execute()) {
+		$error = $stmt->error ?: $mysqli->error;
+		$stmt->close();
+		die_503('Query failed: ' . $error);
+	}
+
+	$result = $stmt->get_result();
+	if(!$result) {
+		$stmt->close();
+		die_503('Query failed: no result set returned');
+	}
+
+	$record = $result->fetch_assoc();
+	$result->free();
+	$stmt->close();
+
+	if(!is_array($record)) {
+		$record = [];
+	}
+	if($cache_key !== null) {
+		$memcached->set($cache_key, serialize($record), $cache_expiration);
 	}
 
 	return $record;
@@ -91,12 +130,5 @@ $day = date('j', $timestamp);
 $hour = date('G', $timestamp);
 $minute = date('i', $timestamp);
 $second = date('s', $timestamp);
-$user_agent = isset($_SERVER['HTTP_USER_AGENT']) ? $mysqli->escape_string($_SERVER['HTTP_USER_AGENT']) : '';
-$request_uri = isset($_SERVER['REQUEST_URI']) ? $mysqli->escape_string($_SERVER['REQUEST_URI']) : '';
-$session_id = $mysqli->escape_string(session_id());
-$ip = isset($_SERVER['REMOTE_ADDR']) ? $mysqli->escape_string($_SERVER['REMOTE_ADDR']) : '';
 $Host = isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '';
 $onion_service = preg_match('/^[0-9a-z]*\.onion$/', $Host);
-
-#$query = "INSERT INTO access_log (`timestamp`, year, month, day, hour, minute, second, user_agent, request_uri, session_id, ip) VALUES (FROM_UNIXTIME($timestamp), '$year', '$month', '$day', '$hour', '$minute', '$second', '$user_agent', '$request_uri', '$session_id', '$ip')";
-#$mysqli->query($query);

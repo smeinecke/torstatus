@@ -9,6 +9,6 @@ require_once 'init.php';
 
 use TorStatus\Graph\BandwidthHistoryGraphRenderer;
 
-(new BandwidthHistoryGraphRenderer())->render($mysqli, $ActiveDescriptorTable, $_GET);
+(new BandwidthHistoryGraphRenderer())->render($db, $ActiveDescriptorTable, $_GET);
 
 $mysqli->close();

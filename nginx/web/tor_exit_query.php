@@ -17,7 +17,7 @@ $pageTitle = 'Tor Exit Query';
 $Self = 'tor_exit_query.php';
 
 $repository = new IndexRepository(
-    $mysqli,
+    $db,
     new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable),
     (int)$OffsetFromGMT
 );

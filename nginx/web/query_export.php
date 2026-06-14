@@ -22,7 +22,7 @@ $request = IndexRequest::fromGlobals(
 );
 
 $repository = new IndexRepository(
-    $mysqli,
+    $db,
     new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable),
     (int)$OffsetFromGMT
 );

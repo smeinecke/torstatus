@@ -13,7 +13,7 @@ use TorStatus\Network\NetworkDetailService;
 $pageTitle = 'Network Detail';
 
 $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $ActiveORAddressesTable);
-(new NetworkDetailService($mysqli, $tables, (int)$OffsetFromGMT))->prepareGraphs($_SESSION);
+(new NetworkDetailService($db, $tables, (int)$OffsetFromGMT))->prepareGraphs($_SESSION);
 
 render('network_detail.html.twig');
 

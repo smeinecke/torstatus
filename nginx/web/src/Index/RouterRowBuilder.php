@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Database\QueryExecutor;
+
 final class RouterRowBuilder
 {
-    /** @var \mysqli */
-    private $mysqli;
+    /** @var QueryExecutor */
+    private $db;
 
     /** @var array<string, string> */
     private $countryCodes;
@@ -24,9 +26,9 @@ final class RouterRowBuilder
     /**
      * @param array<string, string> $countryCodes
      */
-    public function __construct(\mysqli $mysqli, array $countryCodes, string $flagDirectory)
+    public function __construct(QueryExecutor $db, array $countryCodes, string $flagDirectory)
     {
-        $this->mysqli = $mysqli;
+        $this->db = $db;
         $this->countryCodes = $countryCodes;
         $this->flagDirectory = rtrim($flagDirectory, '/');
     }
@@ -85,9 +87,11 @@ final class RouterRowBuilder
         if (in_array($countryCode, $notified, true)) {
             return;
         }
+        if (!in_array($table, ['missing_countries', 'missing_flags'], true)) {
+            \die_503('Invalid notification table');
+        }
 
-        $parameter = $this->mysqli->real_escape_string($countryCode);
-        $this->mysqli->query("INSERT INTO $table (country_code) VALUES ('$parameter') ON DUPLICATE KEY UPDATE country_code = country_code");
+        $this->db->execute("INSERT INTO $table (country_code) VALUES (?) ON DUPLICATE KEY UPDATE country_code = country_code", [$countryCode]);
         $notified[] = $countryCode;
     }
 
