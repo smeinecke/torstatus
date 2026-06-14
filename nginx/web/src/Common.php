@@ -69,8 +69,7 @@ final class Common
 
     public static function appVersion(string $composerJsonPath): string
     {
-        $composerJson = json_decode((string)file_get_contents($composerJsonPath), true);
-        return is_array($composerJson) && isset($composerJson['version']) ? (string)$composerJson['version'] : '4.0';
+        return '5.0';
     }
 
     /** @param array<string, mixed> $defaultContext */
