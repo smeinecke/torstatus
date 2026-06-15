@@ -53,16 +53,17 @@
 {% endif %}
 </section>
 
-<section class="ts-card ts-table-card">
-	<div class="ts-section-header">
-		<div>
+<section class="ts-card ts-table-card ts-router-panel">
+	<header class="ts-table-topbar">
+		<div class="ts-table-title-block">
 			<h2>Routers</h2>
+			<span class="ts-table-result-count">Showing <strong>{{ pagination.start_result }}–{{ pagination.end_result }}</strong> of <strong>{{ pagination.total_results }}</strong> results</span>
 		</div>
-		<div class="ts-table-actions">
+		<div class="ts-table-toolbar" aria-label="Router table controls">
 			<button type="button" class="ts-button ts-button-secondary" data-dialog-open="columns-dialog" title="Choose which columns are shown in the router table">
 				<i class="ti ti-columns-3" aria-hidden="true"></i>Columns
 			</button>
-			<form action="{{ Self|e }}" method="get" class="ts-inline-form">
+			<form action="{{ Self|e }}" method="get" class="ts-inline-form ts-rows-form">
 {% for name, value in query_hidden_inputs %}
 				<input type="hidden" name="{{ name|e }}" value="{{ value|e }}">
 {% endfor %}
@@ -76,14 +77,17 @@
 				</label>
 				<noscript><button type="submit" class="ts-button ts-button-secondary">Apply</button></noscript>
 			</form>
+			{% include '_pagination.html.twig' with { pagination: pagination, pagination_compact: true, pagination_show_info: false, pagination_aria_label: 'Router table pages' } %}
 		</div>
-	</div>
+	</header>
 
-	{% include '_pagination.html.twig' %}
 	<div class="ts-table-scroll">
 		{% include '_router_table.html.twig' %}
 	</div>
-	{% include '_pagination.html.twig' %}
+	<footer class="ts-router-table-footer">
+		<span class="ts-pagination-info">Showing {{ pagination.start_result }} to {{ pagination.end_result }} of {{ pagination.total_results }} results</span>
+		{% include '_pagination.html.twig' with { pagination: pagination, pagination_compact: true, pagination_show_info: false, pagination_aria_label: 'Router table pages, footer' } %}
+	</footer>
 </section>
 
 <div class="ts-dashboard-grid">

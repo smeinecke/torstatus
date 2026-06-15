@@ -28,7 +28,7 @@ final class RouterTablePresenter
             'url' => $this->url($baseUrl, 'Name', $request),
             'arrow' => $this->arrow('Name', $request),
             'alt' => $this->arrowAlt('Name', $request),
-            'label_html' => 'Router Name',
+            'label_html' => 'Router',
         ];
     }
 
@@ -82,6 +82,7 @@ final class RouterTablePresenter
         $sortKey = $sortKeys[$column] ?? $column;
 
         return [
+            'column' => $column,
             'class' => $this->headerClass($sortKey, $column, $request),
             'url' => $this->url($baseUrl, $sortKey, $request),
             'arrow' => $this->arrow($sortKey, $request),

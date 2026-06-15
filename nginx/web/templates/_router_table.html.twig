@@ -1,28 +1,29 @@
 <table class="displayTable ts-router-table">
 <thead>
 <tr>
-<th class="{{ name_header.class }}">
-	<a class="header ts-header-link" href="{{ name_header.country_url|e }}" title="Sort by country"><i class="ti ti-flag-3" aria-hidden="true"></i><span class="ts-sort-icon">{{ name_header.country_alt }}</span><span class="sr-only">Country</span></a>
+<th class="{{ name_header.class }} ts-col-router">
 	<a class="header ts-header-link" href="{{ name_header.url|e }}" title="Sort by router name"><span class="ts-sort-icon">{{ name_header.alt }}</span> {{ name_header.label_html|raw }}</a>
 </th>
 {% for header in table_headers %}
-<th class="{{ header.class }}"><a class="header ts-header-link" href="{{ header.url|e }}" title="Sort by {{ header.label_text|default(header.label_html)|striptags }}"><span class="ts-sort-icon">{{ header.alt }}</span> {{ header.label_html|raw }}</a>{% if header.is_flag|default(false) %} <span class="ts-header-tip" title="Green check = yes, red cross = no, empty = unknown"><i class="ti ti-info-circle" aria-hidden="true"></i><span class="sr-only">Green check = yes, red cross = no, empty = unknown</span></span>{% endif %}</th>
+<th class="{{ header.class }} ts-col-{{ header.column|default('')|lower }}"><a class="header ts-header-link" href="{{ header.url|e }}" title="Sort by {{ header.label_text|default(header.label_html)|striptags }}"><span class="ts-sort-icon">{{ header.alt }}</span> {{ header.label_html|raw }}</a>{% if header.is_flag|default(false) %} <span class="ts-header-tip" title="Green check = yes, red cross = no, empty = unknown"><i class="ti ti-info-circle" aria-hidden="true"></i><span class="sr-only">Green check = yes, red cross = no, empty = unknown</span></span>{% endif %}</th>
 {% endfor %}
 </tr>
 </thead>
 <tbody>
 {% for router in routers %}
 <tr class="{{ router.row_class }}">
-<td class="{{ router.name_class }}">
-	<span class="ts-country"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}" title="{{ router.country_name|e }}"></span></span>
-	<a href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
+<td class="{{ router.name_class }} ts-router-name-cell">
+	<span class="ts-router-identity">
+		<span class="ts-country"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}" title="{{ router.country_name|e }}"></span></span>
+		<a class="ts-router-name" href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
+	</span>
 </td>
 {% for col in columns_active %}
 {% set cell = router.columns[loop.index0] %}
 {% if col == 'Hostname' %}
-<td class="TDS">
+<td class="TDS ts-col-hostname">
 	<div class="ts-host-cell">
-		<span>{{ cell.value|e }}</span>
+		<span class="ts-hostname">{{ cell.value|e }}</span>
 {% if cell.flags|length > 0 or cell.platform is defined %}
 		<span class="ts-badge-list">
 {% for flag in cell.flags %}
@@ -36,19 +37,26 @@
 	</div>
 </td>
 {% elseif col == 'Bandwidth' %}
-<td class="TDb"><table cellspacing="0" cellpadding="0" class="bwb"><tr title="{{ cell.value|e }} KB/s"><td class="{{ cell.bg }}"><div class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px; height: 16px;"></div></td><td><small>{{ cell.value|e }}</small></td></tr></table></td>
+<td class="TDb ts-col-bandwidth">
+	<div class="ts-bandwidth-cell" title="{{ cell.value|e }} KB/s">
+		<span class="ts-bandwidth-track {{ cell.bg }}"><span class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px;"></span></span>
+		<span class="ts-tabular">{{ cell.value|e }}</span>
+	</div>
+</td>
+{% elseif col == 'CountryCode' %}
+<td class="{{ cell.class|default('TDS') }} ts-col-countrycode"><span class="ts-country-code-pill">{{ cell.value|e }}</span></td>
 {% elseif col == 'Uptime' %}
-<td class="{{ cell.class }}">{% if cell.down is defined and cell.down %}<i class="ti ti-server-off ts-row-icon" aria-hidden="true" title="Router is currently down"></i>{% else %}<span class="ts-row-spacer"></span>{% endif %}{% if cell.days is defined %}{{ cell.days }} d {{ cell.hours }} h{% else %}{{ cell.value|e }}{% endif %}</td>
+<td class="{{ cell.class }} ts-col-uptime ts-tabular">{% if cell.down is defined and cell.down %}<i class="ti ti-server-off ts-row-icon" aria-hidden="true" title="Router is currently down"></i>{% else %}<span class="ts-row-spacer"></span>{% endif %}{% if cell.days is defined %}{{ cell.days }} d {{ cell.hours }} h{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'ORPort' or col == 'DirPort' %}
-<td class="{{ cell.class }}">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<strong>{{ cell.value }}</strong>{% else %}{{ cell.value }}{% endif %}</td>
+<td class="{{ cell.class }} ts-col-{{ col|lower }} ts-tabular">{% if cell.value == 0 %}None{% elseif cell.value == 80 or cell.value == 443 %}<strong>{{ cell.value }}</strong>{% else %}{{ cell.value }}{% endif %}</td>
 {% elseif col == 'IP' %}
-<td class="{{ cell.class|default('TDS') }}">{% if WHOISPath %}<a class="who" target="_blank" href="{{ (WHOISPath ~ cell.value)|e }}">{{ cell.value|e }}</a>{% else %}{{ cell.value|e }}{% endif %}</td>
+<td class="{{ cell.class|default('TDS') }} ts-col-ip ts-tabular">{% if WHOISPath %}<a class="who" target="_blank" href="{{ (WHOISPath ~ cell.value)|e }}">{{ cell.value|e }}</a>{% else %}{{ cell.value|e }}{% endif %}</td>
 {% elseif col == 'BadDir' or col == 'BadExit' %}
-<td class="F{{ cell.value }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
+<td class="F{{ cell.value }} ts-col-{{ col|lower }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
 {% elseif col in ['Authority', 'Exit', 'Fast', 'Guard', 'Named', 'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'Hibernating'] %}
-<td class="F{{ cell.value }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
+<td class="F{{ cell.value }} ts-col-{{ col|lower }}" title="{{ col }}: {% if cell.value == '1' %}yes{% elseif cell.value == '0' %}no{% else %}unknown{% endif %}"></td>
 {% else %}
-<td class="{{ cell.class|default('TDS') }}">{{ cell.value|e }}</td>
+<td class="{{ cell.class|default('TDS') }} ts-col-{{ col|lower }}">{{ cell.value|e }}</td>
 {% endif %}
 {% endfor %}
 </tr>

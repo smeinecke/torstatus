@@ -1,5 +1,7 @@
-<nav class="ts-pagination" aria-label="Pagination">
+<nav class="ts-pagination{% if pagination_compact|default(false) %} ts-pagination-compact{% endif %}" aria-label="{{ pagination_aria_label|default('Pagination')|e }}">
+{% if pagination_show_info|default(true) %}
 	<span class="ts-pagination-info">Showing {{ pagination.start_result }} to {{ pagination.end_result }} of {{ pagination.total_results }} results</span>
+{% endif %}
 	<div class="ts-pagination-pages">
 {% if pagination.prev %}
 		<a href="{{ pagination.prev|e }}" class="ts-pagination-arrow" title="Previous page" aria-label="Previous page"><i class="ti ti-chevron-left" aria-hidden="true"></i></a>

@@ -1133,3 +1133,296 @@ summary:focus-visible {
   max-width: none;
   margin-inline: 0;
 }
+
+/* Integrated router table surface: the title, controls, pagination and rows now
+   share a single compact card instead of stacked header blocks. */
+.ts-router-panel {
+  padding: 0;
+  overflow: hidden;
+  border-color: var(--ts-card-border);
+  background: var(--ts-card-solid);
+}
+.ts-table-topbar,
+.ts-router-table-footer {
+  display: grid;
+  grid-template-columns: minmax(16rem, 1fr) auto;
+  gap: .8rem 1rem;
+  align-items: center;
+  background: linear-gradient(180deg, var(--ts-card-solid), var(--ts-surface-3));
+}
+.ts-table-topbar {
+  min-height: 4rem;
+  padding: .7rem .85rem .7rem 1rem;
+  border-bottom: 1px solid var(--ts-card-border);
+}
+.ts-table-title-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .35rem .7rem;
+  align-items: baseline;
+  min-width: 0;
+}
+.ts-table-title-block h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 850;
+  letter-spacing: -.01em;
+}
+.ts-table-result-count {
+  color: var(--ts-muted);
+  font-size: .82rem;
+  white-space: nowrap;
+}
+.ts-table-result-count strong { color: var(--ts-nav-text); font-weight: 850; }
+.ts-table-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .45rem;
+  align-items: center;
+  justify-content: flex-end;
+}
+.ts-router-panel .ts-button,
+.ts-router-panel .ts-rows-form label,
+.ts-pagination-compact .ts-pagination-pages {
+  box-shadow: 0 1px 0 rgba(15, 23, 42, .03);
+}
+.ts-router-panel .ts-button { min-height: 2.25rem; border-radius: .7rem; }
+.ts-router-panel .ts-rows-form label {
+  min-height: 2.25rem;
+  border: 1px solid var(--ts-input-border);
+  border-radius: .7rem;
+  background: var(--ts-input-bg);
+  padding: 0 .35rem 0 .65rem;
+  font-size: .82rem;
+}
+.ts-router-panel .ts-rows-form select {
+  min-height: 1.75rem;
+  border: 0;
+  border-radius: .45rem;
+  background-color: transparent;
+  font-weight: 850;
+}
+.ts-pagination-compact {
+  justify-content: flex-end;
+  gap: .5rem;
+  margin: 0;
+}
+.ts-pagination-compact .ts-pagination-pages {
+  gap: .08rem;
+  min-height: 2.25rem;
+  border: 1px solid var(--ts-input-border);
+  border-radius: .75rem;
+  background: var(--ts-input-bg);
+  padding: .16rem;
+}
+.ts-pagination-compact .ts-pagination-page,
+.ts-pagination-compact .ts-pagination-arrow,
+.ts-pagination-compact .ts-pagination-ellipsis {
+  min-width: 1.85rem;
+  min-height: 1.75rem;
+  border-color: transparent;
+  border-radius: .52rem;
+  padding: .15rem .45rem;
+  font-size: .8rem;
+}
+.ts-pagination-compact .ts-pagination-current {
+  box-shadow: 0 .35rem .75rem rgba(109, 40, 217, .24);
+}
+.ts-router-panel .ts-table-scroll {
+  border-radius: 0;
+  background: var(--ts-card-solid);
+}
+.ts-router-table.displayTable {
+  border: 0 !important;
+  border-radius: 0;
+  background: transparent;
+}
+.ts-router-table {
+  width: max-content !important;
+  min-width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+}
+.ts-router-table th,
+.ts-router-table td {
+  padding: .45rem .65rem !important;
+  border-bottom: 1px solid var(--ts-table-border) !important;
+  vertical-align: middle;
+}
+.ts-router-table thead th {
+  height: 2.5rem;
+  background: var(--ts-table-header-bg) !important;
+  color: var(--ts-nav-text) !important;
+  font-size: .7rem;
+  font-weight: 900;
+  letter-spacing: .045em;
+  line-height: 1.15;
+  text-align: left;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.ts-router-table thead th.HRS { color: var(--ts-purple-dark) !important; }
+.ts-router-table thead th.HRFNO,
+.ts-router-table thead th.HRFNOS { background: var(--ts-pill-red-bg) !important; color: var(--ts-pill-red-text) !important; }
+.ts-router-table thead th.HRFYES,
+.ts-router-table thead th.HRFYESS { background: var(--ts-pill-green-bg) !important; color: var(--ts-pill-green-text) !important; }
+.ts-router-table tbody td {
+  height: 3.2rem;
+  font-size: .82rem !important;
+}
+.ts-router-table tbody tr:last-child td { border-bottom: 0 !important; }
+.ts-router-table tbody tr.r td:first-child { background: var(--ts-table-row-odd) !important; }
+.ts-router-table tbody tr.R td:first-child { background: var(--ts-table-row-even) !important; }
+.ts-router-table tbody tr.d td:first-child,
+.ts-router-table tbody tr.B td:first-child { background: var(--ts-status-warn-bg) !important; }
+.ts-router-table tbody tr:hover td { background: var(--ts-table-row-hover) !important; }
+.ts-router-table .ts-header-link {
+  gap: .35rem;
+  color: inherit !important;
+  font-weight: 900;
+  text-decoration: none !important;
+}
+.ts-router-table .ts-header-link:hover { color: var(--ts-purple-dark) !important; }
+.ts-router-table .ts-sort-icon {
+  min-width: .65rem;
+  margin-right: 0;
+  color: var(--ts-purple);
+  font-size: .78rem;
+}
+.ts-router-table .TRSM { color: var(--ts-muted); font-size: .62rem; letter-spacing: .04em; }
+.ts-router-name-cell,
+.ts-col-router { min-width: 12.5rem; }
+.ts-router-identity {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: .45rem;
+  align-items: center;
+  min-width: 0;
+}
+.ts-router-identity .ts-country {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  border: 1px solid var(--ts-table-border);
+  border-radius: .5rem;
+  background: var(--ts-input-bg);
+}
+.ts-router-identity .flag {
+  width: 1rem;
+  height: .75rem;
+}
+.ts-router-name {
+  overflow: hidden;
+  color: var(--ts-purple-dark);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ts-router-name:hover { color: var(--ts-purple); text-decoration: none; }
+.ts-col-countrycode { min-width: 4.8rem; }
+.ts-country-code-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.35rem;
+  min-height: 1.45rem;
+  border-radius: 999px;
+  background: var(--ts-surface-2);
+  color: var(--ts-nav-text);
+  font-size: .75rem;
+  font-weight: 850;
+  letter-spacing: .02em;
+}
+.ts-col-bandwidth { min-width: 9rem; }
+.ts-bandwidth-cell {
+  display: grid;
+  grid-template-columns: 5.35rem 3.3rem;
+  gap: .6rem;
+  align-items: center;
+}
+.ts-bandwidth-track {
+  display: block;
+  width: 5.35rem;
+  height: .65rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+.ts-bandwidth-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+}
+.ts-bandwidth-track.bwr { background: #e2e8f0; }
+.ts-bandwidth-track.bwr1 { background: #cbd5e1; }
+.ts-bandwidth-track.bwr2 { background: #94a3b8; }
+.ts-bandwidth-track.bwr3 { background: #64748b; }
+.ts-bandwidth-track.bwr4 { background: #475569; }
+.ts-bandwidth-track.bwr5 { background: #1e293b; }
+.ts-bandwidth-track.bwr6 { background: #fde68a; }
+.ts-bandwidth-track.bwr7 { background: #bae6fd; }
+.ts-bandwidth-track .fg1 { background: #94a3b8; }
+.ts-bandwidth-track .fg2 { background: #64748b; }
+.ts-bandwidth-track .fg3 { background: #475569; }
+.ts-bandwidth-track .fg4 { background: #334155; }
+.ts-bandwidth-track .fg5 { background: #0f172a; }
+.ts-bandwidth-track .fg6 { background: #f59e0b; }
+.ts-bandwidth-track .fg7 { background: #0ea5e9; }
+.ts-bandwidth-track .fg8 { background: #f97316; }
+.ts-tabular,
+.ts-router-table .TDc,
+.ts-router-table .TDcb,
+.ts-router-table .TDb { font-variant-numeric: tabular-nums; }
+.ts-col-uptime { min-width: 6.4rem; white-space: nowrap; }
+.ts-col-ip { min-width: 7.8rem; white-space: nowrap; }
+.ts-col-ip a,
+.ts-router-table .who { color: var(--ts-purple-dark); font-weight: 750; text-decoration: none; }
+.ts-col-ip a:hover,
+.ts-router-table .who:hover { color: var(--ts-purple); text-decoration: underline; }
+.ts-col-hostname { min-width: 23rem; }
+.ts-host-cell {
+  display: grid;
+  gap: .28rem;
+  min-width: 0;
+}
+.ts-hostname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ts-badge-list { gap: .22rem; }
+.ts-status-badge,
+.ts-platform-badge {
+  min-height: 1.25rem;
+  padding: .05rem .42rem;
+  font-size: .68rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+.ts-col-orport,
+.ts-col-dirport { min-width: 5.5rem; white-space: nowrap; }
+.ts-router-table-footer {
+  min-height: 2.75rem;
+  padding: .45rem .85rem .5rem 1rem;
+  border-top: 1px solid var(--ts-card-border);
+  color: var(--ts-muted);
+  font-size: .78rem;
+}
+.ts-router-table-footer .ts-pagination-info { font-size: .78rem; }
+
+@media (max-width: 900px) {
+  .ts-table-topbar,
+  .ts-router-table-footer { grid-template-columns: 1fr; align-items: stretch; }
+  .ts-table-toolbar { justify-content: flex-start; }
+  .ts-pagination-compact { justify-content: flex-start; }
+}
+
+@media (max-width: 560px) {
+  .ts-table-result-count { white-space: normal; }
+  .ts-table-toolbar > .ts-pagination { width: 100%; }
+  .ts-table-toolbar .ts-pagination-pages { flex-wrap: wrap; }
+  .ts-router-panel .ts-rows-form label { width: 100%; justify-content: space-between; }
+}
