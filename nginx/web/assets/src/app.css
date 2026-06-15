@@ -312,6 +312,93 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 }
 .ts-nav a:hover { background: var(--ts-nav-hover-bg); color: var(--ts-purple-dark); text-decoration: none; }
 .ts-topbar-actions { display: flex; gap: .5rem; align-items: center; justify-content: flex-end; }
+.ts-nav-search {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+.ts-nav-search-toggle,
+.ts-nav-search-submit,
+.ts-nav-search-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: .15s ease;
+}
+.ts-nav-search-toggle {
+  gap: .45rem;
+  max-width: 16rem;
+  border-radius: .65rem;
+  background: transparent;
+  color: var(--ts-nav-text);
+  padding: .48rem .65rem;
+  font-weight: 650;
+}
+.ts-nav-search-toggle:hover,
+.ts-nav-search.has-query .ts-nav-search-toggle {
+  background: var(--ts-nav-hover-bg);
+  color: var(--ts-purple-dark);
+}
+.ts-nav-search.has-query .ts-nav-search-toggle {
+  border: 1px solid var(--ts-input-border);
+  background: var(--ts-input-bg);
+}
+.ts-nav-search-toggle-label {
+  overflow: hidden;
+  max-width: 11rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ts-nav-search-input-wrap {
+  display: none;
+  align-items: center;
+  width: min(20rem, 32vw);
+  min-width: 15rem;
+  min-height: 2.2rem;
+  border: 1px solid var(--ts-input-border);
+  border-radius: .75rem;
+  background: var(--ts-input-bg);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, .03);
+}
+.ts-nav-search.is-expanded .ts-nav-search-toggle { display: none; }
+.ts-nav-search.is-expanded .ts-nav-search-input-wrap { display: flex; }
+.ts-nav-search-input-wrap:focus-within {
+  border-color: var(--ts-purple);
+  box-shadow: 0 0 0 3px var(--ts-ring);
+}
+.ts-nav-search-input-wrap input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 2rem;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--ts-text);
+  padding: .2rem .35rem .2rem .65rem;
+  font: inherit;
+  font-size: .86rem;
+}
+.ts-nav-search-input-wrap input::placeholder { color: var(--ts-muted); }
+.ts-nav-search-submit,
+.ts-nav-search-clear {
+  flex: 0 0 auto;
+  width: 1.8rem;
+  height: 1.8rem;
+  margin-right: .2rem;
+  border-radius: .55rem;
+  background: transparent;
+  color: var(--ts-muted);
+}
+.ts-nav-search-submit:hover,
+.ts-nav-search-clear:hover {
+  background: var(--ts-nav-hover-bg);
+  color: var(--ts-purple-dark);
+  text-decoration: none;
+}
 
 .ts-service-banner {
   display: flex;
@@ -647,6 +734,7 @@ input[type='submit'] {
 @media (max-width: 900px) {
   .ts-topbar-inner { grid-template-columns: 1fr; justify-items: stretch; }
   .ts-nav { justify-content: flex-start; overflow-x: auto; flex-wrap: nowrap; }
+  .ts-nav-search-input-wrap { width: 17rem; }
   .ts-topbar-actions { justify-content: flex-start; }
   .ts-hero,
   .ts-section-header { display: grid; }
@@ -660,6 +748,13 @@ input[type='submit'] {
   .ts-form-grid { grid-template-columns: 1fr; }
   .ts-button span,
   .ts-nav span { display: none; }
+  .ts-nav-search .ts-nav-search-toggle-label { display: inline; }
+  .ts-nav-search:not(.has-query):not(.is-expanded) .ts-nav-search-toggle-label { display: none; }
+  .ts-nav-search.has-query .ts-nav-search-toggle-label { max-width: 7.5rem; }
+  .ts-nav-search-input-wrap {
+    width: min(17rem, calc(100vw - 2rem));
+    min-width: min(17rem, calc(100vw - 2rem));
+  }
 }
 body.ts-shell a:link,
 body.ts-shell a:visited { color: var(--ts-purple); }
@@ -669,6 +764,9 @@ body.ts-shell .ts-button-secondary:link,
 body.ts-shell .ts-button-secondary:visited,
 body.ts-shell .ts-nav a:link,
 body.ts-shell .ts-nav a:visited { color: var(--ts-nav-text); }
+body.ts-shell .ts-nav-search-clear:link,
+body.ts-shell .ts-nav-search-clear:visited { color: var(--ts-muted); }
+body.ts-shell .ts-nav-search-clear:hover { color: var(--ts-purple-dark); }
 body.ts-shell .ts-brand:link,
 body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-column-list {
@@ -1006,6 +1104,9 @@ div.fg8 { background: #f97316; }
 }
 .ts-button:focus-visible,
 .ts-icon-button:focus-visible,
+.ts-nav-search-toggle:focus-visible,
+.ts-nav-search-submit:focus-visible,
+.ts-nav-search-clear:focus-visible,
 .ts-header-link:focus-visible,
 a:focus-visible,
 summary:focus-visible {

@@ -23,11 +23,31 @@
 			<span class="ts-version">{{ version }}</span>
 		</a>
 
+		{% set topbar_search_query = CSInput|default('') %}
+		{% set topbar_search_field = topbar_search_query is not empty ? CSField|default('Name') : 'Name' %}
+		{% set topbar_search_mod = topbar_search_query is not empty ? CSMod|default('Contains') : 'Contains' %}
 		<nav class="ts-nav" aria-label="Primary navigation">
 			<a href="/index.php" title="Browse the current Tor router list"><i class="ti ti-list-details" aria-hidden="true"></i><span>Routers</span></a>
 			<a href="/tor_exit_query.php" title="Check whether an IP address is a Tor exit"><i class="ti ti-door-exit" aria-hidden="true"></i><span>Exit</span></a>
 			<a href="/network_detail.php" title="View network graphs and summary metrics"><i class="ti ti-chart-line" aria-hidden="true"></i><span>Graphs</span></a>
 			<a href="/query_export.php/Tor_query_EXPORT.csv" title="Download the current router result set as CSV"><i class="ti ti-file-type-csv" aria-hidden="true"></i><span>CSV</span></a>
+			<form action="/index.php" method="get" class="ts-nav-search{% if topbar_search_query is not empty %} has-query{% endif %}" role="search" data-nav-search>
+				<input type="hidden" name="Page" value="1">
+				<input type="hidden" name="CSMod" value="{{ topbar_search_mod|e }}">
+				<input type="hidden" name="CSField" value="{{ topbar_search_field|e }}">
+				<button type="button" class="ts-nav-search-toggle" data-nav-search-toggle aria-expanded="false" aria-controls="topbar-router-search" title="{% if topbar_search_query is not empty %}Edit router search{% else %}Search routers{% endif %}">
+					<i class="ti ti-search" aria-hidden="true"></i>
+					<span class="ts-nav-search-toggle-label">{% if topbar_search_query is not empty %}{{ topbar_search_query|e }}{% else %}Search{% endif %}</span>
+				</button>
+				<div class="ts-nav-search-input-wrap">
+					<label class="sr-only" for="topbar-router-search">Search routers</label>
+					<input id="topbar-router-search" type="search" name="CSInput" placeholder="Search routers" value="{{ topbar_search_query|e }}" maxlength="128" autocomplete="off" data-nav-search-input>
+					<button type="submit" class="ts-nav-search-submit" title="Search routers" aria-label="Search routers"><i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+{% if topbar_search_query is not empty %}
+					<a href="/index.php" class="ts-nav-search-clear" title="Clear current router search" aria-label="Clear current router search"><i class="ti ti-x" aria-hidden="true"></i></a>
+{% endif %}
+				</div>
+			</form>
 		</nav>
 
 		<div class="ts-topbar-actions">
@@ -39,9 +59,6 @@
 				<i class="ti ti-adjustments-horizontal" aria-hidden="true"></i><span>Filters</span>
 			</button>
 {% endif %}
-			<button type="button" class="ts-button ts-button-primary" data-dialog-open="search-dialog" title="Search routers by nickname">
-				<i class="ti ti-search" aria-hidden="true"></i><span>Search</span>
-			</button>
 		</div>
 	</div>
 </header>
@@ -67,30 +84,6 @@
 	{{ footerText|default('')|raw }}
 </footer>
 
-<dialog class="ts-dialog" id="search-dialog">
-	<form method="dialog" class="ts-dialog-close-form">
-		<button class="ts-icon-button" aria-label="Close search"><i class="ti ti-x" aria-hidden="true"></i></button>
-	</form>
-	<div class="ts-dialog-header">
-		<i class="ti ti-search" aria-hidden="true"></i>
-		<div>
-			<h2>Search routers</h2>
-			<p>Search by nickname. Use filters on the router list for advanced fields and flags.</p>
-		</div>
-	</div>
-	<form action="/index.php" method="get" class="ts-form-grid">
-		<input type="hidden" name="CSMod" value="Contains">
-		<input type="hidden" name="CSField" value="Name">
-		<label class="ts-field ts-field-wide">
-			<span>Router nickname</span>
-			<input type="search" name="CSInput" placeholder="Search for a router" value="{{ CSInput|default('')|e }}" maxlength="128" autofocus>
-		</label>
-		<div class="ts-form-actions">
-			<a href="/index.php" class="ts-button ts-button-secondary">Reset</a>
-			<button type="submit" class="ts-button ts-button-primary"><i class="ti ti-search" aria-hidden="true"></i>Search</button>
-		</div>
-	</form>
-</dialog>
 
 {% block dialogs %}{% endblock %}
 

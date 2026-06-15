@@ -25,6 +25,50 @@ function setupThemeToggle() {
   });
 }
 
+
+function setupNavSearch() {
+  const form = document.querySelector('[data-nav-search]');
+  if (!form) return;
+
+  const toggle = form.querySelector('[data-nav-search-toggle]');
+  const input = form.querySelector('[data-nav-search-input]');
+  if (!toggle || !input) return;
+
+  const setExpanded = (expanded, shouldFocus = false) => {
+    form.classList.toggle('is-expanded', expanded);
+    toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+    if (expanded && shouldFocus) {
+      window.requestAnimationFrame(() => {
+        input.focus();
+        input.select();
+      });
+    }
+  };
+
+  toggle.addEventListener('click', (event) => {
+    event.preventDefault();
+    setExpanded(true, true);
+  });
+
+  input.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape') return;
+    event.preventDefault();
+    setExpanded(false);
+    toggle.focus();
+  });
+
+  form.addEventListener('submit', (event) => {
+    if (input.value.trim() !== '') return;
+    event.preventDefault();
+    window.location.assign(form.getAttribute('action') || '/index.php');
+  });
+
+  document.addEventListener('click', (event) => {
+    if (form.contains(event.target)) return;
+    setExpanded(false);
+  });
+}
+
 function setupDialogs() {
   document.querySelectorAll('[data-dialog-open]').forEach((button) => {
     button.addEventListener('click', () => {
@@ -64,6 +108,7 @@ function setupAutoOpenDialogs() {
 }
 
 setupThemeToggle();
+setupNavSearch();
 setupDialogs();
 setupAutoSubmit();
 setupAutoOpenDialogs();
