@@ -1,21 +1,24 @@
 <nav class="ts-pagination" aria-label="Pagination">
-	<div>
-{% if pagination.first %}
-		<a href="{{ pagination.first|e }}" title="First page"><i class="ti ti-chevrons-left" aria-hidden="true"></i>First</a>
-		<a href="{{ pagination.prev|e }}" title="Previous page"><i class="ti ti-chevron-left" aria-hidden="true"></i>Prev</a>
+	<span class="ts-pagination-info">Showing {{ pagination.start_result }} to {{ pagination.end_result }} of {{ pagination.total_results }} results</span>
+	<div class="ts-pagination-pages">
+{% if pagination.prev %}
+		<a href="{{ pagination.prev|e }}" class="ts-pagination-arrow" title="Previous page" aria-label="Previous page"><i class="ti ti-chevron-left" aria-hidden="true"></i></a>
 {% else %}
-		<span>First</span>
-		<span>Prev</span>
+		<span class="ts-pagination-arrow ts-pagination-disabled"><i class="ti ti-chevron-left" aria-hidden="true"></i></span>
 {% endif %}
-	</div>
-	<strong>Page {{ pagination.page }} of {{ pagination.total_pages }}</strong>
-	<div>
-{% if pagination.next %}
-		<a href="{{ pagination.next|e }}" title="Next page">Next<i class="ti ti-chevron-right" aria-hidden="true"></i></a>
-		<a href="{{ pagination.last|e }}" title="Last page">Last<i class="ti ti-chevrons-right" aria-hidden="true"></i></a>
+{% for item in pagination.pages %}
+{% if item.page is null %}
+		<span class="ts-pagination-ellipsis">...</span>
+{% elseif item.current %}
+		<span class="ts-pagination-page ts-pagination-current" aria-current="page">{{ item.page }}</span>
 {% else %}
-		<span>Next</span>
-		<span>Last</span>
+		<a href="{{ item.url|e }}" class="ts-pagination-page" title="Page {{ item.page }}">{{ item.page }}</a>
+{% endif %}
+{% endfor %}
+{% if pagination.next %}
+		<a href="{{ pagination.next|e }}" class="ts-pagination-arrow" title="Next page" aria-label="Next page"><i class="ti ti-chevron-right" aria-hidden="true"></i></a>
+{% else %}
+		<span class="ts-pagination-arrow ts-pagination-disabled"><i class="ti ti-chevron-right" aria-hidden="true"></i></span>
 {% endif %}
 	</div>
 </nav>

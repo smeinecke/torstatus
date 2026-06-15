@@ -311,7 +311,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   text-decoration: none;
 }
 .ts-nav a:hover { background: var(--ts-nav-hover-bg); color: var(--ts-purple-dark); text-decoration: none; }
-.ts-topbar-actions { display: flex; gap: .5rem; justify-content: flex-end; }
+.ts-topbar-actions { display: flex; gap: .5rem; align-items: center; justify-content: flex-end; }
 
 .ts-service-banner {
   display: flex;
@@ -733,22 +733,50 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .ts-table-actions { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: flex-end; }
 .ts-inline-form,
 .ts-inline-form label,
-.ts-pagination,
-.ts-pagination div,
 .ts-header-link,
 .ts-card-link a,
 .ts-badge-list,
 .ts-status-badge,
 .ts-platform-badge { display: inline-flex; align-items: center; gap: .4rem; }
 .ts-inline-form label { font-weight: 750; color: var(--ts-nav-text); }
-.ts-inline-form select { min-height: 2.15rem; border: 1px solid var(--ts-input-border); border-radius: .65rem; background: var(--ts-input-bg); padding: .25rem .5rem; }
-.ts-pagination { width: 100%; justify-content: space-between; gap: 1rem; margin: .75rem 0; color: var(--ts-muted); font-size: .88rem; }
-.ts-pagination div { gap: .45rem; }
-.ts-pagination a,
-.ts-pagination span { display: inline-flex; align-items: center; gap: .25rem; border-radius: .55rem; padding: .25rem .45rem; }
-.ts-pagination span { color: var(--ts-muted); }
-.ts-pagination a { background: var(--ts-surface-3); color: var(--ts-purple); font-weight: 750; }
-.ts-pagination a:hover { background: var(--ts-nav-hover-bg); text-decoration: none; }
+.ts-inline-form select {
+  min-height: 2.15rem;
+  border: 1px solid var(--ts-input-border);
+  border-radius: .65rem;
+  background: var(--ts-input-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right .5rem center;
+  background-size: 1rem;
+  padding: .25rem 1.75rem .25rem .5rem;
+  appearance: none;
+  -webkit-appearance: none;
+}
+.ts-pagination { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: .75rem 0; color: var(--ts-muted); font-size: .88rem; }
+.ts-pagination-info { font-size: .82rem; color: var(--ts-muted); }
+.ts-pagination-pages { display: inline-flex; align-items: center; gap: .15rem; }
+.ts-pagination-page,
+.ts-pagination-arrow,
+.ts-pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  min-height: 2rem;
+  border: 1px solid var(--ts-input-border);
+  border-radius: .5rem;
+  padding: .25rem .5rem;
+  font-size: .82rem;
+  font-weight: 750;
+  line-height: 1;
+}
+.ts-pagination-page { background: var(--ts-input-bg); color: var(--ts-text); text-decoration: none; }
+.ts-pagination-page:hover { background: var(--ts-nav-hover-bg); text-decoration: none; }
+.ts-pagination-current { background: var(--ts-purple) !important; color: #fff !important; border-color: var(--ts-purple) !important; }
+.ts-pagination-arrow { background: var(--ts-input-bg); color: var(--ts-text); text-decoration: none; padding: .25rem; }
+.ts-pagination-arrow:hover { background: var(--ts-nav-hover-bg); text-decoration: none; }
+.ts-pagination-disabled { background: var(--ts-surface-3) !important; color: var(--ts-muted) !important; cursor: default; }
+.ts-pagination-ellipsis { border-color: transparent; background: transparent; color: var(--ts-muted); cursor: default; }
 .ts-router-table {
   width: max-content !important;
   min-width: 100% !important;
@@ -963,7 +991,8 @@ div.fg7 { background: #0ea5e9; }
 div.fg8 { background: #f97316; }
 
 @media (max-width: 760px) {
-  .ts-pagination { display: grid; justify-items: start; }
+  .ts-pagination { flex-wrap: wrap; }
+  .ts-pagination-pages { flex-wrap: wrap; }
   .ts-flag-filter-head { display: none; }
   .ts-flag-filter-row { grid-template-columns: 1fr; align-items: stretch; }
   .ts-radio-segment { justify-self: stretch; width: 100%; }

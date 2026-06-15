@@ -48,7 +48,7 @@
 {% endblock %}
 
 {% block dialogs %}
-<dialog class="ts-dialog" id="exit-query-dialog">
+<dialog class="ts-dialog" id="exit-query-dialog"{% if QueryIP is null %} data-auto-open="true"{% endif %}>
 	<form method="dialog" class="ts-dialog-close-form">
 		<button class="ts-icon-button" aria-label="Close exit query"><i class="ti ti-x" aria-hidden="true"></i></button>
 	</form>

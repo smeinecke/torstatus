@@ -301,20 +301,43 @@ final class IndexRequest
     }
 
     /** @return array<string, mixed> */
-    public function pagination(string $self, int $page, int $totalPages): array
+    public function pagination(string $self, int $page, int $totalPages, int $totalResults): array
     {
         $baseQuery = $this->toBaseQuery();
         $url = static function (int $targetPage) use ($self, $baseQuery): string {
             return $self . '?' . $baseQuery . '&Page=' . $targetPage;
         };
 
+        $startResult = ($page - 1) * $this->rowsPerPage + 1;
+        $endResult = min($page * $this->rowsPerPage, $totalResults);
+
+        $pages = [];
+        $range = 1;
+        $showFirst = 1;
+        $showLast = $totalPages;
+        $leftEdge = range(1, min(1 + $range, $totalPages));
+        $rightEdge = range(max($totalPages - $range, 1), $totalPages);
+        $leftGap = range(max($page - $range, 1), min($page + $range, $totalPages));
+        $all = array_unique(array_merge($leftEdge, $leftGap, $rightEdge));
+        sort($all);
+        $prev = 0;
+        foreach ($all as $p) {
+            if ($p - $prev > 1) {
+                $pages[] = ['page' => null, 'url' => null, 'current' => false];
+            }
+            $pages[] = ['page' => $p, 'url' => $url($p), 'current' => $p === $page];
+            $prev = $p;
+        }
+
         return [
             'page' => $page,
             'total_pages' => $totalPages,
-            'first' => $page > 1 ? $url(1) : null,
+            'total_results' => $totalResults,
+            'start_result' => $startResult,
+            'end_result' => $endResult,
             'prev' => $page > 1 ? $url($page - 1) : null,
             'next' => $page < $totalPages ? $url($page + 1) : null,
-            'last' => $page < $totalPages ? $url($totalPages) : null,
+            'pages' => $pages,
         ];
     }
 
