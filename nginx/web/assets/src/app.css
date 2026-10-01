@@ -672,9 +672,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 .ts-metric-card span { color: var(--ts-muted); font-size: .78rem; font-weight: 750; }
 
 /* Legacy table normalization while the PHP row renderer is still table-based. */
-.displayTable,
-table.body,
-table.torcheck {
+.displayTable {
   width: 100% !important;
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -683,7 +681,6 @@ table.torcheck {
   overflow: hidden;
   background: var(--ts-card-solid);
 }
-table.body { border: 0 !important; background: transparent; }
 .HRN,
 .HRS {
   background: var(--ts-table-header-bg) !important;
@@ -693,11 +690,8 @@ table.body { border: 0 !important; background: transparent; }
 }
 .HRS { background: var(--ts-table-header-bg) !important; color: var(--ts-purple-dark) !important; }
 .TRS,
-.TRSCN,
-.TRSB,
 .TRR,
 .TRr,
-.TRAR,
 .TD,
 .TDc,
 .TDcb,
@@ -747,9 +741,7 @@ input[type='submit'] {
 }
 .ts-legacy-filter-form b { color: var(--ts-text); }
 .TRSM { color: var(--ts-muted) !important; }
-.bwb .bgg { background: var(--ts-pill-green-bg) !important; }
-.bwb .bgr { background: var(--ts-pill-red-bg) !important; }
-.bwb .bgb { background: var(--ts-banner-bg) !important; }
+
 
 @media (max-width: 900px) {
   .ts-topbar-inner { grid-template-columns: 1fr; justify-items: stretch; }
@@ -1085,35 +1077,7 @@ body.ts-shell .ts-brand:visited { color: var(--ts-text); }
 .HRFYESS { background: var(--ts-pill-green-bg) !important; color: var(--ts-pill-green-text) !important; }
 .HRFNOS,
 .HRFYESS { font-style: italic; }
-.TRAR { text-align: right !important; }
 .BOXCOLSEL { width: 100%; min-height: 20rem; border: 1px solid var(--ts-input-border); border-radius: .8rem; padding: .45rem; background: var(--ts-input-bg); color: var(--ts-text); }
-.BTNCOLSEL,
-.BTNUPDOWN { width: auto; }
-table.bwb { border: 0; width: 9rem; }
-table.bwb td { border: 0; padding: 0 .25rem 0 0; }
-td.bwr,
-td.bwr1,
-td.bwr2,
-td.bwr3,
-td.bwr4,
-td.bwr5,
-td.bwr6,
-td.bwr7 { width: 85px; border-radius: 999px; overflow: hidden; background: #e2e8f0; }
-td.bwr1 { background: #cbd5e1; }
-td.bwr2 { background: #94a3b8; }
-td.bwr3 { background: #64748b; }
-td.bwr4 { background: #475569; }
-td.bwr5 { background: #1e293b; }
-td.bwr6 { background: #fde68a; }
-td.bwr7 { background: #bae6fd; }
-div.fg1 { background: #94a3b8; }
-div.fg2 { background: #64748b; }
-div.fg3 { background: #475569; }
-div.fg4 { background: #334155; }
-div.fg5 { background: #0f172a; }
-div.fg6 { background: #f59e0b; }
-div.fg7 { background: #0ea5e9; }
-div.fg8 { background: #f97316; }
 
 @media (max-width: 760px) {
   .ts-pagination { flex-wrap: wrap; }
@@ -1480,6 +1444,7 @@ summary:focus-visible {
 }
 .ts-bandwidth-track > span {
   display: block;
+  width: var(--bw, 0);
   height: 100%;
   border-radius: inherit;
 }

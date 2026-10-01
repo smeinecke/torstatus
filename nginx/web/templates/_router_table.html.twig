@@ -42,7 +42,7 @@
 {% elseif col == 'Bandwidth' %}
 <td class="TDb ts-col-bandwidth">
 	<div class="ts-bandwidth-cell" title="{{ cell.value|e }} KB/s">
-		<!-- djlint:off H021 --><span class="ts-bandwidth-track {{ cell.bg }}"><span class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px;"></span></span><!-- djlint:on H021 -->
+		<!-- djlint:off H021 --><span class="ts-bandwidth-track {{ cell.bg }}"><span class="fg{{ cell.fg }}" style="--bw: {{ cell.bar }}px;"></span></span><!-- djlint:on H021 -->
 		<span class="ts-tabular">{{ cell.value|e }}</span>
 	</div>
 </td>
