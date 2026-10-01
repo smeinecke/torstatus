@@ -34,7 +34,7 @@ jobs:
         run: uv sync
 
       - name: Restore mutmut cache
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: updater/mutants/
           key: mutmut-${{ github.sha }}
