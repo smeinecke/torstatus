@@ -81,7 +81,7 @@ final class NetworkDetailService
         return ['labels' => $labels, 'data' => $data];
     }
 
-    /** @return array{labels: array<int, int>, data: array<int, int>} */
+    /** @return array{labels: array<int, string>, data: array<int, int>} */
     private function uptimeGraph(): array
     {
         $descriptor = $this->tables->descriptor;
@@ -98,7 +98,7 @@ final class NetworkDetailService
         $data = [];
         while ($record = $result->fetch_assoc()) {
             if ((int)$record['WeeksRunning'] > -1) {
-                $labels[] = (int)$record['WeeksRunning'];
+                $labels[] = ((int)$record['WeeksRunning']) . ' wk';
                 $data[] = (int)$record['Count'];
             }
         }

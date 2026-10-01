@@ -106,7 +106,7 @@
 {% block dialogs %}
 <dialog class="ts-dialog ts-dialog-wide" id="filters-dialog">
 	<form method="dialog" class="ts-dialog-close-form">
-		<button class="ts-icon-button" aria-label="Close filters"><i class="ti ti-x" aria-hidden="true"></i></button>
+		<button type="submit" class="ts-icon-button" aria-label="Close filters"><i class="ti ti-x" aria-hidden="true"></i></button>
 	</form>
 	<div class="ts-dialog-header">
 		<i class="ti ti-adjustments-horizontal" aria-hidden="true"></i>
@@ -184,7 +184,7 @@
 
 <dialog class="ts-dialog ts-dialog-wide" id="columns-dialog"{% if column_dialog_open|default(false) %} data-auto-open="true"{% endif %}>
 	<form method="dialog" class="ts-dialog-close-form">
-		<button class="ts-icon-button" aria-label="Close columns"><i class="ti ti-x" aria-hidden="true"></i></button>
+		<button type="submit" class="ts-icon-button" aria-label="Close columns"><i class="ti ti-x" aria-hidden="true"></i></button>
 	</form>
 	<div class="ts-dialog-header">
 		<i class="ti ti-columns-3" aria-hidden="true"></i>

@@ -1,0 +1,6 @@
+# djlint lints the Twig templates (profile jinja covers Twig's {{ }}/{% %} syntax).
+# J018 wants Flask's url_for() — meaningless in Twig/PHP, this app has no url helper.
+# T002 wants double quotes inside {% %} tags — the codebase convention is single quotes.
+profile = "jinja"
+extension = "twig"
+ignore = "J018,T002"

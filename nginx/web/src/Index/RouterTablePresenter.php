@@ -22,11 +22,7 @@ final class RouterTablePresenter
     {
         return [
             'class' => $this->sortedClass('Name', $request),
-            'country_url' => $this->url($baseUrl, 'CountryCode', $request),
-            'country_arrow' => $this->arrow('CountryCode', $request),
-            'country_alt' => $this->arrowAlt('CountryCode', $request),
             'url' => $this->url($baseUrl, 'Name', $request),
-            'arrow' => $this->arrow('Name', $request),
             'alt' => $this->arrowAlt('Name', $request),
             'label_html' => 'Router',
         ];
@@ -46,6 +42,7 @@ final class RouterTablePresenter
             'Contact' => 'Contact',
             'IP' => 'IP Address',
             'Platform' => 'Platform',
+            'CountryCode' => 'Country',
             'Hibernating' => 'Hibernating',
             'Authority' => 'Authority',
             'Exit' => 'Exit',
@@ -85,7 +82,6 @@ final class RouterTablePresenter
             'column' => $column,
             'class' => $this->headerClass($sortKey, $column, $request),
             'url' => $this->url($baseUrl, $sortKey, $request),
-            'arrow' => $this->arrow($sortKey, $request),
             'alt' => $this->arrowAlt($sortKey, $request),
             'label_html' => $labels[$column] ?? $column,
             'is_flag' => in_array($column, $flagColumns, true),
@@ -120,11 +116,6 @@ final class RouterTablePresenter
             'SR' => $sortKey,
             'SO' => $this->nextSortOrder($sortKey, $request),
         ]);
-    }
-
-    private function arrow(string $sortKey, IndexRequest $request): string
-    {
-        return $request->sortRequest === $sortKey && $request->sortOrder === 'Asc' ? 'sortingarrowup.png' : 'sortingarrowdown.png';
     }
 
     private function arrowAlt(string $sortKey, IndexRequest $request): string
