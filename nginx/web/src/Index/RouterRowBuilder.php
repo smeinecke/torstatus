@@ -9,22 +9,16 @@ use TorStatus\Http\Response;
 
 final class RouterRowBuilder
 {
-    /** @var QueryExecutor */
-    private $db;
-
-    /** @var array<string, string> */
-    private $countryCodes;
-
     /** @var array<int, string> */
-    private $notifiedMissingCountries = [];
+    private array $notifiedMissingCountries = [];
 
     /**
      * @param array<string, string> $countryCodes
      */
-    public function __construct(QueryExecutor $db, array $countryCodes)
-    {
-        $this->db = $db;
-        $this->countryCodes = $countryCodes;
+    public function __construct(
+        private readonly QueryExecutor $db,
+        private readonly array $countryCodes,
+    ) {
     }
 
     /**

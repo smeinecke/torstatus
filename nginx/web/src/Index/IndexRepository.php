@@ -9,20 +9,11 @@ use TorStatus\Network\IpAddress;
 
 final class IndexRepository
 {
-    /** @var QueryExecutor */
-    private $db;
-
-    /** @var TableNames */
-    private $tables;
-
-    /** @var int */
-    private $offsetFromGmt;
-
-    public function __construct(QueryExecutor $db, TableNames $tables, int $offsetFromGmt)
-    {
-        $this->db = $db;
-        $this->tables = $tables;
-        $this->offsetFromGmt = $offsetFromGmt;
+    public function __construct(
+        private readonly QueryExecutor $db,
+        private readonly TableNames $tables,
+        private readonly int $offsetFromGmt,
+    ) {
     }
 
     public function countRouters(): int
@@ -35,20 +26,6 @@ final class IndexRepository
     {
         $record = $this->db->singleRow("select count(*) as Count from {$this->tables->descriptor}", [], 1800);
         return (int)($record['Count'] ?? 0);
-    }
-
-    /** @return array<string, mixed> */
-    public function fetchNetworkStatusSource(): array
-    {
-        $query = 'select Name, IP, ORPort, DirPort, Fingerprint, Platform, LastDescriptorPublished, OnionKey, SigningKey, Contact, DescriptorSignature from NetworkStatusSource where ID = ?';
-        return $this->db->singleRow($query, [1], 1800);
-    }
-
-    /** @return array<string, mixed> */
-    public function fetchNetworkStatusSourceLocation(string $fingerprint): array
-    {
-        $query = "select Hostname, CountryCode from {$this->tables->networkStatus} where Fingerprint = ?";
-        return $this->db->singleRow($query, [$fingerprint], 1800);
     }
 
     public function countExitRoutersByIp(string $remoteIp): int

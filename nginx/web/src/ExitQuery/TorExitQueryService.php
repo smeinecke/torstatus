@@ -9,16 +9,10 @@ use TorStatus\Index\IndexRepository;
 
 final class TorExitQueryService
 {
-    /** @var IndexRepository */
-    private $repository;
-
-    /** @var ExitPolicyMatcher */
-    private $exitPolicyMatcher;
-
-    public function __construct(IndexRepository $repository, ExitPolicyMatcher $exitPolicyMatcher)
-    {
-        $this->repository = $repository;
-        $this->exitPolicyMatcher = $exitPolicyMatcher;
+    public function __construct(
+        private readonly IndexRepository $repository,
+        private readonly ExitPolicyMatcher $exitPolicyMatcher,
+    ) {
     }
 
     /** @return array<string, mixed> */

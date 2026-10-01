@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\Index;
 
+use TorStatus\Common;
+
 final class IndexRequest
 {
     public const SORT_FIELDS = [
@@ -135,8 +137,8 @@ final class IndexRequest
             $customSearchInput = substr($customSearchInput, 0, 128);
         }
 
-        $columnListActive = self::arrayOfStrings($session['ColumnList_ACTIVE'] ?? null);
-        $columnListInactive = self::arrayOfStrings($session['ColumnList_INACTIVE'] ?? null);
+        $columnListActive = Common::arrayOfStrings($session['ColumnList_ACTIVE'] ?? null);
+        $columnListInactive = Common::arrayOfStrings($session['ColumnList_INACTIVE'] ?? null);
         if (!isset($session['ColumnSetVisited']) && !isset($session['IndexVisited'])) {
             $columnListActive = $defaultActiveColumns;
             $columnListInactive = $defaultInactiveColumns;
@@ -157,10 +159,27 @@ final class IndexRequest
     }
 
 
+    /** @var array<string, string> */
+    private const FLAG_LABELS = [
+        'FAuthority' => 'Authority',
+        'FBadDirectory' => 'Bad Directory',
+        'FBadExit' => 'Bad Exit',
+        'FExit' => 'Exit',
+        'FFast' => 'Fast',
+        'FGuard' => 'Guard',
+        'FHibernating' => 'Hibernating',
+        'FNamed' => 'Named',
+        'FStable' => 'Stable',
+        'FRunning' => 'Running',
+        'FValid' => 'Valid',
+        'FV2Dir' => 'V2Dir',
+        'FHSDir' => 'HSDir',
+    ];
+
     /** @return array<string, string> */
     public static function sortOptions(): array
     {
-        return [
+        $options = [
             'Name' => 'Router Name',
             'Fingerprint' => 'Fingerprint',
             'CountryCode' => 'Country Code',
@@ -173,40 +192,19 @@ final class IndexRequest
             'DirPort' => 'DirPort',
             'Platform' => 'Platform',
             'Contact' => 'Contact',
-            'FAuthority' => 'Authority',
-            'FBadDirectory' => 'Bad Directory',
-            'FBadExit' => 'Bad Exit',
-            'FExit' => 'Exit',
-            'FFast' => 'Fast',
-            'FGuard' => 'Guard',
-            'Hibernating' => 'Hibernating',
-            'FNamed' => 'Named',
-            'FStable' => 'Stable',
-            'FRunning' => 'Running',
-            'FValid' => 'Valid',
-            'FV2Dir' => 'V2Dir',
-            'FHSDir' => 'HSDir',
         ];
+        // The sortable column is `Hibernating` (descriptor field), while the
+        // filter parameter is `FHibernating` — map it back for sorting.
+        foreach (self::FLAG_LABELS as $flag => $label) {
+            $options[$flag === 'FHibernating' ? 'Hibernating' : $flag] = $label;
+        }
+        return $options;
     }
 
     /** @return array<string, string> */
     public static function filterOptions(): array
     {
-        return [
-            'FAuthority' => 'Authority',
-            'FBadDirectory' => 'Bad Directory',
-            'FBadExit' => 'BadExit',
-            'FExit' => 'Exit',
-            'FFast' => 'Fast',
-            'FGuard' => 'Guard',
-            'FHibernating' => 'Hibernating',
-            'FNamed' => 'Named',
-            'FStable' => 'Stable',
-            'FRunning' => 'Running',
-            'FValid' => 'Valid',
-            'FV2Dir' => 'V2Dir',
-            'FHSDir' => 'HSDir',
-        ];
+        return self::FLAG_LABELS;
     }
 
     /** @return array<string, string> */
@@ -275,21 +273,11 @@ final class IndexRequest
     /** @return array<string, string> */
     public function toHiddenInputs(): array
     {
-        $params = [
+        return [
             'SR' => $this->sortRequest,
             'SO' => $this->sortOrder,
             'Page' => '1',
-        ];
-        foreach ($this->filters as $field => $value) {
-            $params[$field] = $value;
-        }
-        if ($this->customSearchInput !== null) {
-            $params['CSField'] = $this->customSearchField;
-            $params['CSMod'] = $this->customSearchModifier;
-            $params['CSInput'] = $this->customSearchInput;
-        }
-
-        return $params;
+        ] + $this->queryParams();
     }
 
     /** @return array<int, array{value: int, selected: bool}> */
@@ -343,15 +331,7 @@ final class IndexRequest
 
     public function toBaseUrl(string $self): string
     {
-        $params = ['RowsPerPage' => (string)$this->rowsPerPage];
-        foreach ($this->filters as $field => $value) {
-            $params[$field] = $value;
-        }
-        if ($this->customSearchInput !== null) {
-            $params['CSField'] = $this->customSearchField;
-            $params['CSMod'] = $this->customSearchModifier;
-            $params['CSInput'] = $this->customSearchInput;
-        }
+        $params = ['RowsPerPage' => (string)$this->rowsPerPage] + $this->queryParams();
         return $self . '?' . http_build_query($params);
     }
 
@@ -361,7 +341,14 @@ final class IndexRequest
             'RowsPerPage' => (string)$this->rowsPerPage,
             'SR' => $this->sortRequest,
             'SO' => $this->sortOrder,
-        ];
+        ] + $this->queryParams();
+        return http_build_query($params);
+    }
+
+    /** @return array<string, string> */
+    private function queryParams(): array
+    {
+        $params = [];
         foreach ($this->filters as $field => $value) {
             $params[$field] = $value;
         }
@@ -370,7 +357,7 @@ final class IndexRequest
             $params['CSMod'] = $this->customSearchModifier;
             $params['CSInput'] = $this->customSearchInput;
         }
-        return http_build_query($params);
+        return $params;
     }
 
     /** @param array<string, mixed> $source */
@@ -384,17 +371,5 @@ final class IndexRequest
             return null;
         }
         return (string)$value;
-    }
-
-    /** @return array<int, string> */
-    private static function arrayOfStrings($value): array
-    {
-        if (!is_array($value)) {
-            return [];
-        }
-
-        return array_values(array_filter($value, static function ($item): bool {
-            return is_string($item) && $item !== '';
-        }));
     }
 }

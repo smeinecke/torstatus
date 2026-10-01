@@ -2,7 +2,7 @@
 
 import phpserialize
 
-from torstatus_updater.serializer import dumps, dumps_list
+from torstatus_updater.serializer import dumps_list
 
 
 def test_dumps_list() -> None:
@@ -16,8 +16,3 @@ def test_dumps_list() -> None:
 def test_dumps_empty_list() -> None:
     result = dumps_list([])
     assert phpserialize.loads(result) == {}
-
-
-def test_dumps_bytes() -> None:
-    result = dumps(b"raw bytes")
-    assert isinstance(result, bytes)

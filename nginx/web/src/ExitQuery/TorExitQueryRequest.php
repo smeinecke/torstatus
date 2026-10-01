@@ -8,20 +8,11 @@ use TorStatus\Network\IpAddress;
 
 final class TorExitQueryRequest
 {
-    /** @var string|null */
-    public $queryIp;
-
-    /** @var string|null */
-    public $destinationIp;
-
-    /** @var string|null */
-    public $destinationPort;
-
-    public function __construct(?string $queryIp, ?string $destinationIp, ?string $destinationPort)
-    {
-        $this->queryIp = $queryIp;
-        $this->destinationIp = $destinationIp;
-        $this->destinationPort = $destinationPort;
+    public function __construct(
+        public readonly ?string $queryIp,
+        public readonly ?string $destinationIp,
+        public readonly ?string $destinationPort,
+    ) {
     }
 
     /**

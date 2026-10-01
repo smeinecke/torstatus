@@ -70,10 +70,16 @@ final class Common
         );
     }
 
-    public static function fetchMirrors(QueryExecutor $db): string
+    /** @return array<int, string> */
+    public static function arrayOfStrings($value): array
     {
-        $row = $db->singleRow('SELECT mirrors FROM `Mirrors` WHERE id = ?', [1], 86400);
-        return (string)($row['mirrors'] ?? '');
+        if (!is_array($value)) {
+            return [];
+        }
+
+        return array_values(array_filter($value, static function ($item): bool {
+            return is_string($item) && $item !== '';
+        }));
     }
 
     public static function appVersion(): string

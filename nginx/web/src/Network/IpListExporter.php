@@ -9,16 +9,10 @@ use TorStatus\Index\TableNames;
 
 final class IpListExporter
 {
-    /** @var QueryExecutor */
-    private $db;
-
-    /** @var TableNames */
-    private $tables;
-
-    public function __construct(QueryExecutor $db, TableNames $tables)
-    {
-        $this->db = $db;
-        $this->tables = $tables;
+    public function __construct(
+        private readonly QueryExecutor $db,
+        private readonly TableNames $tables,
+    ) {
     }
 
     public function output(bool $exitOnly): void
