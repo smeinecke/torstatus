@@ -77,6 +77,36 @@ final class ColumnPreferencesTest extends TestCase
         self::assertSame(['Hostname'], $prefs->inactive());
     }
 
+    public function testApplyPostActionContextCarriesSelection(): void
+    {
+        $prefs = new ColumnPreferences(['IP', 'Hostname', 'Platform'], []);
+        $context = $prefs->applyPost(['CR_ACTIVE' => 'Hostname', 'Down' => '1'])->toTemplateContext();
+        self::assertSame('Hostname', $context['CR_ACTIVE']);
+        self::assertSame('1', $context['CR_Down']);
+        self::assertNull($context['CR_Up']);
+        self::assertNull($context['CR_Add']);
+        self::assertNull($context['CR_Remove']);
+        self::assertNull($context['CR_INACTIVE']);
+    }
+
+    public function testApplyPostActionContextAfterAdd(): void
+    {
+        $prefs = new ColumnPreferences(['IP'], ['Hostname']);
+        $context = $prefs->applyPost(['CR_INACTIVE' => 'Hostname', 'Add' => '1'])->toTemplateContext();
+        self::assertSame('Hostname', $context['CR_INACTIVE']);
+        self::assertSame('1', $context['CR_Add']);
+        self::assertNull($context['CR_ACTIVE']);
+    }
+
+    public function testColumnLabelsCoverAllColumns(): void
+    {
+        $labels = \TorStatus\Index\RouterTablePresenter::columnLabels();
+        foreach (ColumnPreferences::COLUMNS as $column) {
+            self::assertArrayHasKey($column, $labels);
+            self::assertNotSame('', $labels[$column]);
+        }
+    }
+
     public function testPersistWritesSessionKeys(): void
     {
         $prefs = new ColumnPreferences(['IP'], ['Hostname']);

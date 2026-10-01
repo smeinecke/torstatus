@@ -12,7 +12,7 @@
 // checked while the dynamic fragment is treated as unverifiable (the same way
 // `bg-${color}` is in JSX — see require-static-classes).
 
-const ATTR_RE = /\bclass\s*=\s*(["'])([\s\S]*?)\1/g;
+const ATTR_RE = /\b(class|style)\s*=\s*(["'])([\s\S]*?)\2/g;
 const TWIG_RE = /\{\{[\s\S]*?\}\}|\{%[\s\S]*?%\}/g;
 const mapsByFile = new Map();
 
@@ -31,6 +31,26 @@ function toJsxExpression(raw) {
   return { code: `{${tpl}}`, valueOffset: 1 }; // expression container around template
 }
 
+// style="prop: value; …" → JSX object form `style={{ prop: value, … }}` so the
+// JSX reader checks it (its attributes path has no staticStyles for strings).
+// Twig interpolation inside a value becomes ${0} like class strings do.
+function styleToJsx(raw) {
+  const props = [];
+  for (const decl of raw.split(';')) {
+    const idx = decl.indexOf(':');
+    if (idx < 0) continue;
+    const prop = decl.slice(0, idx).trim();
+    const val = decl.slice(idx + 1).trim().replace(/[\r\n]+/g, ' ');
+    if (!prop || prop.includes('{{') || prop.includes('{%')) continue;
+    const expr = val.includes('{{') || val.includes('{%')
+      ? '`' + val.replace(/[`\\]/g, '').replace(TWIG_RE, '${0}') + '`'
+      : JSON.stringify(val);
+    props.push(`${JSON.stringify(prop)}: ${expr}`);
+  }
+  if (!props.length) return null;
+  return { code: `{{ ${props.join(', ')} }}`, valueOffset: 1 };
+}
+
 export default {
   meta: { name: 'twig-class-processor', version: '1.0.0' },
   supportsAutofix: false,
@@ -42,13 +62,16 @@ export default {
     let m;
     ATTR_RE.lastIndex = 0;
     while ((m = ATTR_RE.exec(text)) !== null) {
-      const valueStart = m.index + m[0].length - m[2].length; // offset of first value char
+      const valueStart = m.index + m[0].length - m[3].length; // offset of first value char
       let line = 0;
       while (line + 1 < starts.length && starts[line + 1] <= m.index) line++;
-      const { code, valueOffset } = toJsxExpression(m[2]);
-      const piece = `<i className=${code}/>`;
+      const attr = m[1] === 'style' ? 'style' : 'className';
+      const conv = m[1] === 'style' ? styleToJsx(m[3]) : toJsxExpression(m[3]);
+      if (!conv) continue;
+      const { code, valueOffset } = conv;
+      const piece = `<i ${attr}=${code}/>`;
       const base = vLines[line] ?? '';
-      const vValueStart = base.length + '<i className='.length + valueOffset;
+      const vValueStart = base.length + `<i ${attr}=`.length + valueOffset;
       const entry = {
         vStart: vValueStart,
         vEnd: vValueStart + code.length - valueOffset - (valueOffset ? 1 : 0),
