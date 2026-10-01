@@ -1,5 +1,14 @@
 {% extends "base.html.twig" %}
 
+{% set graphs = [
+	{ title: 'Routers by country code', type: 'cc', label: 'Routers', wide: true },
+	{ title: 'Exit routers by country code', type: 'cc_exit', label: 'Exit routers', wide: true },
+	{ title: 'Routers by uptime', type: 'uptime', label: 'Routers', wide: true },
+	{ title: 'Routers by observed bandwidth', type: 'bandwidth', label: 'Routers' },
+	{ title: 'Routers by platform', type: 'platform', label: 'Routers' },
+	{ title: 'Routers matching specified criteria', type: 'summary', label: 'Routers', wide: true },
+] %}
+
 {% block content %}
 <section class="ts-hero">
 	<div>
@@ -11,29 +20,11 @@
 </section>
 
 <div class="ts-graph-grid">
-	<section class="ts-card ts-graph-card ts-graph-card-wide">
-		<h2>Routers by country code</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=cc" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
+	{% for graph in graphs %}
+	<section class="ts-card ts-graph-card{% if graph.wide|default(false) %} ts-graph-card-wide{% endif %}">
+		<h2>{{ graph.title }}</h2>
+		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type={{ graph.type }}" data-chart-type="bar" data-chart-value-label="{{ graph.label }}"></canvas></div>
 	</section>
-	<section class="ts-card ts-graph-card ts-graph-card-wide">
-		<h2>Exit routers by country code</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=cc_exit" data-chart-type="bar" data-chart-value-label="Exit routers"></canvas></div>
-	</section>
-	<section class="ts-card ts-graph-card ts-graph-card-wide">
-		<h2>Routers by uptime</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=uptime" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
-	</section>
-	<section class="ts-card ts-graph-card">
-		<h2>Routers by observed bandwidth</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=bandwidth" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
-	</section>
-	<section class="ts-card ts-graph-card">
-		<h2>Routers by platform</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=platform" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
-	</section>
-	<section class="ts-card ts-graph-card ts-graph-card-wide">
-		<h2>Routers matching specified criteria</h2>
-		<div class="ts-chart-canvas-wrap"><canvas data-chart-endpoint="graphs.php?type=summary" data-chart-type="bar" data-chart-value-label="Routers"></canvas></div>
-	</section>
+	{% endfor %}
 </div>
 {% endblock %}

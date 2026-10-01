@@ -312,6 +312,10 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
   text-decoration: none;
 }
 .ts-nav a:hover { background: var(--ts-nav-hover-bg); color: var(--ts-purple-dark); text-decoration: none; }
+.ts-nav a[aria-current='page'] {
+  background: var(--ts-nav-hover-bg);
+  color: var(--ts-purple-dark);
+}
 .ts-topbar-actions { display: flex; gap: .5rem; align-items: center; justify-content: flex-end; }
 .ts-nav-search {
   display: inline-flex;
@@ -563,6 +567,7 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mon
 
 .ts-dialog {
   position: relative;
+  margin: auto; /* Tailwind preflight strips the UA margin:auto that centers dialogs */
   width: min(38rem, calc(100vw - 2rem));
   max-height: calc(100dvh - 2rem);
   overflow: auto;
@@ -707,8 +712,12 @@ tr.r td { background: var(--ts-table-row-odd) !important; }
 tr.R td { background: var(--ts-table-row-even) !important; }
 tr.d td { background: var(--ts-status-warn-bg) !important; }
 tr.B td { background: var(--ts-status-warn-bg) !important; }
+.ts-router-table tbody tr:hover td { background: var(--ts-table-row-hover) !important; }
 .header { color: inherit !important; text-decoration: none !important; }
 .ts-sort-icon { margin-right: .2rem; color: var(--ts-purple); font-size: .85rem; }
+.HRN .ts-sort-icon { opacity: .3; }
+.HRN:hover .ts-sort-icon { opacity: .8; }
+.HRS .ts-sort-icon { opacity: 1; }
 .ts-country {
   display: inline-flex;
   align-items: center;
@@ -1543,4 +1552,22 @@ summary:focus-visible {
   .ts-table-toolbar > .ts-pagination { width: 100%; }
   .ts-table-toolbar .ts-pagination-pages { flex-wrap: wrap; }
   .ts-router-panel .ts-rows-form label { width: 100%; justify-content: space-between; }
+}
+
+.ts-empty-state {
+  display: grid;
+  justify-items: center;
+  gap: .55rem;
+  padding: 2.5rem 1rem;
+  color: var(--ts-muted);
+}
+.ts-empty-state .ti { font-size: 1.6rem; }
+.ts-empty-state p { margin: 0; font-weight: 600; }
+
+@media (prefers-reduced-motion: reduce) {
+  .ts-nav-search-toggle,
+  .ts-button,
+  .ts-card summary::after { transition: none; }
+  .ts-button:hover { transform: none; }
+  .ts-chart-canvas-wrap[data-chart-state='loading']::before { animation: none; background: var(--ts-input-bg); }
 }

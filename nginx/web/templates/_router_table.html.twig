@@ -1,3 +1,6 @@
+{% if routers is empty %}
+<div class="ts-empty-state"><i class="ti ti-search-off" aria-hidden="true"></i><p>No routers match the current filters.</p><a href="index.php" class="ts-button ts-button-secondary"><i class="ti ti-refresh" aria-hidden="true"></i>Reset filters</a></div>
+{% else %}
 <table class="displayTable ts-router-table">
 <thead>
 <tr>
@@ -63,3 +66,4 @@
 {% endfor %}
 </tbody>
 </table>
+{% endif %}

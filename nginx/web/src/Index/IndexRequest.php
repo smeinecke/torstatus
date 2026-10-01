@@ -296,7 +296,7 @@ final class IndexRequest
             return $self . '?' . $baseQuery . '&Page=' . $targetPage;
         };
 
-        $startResult = ($page - 1) * $this->rowsPerPage + 1;
+        $startResult = $totalResults === 0 ? 0 : ($page - 1) * $this->rowsPerPage + 1;
         $endResult = min($page * $this->rowsPerPage, $totalResults);
 
         $pages = [];
