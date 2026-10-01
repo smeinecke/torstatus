@@ -67,7 +67,11 @@ final class BandwidthHistoryGraphRenderer
     /** @return array{write: array{data: array<int, int|float>, increment: int, last: string}, read: array{data: array<int, int|float>, increment: int, last: string}} */
     private function fetchHistory(QueryExecutor $db, string $descriptorTable, string $fingerprint): array
     {
-        $descriptorTable = SqlIdentifier::table($descriptorTable);
+        try {
+            $descriptorTable = SqlIdentifier::table($descriptorTable);
+        } catch (\InvalidArgumentException $e) {
+            Response::serviceUnavailable($e->getMessage());
+        }
         $query = "select WriteHistoryLAST, WriteHistoryINC, WriteHistorySERDATA, ReadHistoryLAST, ReadHistoryINC, ReadHistorySERDATA from $descriptorTable where Fingerprint = ?";
         $record = $db->singleRow($query, [$fingerprint], 1800);
         if ($record === []) {

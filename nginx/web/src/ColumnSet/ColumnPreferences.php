@@ -54,9 +54,9 @@ final class ColumnPreferences
         $action = ColumnSetAction::fromPost($post, $selectedActive, $selectedInactive);
 
         if ($action->add && $selectedInactive !== null) {
-            $this->moveBetweenLists($selectedInactive, $this->inactive, $this->active);
+            [$this->inactive, $this->active] = $this->moveBetweenLists($selectedInactive, $this->inactive, $this->active);
         } elseif ($action->remove && $selectedActive !== null) {
-            $this->moveBetweenLists($selectedActive, $this->active, $this->inactive);
+            [$this->active, $this->inactive] = $this->moveBetweenLists($selectedActive, $this->active, $this->inactive);
         } elseif ($action->up && $selectedActive !== null) {
             $this->active = $this->move($this->active, $selectedActive, -1);
         } elseif ($action->down && $selectedActive !== null) {
@@ -97,12 +97,13 @@ final class ColumnPreferences
 
     /** @param array<int, string> $source
      *  @param array<int, string> $target
+     *  @return array{0: array<int, string>, 1: array<int, string>}
      */
-    private function moveBetweenLists(string $column, array &$source, array &$target): void
+    private function moveBetweenLists(string $column, array $source, array $target): array
     {
         $key = array_search($column, $source, true);
         if ($key === false) {
-            return;
+            return [$source, $target];
         }
 
         unset($source[$key]);
@@ -110,6 +111,8 @@ final class ColumnPreferences
         if (!in_array($column, $target, true)) {
             $target[] = $column;
         }
+
+        return [$source, $target];
     }
 
     /** @param array<int, string> $columns

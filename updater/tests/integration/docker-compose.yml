@@ -66,9 +66,9 @@ services:
       - REAL_SERVER_IP=127.0.0.1
       - HIDDEN_SERVICE_URL=
     volumes:
-      - ../../../nginx/web:/var/www/html
-      - ../../../nginx/web/config_docker.php:/var/www/html/config.php
-      - ../../../nginx/vendor:/var/www/vendor
+      - ../../../nginx/web:/var/www/app/web
+      - ../../../nginx/web/config_docker.php:/var/www/app/web/config.php
+      - ../../../nginx/vendor:/var/www/app/vendor
     networks:
       - testbed
     healthcheck:
@@ -85,9 +85,9 @@ services:
   nginx:
     image: nginx:latest
     volumes:
-      - ../../../nginx/web:/var/www/html
-      - ../../../nginx/web/config_docker.php:/var/www/html/config.php
-      - ../../../nginx/vendor:/var/www/vendor
+      - ../../../nginx/web:/var/www/app/web
+      - ../../../nginx/web/config_docker.php:/var/www/app/web/config.php
+      - ../../../nginx/vendor:/var/www/app/vendor
       - ../../../nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     networks:
       - testbed

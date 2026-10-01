@@ -3,6 +3,7 @@ parameters:
     level: 5
     paths:
         - nginx/web
+        - nginx/tests
     excludePaths:
         - nginx/web/config.php (?)
         - nginx/web/public/graphs.php
@@ -10,3 +11,7 @@ parameters:
         -
             message: '#might not be defined#'
             path: nginx/web/public/*
+        -
+            message: '#will always evaluate to true#'
+            identifier: staticMethod.alreadyNarrowedType
+            path: nginx/tests/*
