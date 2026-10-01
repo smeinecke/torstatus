@@ -8,14 +8,11 @@ use TorStatus\Database\SqlIdentifier;
 
 final class TableNames
 {
-    /** @var string */
-    public $networkStatus;
+    public readonly string $networkStatus;
 
-    /** @var string */
-    public $descriptor;
+    public readonly string $descriptor;
 
-    /** @var string */
-    public $orAddresses;
+    public readonly string $orAddresses;
 
     public function __construct(string $networkStatus, string $descriptor, string $orAddresses)
     {

@@ -10,20 +10,11 @@ use TorStatus\Network\IpAddress;
 
 final class RouterDetailService
 {
-    /** @var QueryExecutor */
-    private $db;
-
-    /** @var TableNames */
-    private $tables;
-
-    /** @var int */
-    private $offsetFromGmt;
-
-    public function __construct(QueryExecutor $db, TableNames $tables, int $offsetFromGmt)
-    {
-        $this->db = $db;
-        $this->tables = $tables;
-        $this->offsetFromGmt = $offsetFromGmt;
+    public function __construct(
+        private readonly QueryExecutor $db,
+        private readonly TableNames $tables,
+        private readonly int $offsetFromGmt,
+    ) {
     }
 
     /** @return array<string, mixed>|null */

@@ -8,19 +8,13 @@ use Twig\Environment;
 
 final class Renderer
 {
-    /** @var Environment */
-    private $twig;
-
-    /** @var array<string, mixed> */
-    private $defaultContext;
-
     /**
      * @param array<string, mixed> $defaultContext
      */
-    public function __construct(Environment $twig, array $defaultContext)
-    {
-        $this->twig = $twig;
-        $this->defaultContext = $defaultContext;
+    public function __construct(
+        private readonly Environment $twig,
+        private readonly array $defaultContext,
+    ) {
     }
 
     /** @param array<string, mixed> $context */

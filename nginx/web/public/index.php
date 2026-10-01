@@ -51,9 +51,6 @@ $tables = new TableNames($ActiveNetworkStatusTable, $ActiveDescriptorTable, $Act
 $repository = new IndexRepository($db, $tables, (int)$OffsetFromGMT);
 
 $routerCount = $repository->countRouters();
-$source = $repository->fetchNetworkStatusSource();
-$sourceFingerprint = (string)($source['Fingerprint'] ?? '');
-$sourceLocation = $sourceFingerprint !== '' ? $repository->fetchNetworkStatusSourceLocation($sourceFingerprint) : [];
 
 $torUsage = (new TorUsageService($repository, new ExitPolicyMatcher()))->evaluate(
     $clientContext->remoteIp,
@@ -99,20 +96,6 @@ $context = array_merge(
         'base_q' => $request->toBaseQuery(),
         'RemoteIP' => $clientContext->remoteIp,
         'stats_rows' => $statsRows,
-        'SourceFingerprint' => $sourceFingerprint,
-        'SourceName' => (string)($source['Name'] ?? ''),
-        'SourceCountryCode' => (string)($sourceLocation['CountryCode'] ?? ''),
-        'SourceContact' => $source['Contact'] ?? null,
-        'SourcePlatform' => (string)($source['Platform'] ?? ''),
-        'SourceIP' => (string)($source['IP'] ?? ''),
-        'SourceHostname' => (string)($sourceLocation['Hostname'] ?? ''),
-        'SourceORPort' => (string)($source['ORPort'] ?? ''),
-        'SourceDirPort' => (string)($source['DirPort'] ?? ''),
-        'SourceLastDescriptorPublished' => (string)($source['LastDescriptorPublished'] ?? ''),
-        'SourceOnionKey' => (string)($source['OnionKey'] ?? ''),
-        'SourceSigningKey' => (string)($source['SigningKey'] ?? ''),
-        'SourceDescriptorSignature' => (string)($source['DescriptorSignature'] ?? ''),
-        'SourceFingerprint_formatted' => chunk_split(strtoupper($sourceFingerprint), 4, ' '),
         'LastUpdate' => $LastUpdate,
         'LocalTimeZone' => $LocalTimeZone,
         'LastUpdateElapsed' => $LastUpdateElapsed,

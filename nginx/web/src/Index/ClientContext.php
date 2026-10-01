@@ -8,20 +8,11 @@ use TorStatus\Network\IpAddress;
 
 final class ClientContext
 {
-    /** @var string */
-    public $remoteIp;
-
-    /** @var string */
-    public $serverIp;
-
-    /** @var string */
-    public $serverPort;
-
-    public function __construct(string $remoteIp, string $serverIp, string $serverPort)
-    {
-        $this->remoteIp = $remoteIp;
-        $this->serverIp = $serverIp;
-        $this->serverPort = $serverPort;
+    public function __construct(
+        public readonly string $remoteIp,
+        public readonly string $serverIp,
+        public readonly string $serverPort,
+    ) {
     }
 
     /**

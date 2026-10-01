@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace TorStatus\ColumnSet;
 
+use TorStatus\Common;
+
 final class ColumnPreferences
 {
     public const COLUMNS = [
@@ -14,10 +16,10 @@ final class ColumnPreferences
     ];
 
     /** @var array<int, string> */
-    private $active;
+    private array $active;
 
     /** @var array<int, string> */
-    private $inactive;
+    private array $inactive;
 
     /** @param array<int, string> $active
      *  @param array<int, string> $inactive
@@ -39,8 +41,8 @@ final class ColumnPreferences
         }
 
         return new self(
-            self::arrayOfStrings($session['ColumnList_ACTIVE'] ?? []),
-            self::arrayOfStrings($session['ColumnList_INACTIVE'] ?? [])
+            Common::arrayOfStrings($session['ColumnList_ACTIVE'] ?? []),
+            Common::arrayOfStrings($session['ColumnList_INACTIVE'] ?? [])
         );
     }
 
@@ -147,17 +149,5 @@ final class ColumnPreferences
         }
 
         return $normalized;
-    }
-
-    /** @return array<int, string> */
-    private static function arrayOfStrings($value): array
-    {
-        if (!is_array($value)) {
-            return [];
-        }
-
-        return array_values(array_filter($value, static function ($item): bool {
-            return is_string($item) && $item !== '';
-        }));
     }
 }
