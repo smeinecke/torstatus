@@ -100,7 +100,7 @@ final class IndexRequest
         $method = strtoupper((string)($server['REQUEST_METHOD'] ?? 'GET'));
         $scriptName = (string)($server['SCRIPT_NAME'] ?? '');
         $isExport = strpos($scriptName, 'query_export.php') !== false;
-        $useSessionFallback = $isExport && $method === 'GET' && $get === [];
+        $useSessionFallback = $get === [] && (($isExport && $method === 'GET') || $method === 'POST');
         $filterSource = $useSessionFallback ? $session : $get;
 
         $sortRequest = self::stringFrom($filterSource, 'SR');

@@ -1,5 +1,6 @@
 """Tests for torstatus_updater.tor_client."""
 
+import socket
 from unittest.mock import MagicMock, patch
 
 from torstatus_updater.tor_client import TorClient
@@ -18,6 +19,24 @@ def test_connect_authenticate(mock_from_port) -> None:
     mock_ctrl.signal.assert_called_once_with("ACTIVE")
     client.close()
     mock_ctrl.close.assert_called_once()
+
+
+@patch("torstatus_updater.tor_client.Controller.from_port")
+@patch("torstatus_updater.tor_client.socket.getaddrinfo")
+def test_connect_resolves_hostname(mock_getaddrinfo, mock_from_port) -> None:
+    """stem's from_port rejects hostnames — connect() must resolve them."""
+    mock_ctrl = MagicMock()
+    mock_from_port.return_value = mock_ctrl
+    mock_getaddrinfo.return_value = [
+        (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("10.11.12.13", 9051))
+    ]
+
+    client = TorClient("tor.internal", 9051)
+    client.connect()
+
+    mock_getaddrinfo.assert_called_once_with("tor.internal", 9051, proto=socket.IPPROTO_TCP)
+    mock_from_port.assert_called_once_with(address="10.11.12.13", port=9051)
+    client.close()
 
 
 @patch("torstatus_updater.tor_client.Controller.from_port")

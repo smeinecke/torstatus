@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import socket
 
 from stem.control import Controller
 
@@ -21,7 +22,9 @@ class TorClient:
 
     def connect(self) -> None:
         """Open the control connection and authenticate."""
-        self._ctrl = Controller.from_port(address=self.host, port=self.port)  # type: ignore[arg-type]
+        # stem's from_port only accepts IP literals; resolve hostnames first
+        address = socket.getaddrinfo(self.host, self.port, proto=socket.IPPROTO_TCP)[0][4][0]
+        self._ctrl = Controller.from_port(address=address, port=self.port)  # type: ignore[arg-type]
         if self.password:
             self._ctrl.authenticate(password=self.password)
         else:

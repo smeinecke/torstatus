@@ -14,9 +14,10 @@ def init_countries(
     geoip6_path: str = "/usr/share/tor/geoip6",
 ) -> list[CountryRange]:
     """Load Tor GeoIP CSV files into sorted integer IP ranges."""
-    ranges = _read_ranges(geoip_path)
-    if Path(geoip6_path).exists():
-        ranges.extend(_read_ranges(geoip6_path))
+    ranges: list[CountryRange] = []
+    for path in (geoip_path, geoip6_path):
+        if Path(path).exists():
+            ranges.extend(_read_ranges(path))
     ranges.sort(key=lambda row: row[0])
     return ranges
 

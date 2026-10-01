@@ -28,7 +28,7 @@ final class IpListExporter
 
         header('Content-Transfer-Encoding: Binary');
         header('Content-Type: text/csv; charset=UTF-8');
-        header("Content-Disposition: inline; filename=$filename");
+        header("Content-Disposition: attachment; filename=$filename");
         echo $output;
     }
 

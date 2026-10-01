@@ -24,7 +24,7 @@ $Self = 'index.php';
 
 $columnDialogOpen = false;
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
-if ($method === 'POST' && isset($_POST['CR_ACTIVE'])) {
+if ($method === 'POST' && array_intersect(array_keys($_POST), ['CR_ACTIVE', 'CR_INACTIVE', 'Add', 'Remove', 'Up', 'Down']) !== []) {
     $columnDialogOpen = true;
     $preferences = ColumnPreferences::fromSession(
         $ColumnList_ACTIVE_DEFAULT,

@@ -14,7 +14,7 @@ def parse_config(path: str) -> dict[str, str]:
     with open(path, encoding="utf-8", errors="ignore") as fh:
         for line in fh:
             line = line.strip()
-            m = re.match(r"^\$(\w+)\s*=\s*(.*?);", line)
+            m = re.match(r"^\$(\w+)\s*=\s*(.*);\s*$", line)
             if not m:
                 continue
             key = m.group(1)

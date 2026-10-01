@@ -54,6 +54,16 @@ fi
 echo "Installing PHP dependencies..."
 cd nginx
 composer install --no-dev --no-interaction
+
+# Build frontend assets if Node.js is available
+if command -v npm >/dev/null 2>&1; then
+    echo "Installing npm dependencies and building frontend assets..."
+    npm ci --no-audit --no-fund
+    npm run build
+else
+    echo "WARNING: npm not found - skipping frontend asset build."
+    echo "         Install Node.js and run 'npm ci && npm run build' in nginx/."
+fi
 cd ..
 
 echo "=== Installation complete ==="

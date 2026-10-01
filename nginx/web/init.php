@@ -24,17 +24,9 @@ $ActiveNetworkStatusTable = (string)($status['ActiveNetworkStatusTable'] ?? '');
 $ActiveDescriptorTable = (string)($status['ActiveDescriptorTable'] ?? '');
 $ActiveORAddressesTable = (string)($status['ActiveORAddressesTable'] ?? '');
 
-$timestamp = time();
-$year = date('Y', $timestamp);
-$month = date('n', $timestamp);
-$day = date('j', $timestamp);
-$hour = date('G', $timestamp);
-$minute = date('i', $timestamp);
-$second = date('s', $timestamp);
-
 $Host = isset($_SERVER['HTTP_HOST']) ? (string)$_SERVER['HTTP_HOST'] : '';
 $onion_service = Common::isOnionHost($Host);
-$appVersion = Common::appVersion(__DIR__ . '/../composer.json');
+$appVersion = Common::appVersion();
 $renderer = Common::renderer(__DIR__ . '/templates', [
     'pageTitle' => '',
     'noindex' => false,

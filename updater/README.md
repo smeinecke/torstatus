@@ -64,7 +64,7 @@ sudo systemctl status torstatus-updater.service
 
 ```bash
 cd updater
-uv sync --extra dev
+uv sync
 ```
 
 ### Tests
@@ -73,6 +73,23 @@ uv sync --extra dev
 uv run make test
 # or directly
 uv run python -m pytest tests -v
+```
+
+### Integration tests
+
+The Docker Compose testbed in `tests/integration/` spins up the full stack —
+a stub Tor control server, MariaDB, Valkey, the updater image, and the real
+PHP-FPM/Nginx frontend — then asserts on the database contents and HTTP
+responses. Requires a Docker daemon:
+
+```bash
+uv run make test-integration
+```
+
+### Mutation testing
+
+```bash
+uv run make mutation
 ```
 
 ### Lint / format / type-check

@@ -10,5 +10,12 @@ tor/hidden_services/*
 nginx/vendor/
 /.ruff_cache
 
+# test/mutation artifacts
+mutants/
+.coverage
+coverage.xml
+htmlcov/
+
 nginx/node_modules/
 nginx/.vite/
+.pytest_cache/

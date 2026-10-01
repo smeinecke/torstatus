@@ -5,10 +5,11 @@ on:
     branches: [main, master]
   pull_request:
     branches: [main, master]
+  workflow_dispatch:
 
 jobs:
-  python:
-    name: Python lint & test
+  python-lint:
+    name: Python lint & typecheck
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -21,22 +22,14 @@ jobs:
         with:
           enable-cache: true
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version-file: updater/pyproject.toml
-
       - name: Install dependencies
-        run: uv sync --all-extras --dev
+        run: uv sync
 
       - name: Run ruff check
         run: uv run ruff check .
 
       - name: Run ruff format check
         run: uv run ruff format --check .
-
-      - name: Run tests
-        run: uv run python -m pytest tests -v
 
       - name: Run bandit
         run: uv run bandit -c pyproject.toml -r .
@@ -47,8 +40,44 @@ jobs:
       - name: Run radon
         run: uv run radon cc . -a -nc
 
+      - name: Run xenon
+        run: uv run xenon -b D -m B -a B .
+
       - name: Run vulture
         run: uv run vulture . --exclude .venv,migrations,tests
+
+  python-test:
+    name: Python tests (${{ matrix.python-version }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+    defaults:
+      run:
+        working-directory: updater
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync --python ${{ matrix.python-version }}
+
+      - name: Run tests
+        # --no-sync: the sync step already built the venv for the matrix
+        # python; a bare `uv run` would re-resolve to the default interpreter.
+        run: uv run --no-sync python -m pytest tests -v -m "not integration" --cov --cov-report=xml --cov-report=term-missing
+
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: updater/coverage.xml
 
   frontend:
     name: Frontend assets
@@ -65,7 +94,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: nginx
-        run: npm install
+        run: npm ci
 
       - name: Build frontend assets
         working-directory: nginx
@@ -138,3 +167,25 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  integration:
+    name: Integration tests (Docker Compose)
+    runs-on: ubuntu-latest
+    needs: [python-test, php, frontend]
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: updater
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Install dependencies
+        run: uv sync
+
+      - name: Run integration tests
+        run: uv run python -m pytest tests/test_integration_compose.py -v -m integration --timeout=600 --no-cov

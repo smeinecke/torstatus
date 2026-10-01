@@ -12,7 +12,7 @@
 
 $LocalTorServerIP = "tor";
 $LocalTorServerControlPort = "9051";
-$LocalTorServerPassword = "torstatus";
+$LocalTorServerPassword = isset($_ENV['TOR_CONTROL_PASSWORD']) ? $_ENV['TOR_CONTROL_PASSWORD'] : 'torstatus';
 
 // }}}
 
@@ -35,7 +35,7 @@ $SQL_Catalog = "torstatus";
 // ++++++++++ Paths ++++++++++ {{{
 if(isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.onion') === false)
 {
-	define("WHOISPath","https://https://client.rdap.org/");
+	define("WHOISPath","https://client.rdap.org/");
 }
 
 // }}}

@@ -15,7 +15,7 @@
 <td class="{{ router.name_class }} ts-router-name-cell">
 	<span class="ts-router-identity">
 		<span class="ts-country"><span class="flag flag-country-{{ router.country_code != 'nna' ? router.country_code|lower : 'nna' }}" title="{{ router.country_name|e }}"></span></span>
-		<a class="ts-router-name" href="router_detail.php?FP={{ router.Fingerprint|e }}">{{ router.Name|e }}</a>
+		<a class="ts-router-name" href="router_detail.php?FP={{ router.Fingerprint|e('url') }}">{{ router.Name|e }}</a>
 	</span>
 </td>
 {% for col in columns_active %}

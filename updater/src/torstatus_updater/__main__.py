@@ -55,6 +55,7 @@ def main() -> int:
 
     if not database.check_installed():
         LOG.error("Database not installed")
+        database.close()
         return 1
 
     descriptor_table, _, _, _, _ = database.active_tables()
@@ -69,9 +70,9 @@ def main() -> int:
         port=int(config.get("LocalTorServerControlPort", "9051")),
         password=tor_password,
     )
-    tor.connect()
 
     try:
+        tor.connect()
         # Phase 1: descriptors
         router_count = update_descriptors(tor, database, descriptor_table)
         database.commit()
