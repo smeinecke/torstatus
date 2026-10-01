@@ -1,10 +1,12 @@
 import { resolve } from 'node:path';
+import tailwindcss from '@tailwindcss/vite';
 import { defineConfig } from 'vite';
 
 const projectRoot = resolve(process.cwd());
 
 export default defineConfig({
   root: resolve(projectRoot, 'web/assets/src'),
+  plugins: [tailwindcss()],
   publicDir: false,
   build: {
     emptyOutDir: false,
