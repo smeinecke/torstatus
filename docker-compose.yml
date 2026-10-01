@@ -124,7 +124,7 @@ services:
       interval: 5m
       timeout: 10s
   valkey:
-    image: valkey/valkey:8-alpine
+    image: valkey/valkey:9-alpine
     restart: unless-stopped
     networks:
       - torstatus
