@@ -1,3 +1,6 @@
+{% if routers is empty %}
+<div class="ts-empty-state"><i class="ti ti-search-off" aria-hidden="true"></i><p>No routers match the current filters.</p><a href="index.php" class="ts-button ts-button-secondary"><i class="ti ti-refresh" aria-hidden="true"></i>Reset filters</a></div>
+{% else %}
 <table class="displayTable ts-router-table">
 <thead>
 <tr>
@@ -39,7 +42,7 @@
 {% elseif col == 'Bandwidth' %}
 <td class="TDb ts-col-bandwidth">
 	<div class="ts-bandwidth-cell" title="{{ cell.value|e }} KB/s">
-		<span class="ts-bandwidth-track {{ cell.bg }}"><span class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px;"></span></span>
+		<!-- djlint:off H021 --><span class="ts-bandwidth-track {{ cell.bg }}"><span class="fg{{ cell.fg }}" style="width: {{ cell.bar }}px;"></span></span><!-- djlint:on H021 -->
 		<span class="ts-tabular">{{ cell.value|e }}</span>
 	</div>
 </td>
@@ -63,3 +66,4 @@
 {% endfor %}
 </tbody>
 </table>
+{% endif %}

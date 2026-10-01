@@ -16,7 +16,7 @@ function isDarkTheme() {
 
   try {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  } catch (error) {
+  } catch {
     return false;
   }
 }
@@ -134,7 +134,9 @@ function setCanvasHeight(canvas, graph, type) {
 
   canvas.style.height = `${height}px`;
   const wrapper = canvas.closest('.ts-chart-canvas-wrap');
-  if (wrapper) wrapper.style.minHeight = `${height}px`;
+  // fixed wrapper height: canvas CSS uses height:100%, so min-height alone
+  // lets responsive sizing grow the chart to fill the page
+  if (wrapper) wrapper.style.height = `${height}px`;
 }
 
 function sharedOptions(canvas, graph, type) {
@@ -186,6 +188,7 @@ function barScales(canvas, graph, horizontal) {
   const valueTicks = {
     color: colors.text,
     callback: compactNumber,
+    precision: 0,
   };
   const grid = { color: colors.grid, drawBorder: false };
 
@@ -273,6 +276,7 @@ function renderLineChart(canvas, graph) {
           ticks: {
             color: colors.text,
             callback: compactNumber,
+            precision: 0,
           },
           grid: { color: colors.grid, drawBorder: false },
           beginAtZero: true,

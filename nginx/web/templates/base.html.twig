@@ -26,10 +26,11 @@
 		{% set topbar_search_query = CSInput|default('') %}
 		{% set topbar_search_field = topbar_search_query is not empty ? CSField|default('Name') : 'Name' %}
 		{% set topbar_search_mod = topbar_search_query is not empty ? CSMod|default('Contains') : 'Contains' %}
+		{% set current_page = Self|default('')|split('/')|last %}
 		<nav class="ts-nav" aria-label="Primary navigation">
-			<a href="/index.php" title="Browse the current Tor router list"><i class="ti ti-list-details" aria-hidden="true"></i><span>Routers</span></a>
-			<a href="/tor_exit_query.php" title="Check whether an IP address is a Tor exit"><i class="ti ti-door-exit" aria-hidden="true"></i><span>Exit</span></a>
-			<a href="/network_detail.php" title="View network graphs and summary metrics"><i class="ti ti-chart-line" aria-hidden="true"></i><span>Graphs</span></a>
+			<a href="/index.php" title="Browse the current Tor router list"{% if current_page == 'index.php' %} aria-current="page"{% endif %}><i class="ti ti-list-details" aria-hidden="true"></i><span>Routers</span></a>
+			<a href="/tor_exit_query.php" title="Check whether an IP address is a Tor exit"{% if current_page == 'tor_exit_query.php' %} aria-current="page"{% endif %}><i class="ti ti-door-exit" aria-hidden="true"></i><span>Exit</span></a>
+			<a href="/network_detail.php" title="View network graphs and summary metrics"{% if current_page == 'network_detail.php' %} aria-current="page"{% endif %}><i class="ti ti-chart-line" aria-hidden="true"></i><span>Graphs</span></a>
 			<a href="/query_export.php/Tor_query_EXPORT.csv" title="Download the current router result set as CSV"><i class="ti ti-file-type-csv" aria-hidden="true"></i><span>CSV</span></a>
 			<form action="/index.php" method="get" class="ts-nav-search{% if topbar_search_query is not empty %} has-query{% endif %}" role="search" data-nav-search>
 				<input type="hidden" name="Page" value="1">
@@ -83,7 +84,6 @@
 <footer class="ts-footer">
 	{{ footerText|default('')|raw }}
 </footer>
-
 
 {% block dialogs %}{% endblock %}
 

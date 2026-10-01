@@ -96,6 +96,16 @@ jobs:
         working-directory: nginx
         run: npm ci
 
+      - name: Lint JavaScript (ESLint + shadcn/lint)
+        working-directory: nginx
+        run: npm run lint
+
+      - name: Setup uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Lint Twig templates (djlint)
+        run: uvx djlint nginx/web/templates/ --lint
+
       - name: Build frontend assets
         working-directory: nginx
         run: npm run build

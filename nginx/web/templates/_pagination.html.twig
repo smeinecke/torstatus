@@ -1,5 +1,5 @@
-<nav class="ts-pagination{% if pagination_compact|default(false) %} ts-pagination-compact{% endif %}" aria-label="{{ pagination_aria_label|default('Pagination')|e }}">
-{% if pagination_show_info|default(true) %}
+<nav class="ts-pagination{% if pagination_compact ?? false %} ts-pagination-compact{% endif %}" aria-label="{{ (pagination_aria_label ?? 'Pagination')|e }}">
+{% if pagination_show_info ?? true %}
 	<span class="ts-pagination-info">Showing {{ pagination.start_result }} to {{ pagination.end_result }} of {{ pagination.total_results }} results</span>
 {% endif %}
 	<div class="ts-pagination-pages">
