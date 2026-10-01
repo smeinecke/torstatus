@@ -26,7 +26,9 @@ final class BandwidthHistoryGraphRenderer
             : 'Recent Read History (Bytes/Sec Average) (GMT)';
 
         $pointCount = count($series['data']);
-        $end = strtotime($series['last']);
+        // history timestamps are stored in UTC; parse them explicitly so the
+        // graph is correct regardless of the server's default timezone
+        $end = strtotime($series['last'] . ' UTC');
         if ($end === false) {
             $end = time();
         }

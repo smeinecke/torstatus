@@ -1,6 +1,7 @@
 """MariaDB helpers and table-flipping logic."""
 
 import logging
+import re
 
 import pymysql
 
@@ -59,7 +60,8 @@ class Database:
         with self.cursor() as cur:
             cur.execute("SELECT ActiveNetworkStatusTable, ActiveDescriptorTable FROM Status WHERE ID = 1")
             row = cur.fetchone()
-        descriptor_table = 2 if row and row[0] and "1" in str(row[0]) else 1
+        match = re.search(r"(\d+)$", str(row[0])) if row and row[0] else None
+        descriptor_table = 2 if match and int(match.group(1)) == 1 else 1
         return (
             descriptor_table,
             f"Descriptor{descriptor_table}",
@@ -94,7 +96,8 @@ class Database:
     ) -> None:
         """Populate NetworkStatusSource from the newly-built Descriptor table."""
         with self.cursor() as cur:
-            cur.execute("TRUNCATE TABLE NetworkStatusSource")
+            # DELETE (not TRUNCATE) so this stays inside the current transaction
+            cur.execute("DELETE FROM NetworkStatusSource")
             if source_fingerprint:
                 cur.execute(
                     f"INSERT INTO NetworkStatusSource SELECT * FROM Descriptor{descriptor_table} WHERE Fingerprint = %s LIMIT 1",  # nosec B608

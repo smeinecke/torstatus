@@ -189,8 +189,8 @@ def update_descriptors(
     insert_bandwidth = f"INSERT INTO Bandwidth{descriptor_table} (fingerprint, `read`, `write`) VALUES (%s, %s, %s)"  # nosec B608
     insert_or = f"INSERT INTO ORAddresses{descriptor_table} (descriptor_id, address, port) VALUES (%s, %s, %s)"  # nosec B608
 
-    cursor = database.cursor()
-    return _update_descriptors_indexed(tor, lines, cursor, insert_descriptor, insert_bandwidth, insert_or)
+    with database.cursor() as cursor:
+        return _update_descriptors_indexed(tor, lines, cursor, insert_descriptor, insert_bandwidth, insert_or)
 
 
 def _update_descriptors_indexed(
@@ -204,6 +204,8 @@ def _update_descriptors_indexed(
     router_count = 0
     current: dict = {}
     or_addresses: list[dict] = []
+    pending_bandwidth: list[tuple] = []
+    pending_or: list[tuple] = []
     i = 0
     total = len(lines)
 
@@ -300,9 +302,9 @@ def _update_descriptors_indexed(
             current["FamilySERDATA"] = serializer.dumps_list(m.group(1).split())
             continue
 
-        # exit policy
-        if line.startswith("accept ") or line.startswith("reject "):
-            policy = re.sub(r"[^\w\d :.*/\-]", "", line)
+        # exit policy (IPv4 rules and IPv6 accept6/reject6 rules)
+        if re.match(r"^(?:accept6?|reject6?)\s", line):
+            policy = re.sub(r"[^\w\d :.*/\-\[\]]", "", line)
             current["exitpolicy"] = current.get("exitpolicy", "") + policy + "!"
             continue
 
@@ -337,21 +339,21 @@ def _update_descriptors_indexed(
             cursor.execute(insert_descriptor, _descriptor_params(current))
             router_id = cursor.lastrowid
 
-            cursor.execute(
-                insert_bandwidth,
-                (
-                    current.get("Fingerprint"),
-                    current.get("read", ""),
-                    current.get("write", ""),
-                ),
-            )
-
-            for item in or_addresses:
-                cursor.execute(insert_or, (router_id, item["address"], item["port"]))
+            pending_bandwidth.append((
+                current.get("Fingerprint"),
+                current.get("read", ""),
+                current.get("write", ""),
+            ))
+            pending_or.extend((router_id, item["address"], item["port"]) for item in or_addresses)
 
             current = {}
             or_addresses = []
             continue
+
+    if pending_bandwidth:
+        cursor.executemany(insert_bandwidth, pending_bandwidth)
+    if pending_or:
+        cursor.executemany(insert_or, pending_or)
 
     return router_count
 
@@ -391,7 +393,6 @@ def update_network_status(
     LOG.info("Fetching network status...")
     lines = tor.get_info_lines("ns/all")
 
-    cursor = database.cursor()
     insert_ns = (
         f"INSERT INTO NetworkStatus{descriptor_table} "  # nosec B608
         "(Name, Fingerprint, DescriptorHash, LastDescriptorPublished, IP, Hostname, "
@@ -405,39 +406,40 @@ def update_network_status(
     i = 0
     total = len(lines)
 
-    while i < total:
-        line = lines[i].rstrip("\r")
-        i += 1
-        if line == "250 OK":
-            break
+    with database.cursor() as cursor:
+        while i < total:
+            line = lines[i].rstrip("\r")
+            i += 1
+            if line == "250 OK":
+                break
 
-        # r line
-        m = _RE_NS_R.match(line)
-        if m or line == ".":
-            if current:
-                processed = _insert_network_status(cursor, insert_ns, current, processed, router_count)
-                current = {}
+            # r line
+            m = _RE_NS_R.match(line)
+            if m or line == ".":
+                if current:
+                    processed = _insert_network_status(cursor, insert_ns, current, processed, router_count)
+                    current = {}
 
+                if m:
+                    current["Nickname"] = m.group(1)
+                    current["Identity"] = _decode_tor_base64(m.group(2)).hex()
+                    current["Digest"] = m.group(3)
+                    current["Publication"] = f"{m.group(4)} {m.group(5)}"
+                    current["IP"] = _normalize_ip(m.group(6))
+                    current["ORPort"] = int(m.group(7))
+                    current["DirPort"] = int(m.group(8))
+                    current["Country"] = geoip.get_country(current["IP"], ip_list)
+                continue
+
+            # s line (flags)
+            m = _RE_NS_S.match(line)
             if m:
-                current["Nickname"] = m.group(1)
-                current["Identity"] = _decode_tor_base64(m.group(2)).hex()
-                current["Digest"] = m.group(3)
-                current["Publication"] = f"{m.group(4)} {m.group(5)}"
-                current["IP"] = _normalize_ip(m.group(6))
-                current["ORPort"] = int(m.group(7))
-                current["DirPort"] = int(m.group(8))
-                current["Country"] = geoip.get_country(current["IP"], ip_list)
-            continue
+                for flag in m.group(1).split():
+                    current[flag] = 1
+                continue
 
-        # s line (flags)
-        m = _RE_NS_S.match(line)
-        if m:
-            for flag in m.group(1).split():
-                current[flag] = 1
-            continue
-
-    # Flush the final router
-    _insert_network_status(cursor, insert_ns, current, processed, router_count)
+        # Flush the final router
+        _insert_network_status(cursor, insert_ns, current, processed, router_count)
 
 
 def update_hostnames(
@@ -448,18 +450,18 @@ def update_hostnames(
 ) -> None:
     """Look up reverse hostnames for every router in NetworkStatus."""
     LOG.info("Updating hostnames...")
-    cursor = database.cursor()
-    cursor.execute(f"SELECT Fingerprint, IP FROM NetworkStatus{descriptor_table}")  # nosec B608
+    with database.cursor() as cursor:
+        cursor.execute(f"SELECT Fingerprint, IP FROM NetworkStatus{descriptor_table}")  # nosec B608
+        rows = cursor.fetchall()
     update_sql = f"UPDATE NetworkStatus{descriptor_table} SET Hostname = %s WHERE Fingerprint = %s"  # nosec B608
 
     lookup_counter = 0
-    for row in cursor.fetchall():
-        fingerprint, ip = row
-        lookup_counter += 1
-        LOG.debug("Looking up %s (%d/%d)", ip, lookup_counter, router_count)
+    with database.cursor() as update_cursor:
+        for fingerprint, ip in rows:
+            lookup_counter += 1
+            LOG.debug("Looking up %s (%d/%d)", ip, lookup_counter, router_count)
 
-        hostname = dns_lookup.lookup(ip, cache_client=cache_client)
-        with database.cursor() as uc:
-            uc.execute(update_sql, (hostname, fingerprint))
+            hostname = dns_lookup.lookup(ip, cache_client=cache_client)
+            update_cursor.execute(update_sql, (hostname, fingerprint))
 
     LOG.info("Updated %d hostnames", lookup_counter)

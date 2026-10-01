@@ -265,7 +265,7 @@ final class IndexRepository
         $query .= ", $networkStatus.FValid as Valid";
         $query .= ", $networkStatus.FV2Dir as V2Dir";
         $query .= ", $networkStatus.FHSDir as HSDir";
-        $query .= ", INET_ATON($networkStatus.IP) as NIP from $networkStatus inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id";
+        $query .= ", INET6_ATON($networkStatus.IP) as NIP from $networkStatus inner join $descriptor on $networkStatus.Fingerprint = $descriptor.Fingerprint left join $orAddresses on $descriptor.ID = $orAddresses.descriptor_id";
 
         $params = [$this->offsetFromGmt];
         $where = $this->buildWhereClauses($request, $params);

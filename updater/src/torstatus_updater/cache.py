@@ -39,7 +39,7 @@ class MemcachedCache:
         """Create a memcached client."""
         import pymemcache.client.base
 
-        self._client: Any = pymemcache.client.base.Client((host, port), encoding="utf-8")
+        self._client: Any = pymemcache.client.base.Client((host, port), connect_timeout=2, timeout=5, encoding="utf-8")
 
     def get(self, key: str) -> str | None:
         """Read a value."""
@@ -58,7 +58,7 @@ class RedisCache:
         """Create a Redis-compatible client."""
         import redis
 
-        self._client: Any = redis.Redis(host=host, port=port, decode_responses=True)
+        self._client: Any = redis.Redis(host=host, port=port, decode_responses=True, socket_connect_timeout=2, socket_timeout=5)
 
     def get(self, key: str) -> str | None:
         """Read a value."""

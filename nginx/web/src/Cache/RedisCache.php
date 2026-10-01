@@ -16,21 +16,30 @@ final class RedisCache implements CacheInterface
         }
 
         $this->client = new \Redis();
-        $this->client->connect($host, $port);
+        $this->client->connect($host, $port, 2.0, null, 0, 2.0);
     }
 
     public function get(string $key): ?string
     {
-        $value = $this->client->get($key);
+        try {
+            $value = $this->client->get($key);
+        } catch (\RedisException) {
+            return null;
+        }
+
         return is_string($value) ? $value : null;
     }
 
     public function set(string $key, string $value, int $ttl = 0): bool
     {
-        if ($ttl > 0) {
-            return $this->client->setex($key, $ttl, $value) === true;
-        }
+        try {
+            if ($ttl > 0) {
+                return $this->client->setex($key, $ttl, $value) === true;
+            }
 
-        return $this->client->set($key, $value) === true;
+            return $this->client->set($key, $value) === true;
+        } catch (\RedisException) {
+            return false;
+        }
     }
 }

@@ -1,6 +1,7 @@
 services:
   nginx:
     image: nginx:latest
+    restart: unless-stopped
     depends_on:
       php-fpm:
         condition: service_healthy
@@ -29,6 +30,7 @@ services:
       timeout: 10s
   php-fpm:
     build: php-fpm
+    restart: unless-stopped
     ports:
       - 127.0.0.1:9001:9000
     environment:
@@ -51,7 +53,8 @@ services:
       interval: 5m
       timeout: 10s
   mariadb:
-    image: mariadb:11.5
+    image: mariadb:11.8
+    restart: unless-stopped
     stop_grace_period: 30s
     environment:
       MARIADB_ROOT_PASSWORD: torstatus
@@ -72,6 +75,9 @@ services:
       timeout: 10s
   updater:
     build: updater
+    restart: unless-stopped
+    environment:
+      - TOR_CONTROL_PASSWORD=${TOR_CONTROL_PASSWORD:-torstatus}
     depends_on:
       tor:
         condition: service_healthy
@@ -95,6 +101,9 @@ services:
       timeout: 10s
   tor:
     build: tor
+    restart: unless-stopped
+    environment:
+      - TOR_CONTROL_PASSWORD=${TOR_CONTROL_PASSWORD:-torstatus}
     depends_on:
       nginx:
         condition: service_healthy
@@ -116,6 +125,7 @@ services:
       timeout: 10s
   valkey:
     image: valkey/valkey:8-alpine
+    restart: unless-stopped
     networks:
       - torstatus
     logging:

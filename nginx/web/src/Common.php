@@ -6,6 +6,7 @@ namespace TorStatus;
 
 use TorStatus\Cache\CacheInterface;
 use TorStatus\Cache\MemcachedCache;
+use TorStatus\Cache\NullCache;
 use TorStatus\Cache\RedisCache;
 use TorStatus\Database\QueryExecutor;
 use TorStatus\Http\Response;
@@ -18,6 +19,11 @@ final class Common
 {
     public static function startSession(): void
     {
+        ini_set('session.use_strict_mode', '1');
+        ini_set('session.use_only_cookies', '1');
+        ini_set('session.cookie_httponly', '1');
+        ini_set('session.cookie_samesite', 'Lax');
+
         @session_start() or Response::badRequest();
     }
 
@@ -28,11 +34,13 @@ final class Common
                 $parts = parse_url($redisUri);
                 $host = $parts['host'] ?? 'valkey';
                 $port = $parts['port'] ?? 6379;
-                return new RedisCache($host, $port);
+                return new RedisCache($host, (int)$port);
             }
             return new MemcachedCache($memcachedHost, 11211);
         } catch (\Throwable $e) {
-            Response::serviceUnavailable('Could not initialize cache: ' . $e->getMessage());
+            // Degrade gracefully: without the shared cache every query just runs uncached
+            error_log('Cache backend unavailable, continuing without cache: ' . $e->getMessage());
+            return new NullCache();
         }
     }
 
@@ -68,7 +76,7 @@ final class Common
         return (string)($row['mirrors'] ?? '');
     }
 
-    public static function appVersion(string $composerJsonPath): string
+    public static function appVersion(): string
     {
         return '5.0';
     }
@@ -78,7 +86,8 @@ final class Common
     {
         $loader = new FilesystemLoader($templateDirectory);
         $twig = new Environment($loader, [
-            'cache' => false,
+            'cache' => sys_get_temp_dir() . '/torstatus_twig',
+            'auto_reload' => true,
             'debug' => false,
             'autoescape' => 'html',
         ]);
@@ -89,7 +98,7 @@ final class Common
 
     public static function isOnionHost(string $host): bool
     {
-        return preg_match('/^[0-9a-z]+\.onion$/', $host) === 1;
+        return preg_match('/^[0-9a-z]+\.onion(?::\d+)?$/i', $host) === 1;
     }
 
     public static function formatBytesPerSecond(float $bytes): string

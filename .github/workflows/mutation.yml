@@ -1,0 +1,56 @@
+name: Mutation Testing
+
+# Mutation testing is too slow for the PR gate — run it weekly and on
+# demand. `mutmut run` is incremental, so rerunning after adding tests
+# only re-tests mutants in functions whose source changed.
+
+permissions:
+  contents: read
+
+on:
+  schedule:
+    - cron: "0 4 * * 1" # Mondays 04:00 UTC
+  workflow_dispatch:
+
+jobs:
+  mutmut:
+    name: mutmut (unit suite)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: updater
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python environment
+        run: uv sync
+
+      - name: Restore mutmut cache
+        uses: actions/cache@v4
+        with:
+          path: updater/mutants/
+          key: mutmut-${{ github.sha }}
+          restore-keys: |
+            mutmut-
+
+      - name: Run mutmut
+        run: uv run mutmut run
+
+      - name: Report results
+        if: always()
+        run: uv run mutmut results | tee mutmut-results.txt
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mutmut-results
+          path: updater/mutmut-results.txt

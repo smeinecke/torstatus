@@ -18,6 +18,7 @@ RUN mkdir /run/tor && chown debian-tor:debian-tor /run/tor && chmod 0700 /run/to
 
 COPY torrc /etc/tor/torrc
 COPY updates.sh /opt
+COPY docker-entrypoint.sh /opt/docker-entrypoint.sh
+RUN chmod +x /opt/docker-entrypoint.sh
 
-CMD [ "/usr/bin/tor", "--defaults-torrc", "/usr/share/tor/tor-service-defaults-torrc", "-f", "/etc/tor/torrc", "--RunAsDaemon", "0" ] 
-
+CMD ["/opt/docker-entrypoint.sh"]

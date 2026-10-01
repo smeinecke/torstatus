@@ -30,7 +30,7 @@ $result = $repository->fetchRouterExport($request);
 
 header('Content-Transfer-Encoding: Binary');
 header('Content-Type: text/csv; charset=UTF-8');
-header('Content-Disposition: inline; filename=Tor_query_EXPORT.csv');
+header('Content-Disposition: attachment; filename=Tor_query_EXPORT.csv');
 
 (new RouterCsvExporter())->output($result, $request->columnListActive);
 $result->free();

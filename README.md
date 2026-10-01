@@ -15,7 +15,7 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 - Clone the repository.
 - Install PHP dependencies with Composer: `cd nginx && composer install --no-dev`.
-- Install and build frontend assets: `cd nginx && npm install && npm run build`.
+- Install and build frontend assets: `cd nginx && npm ci && npm run build`.
 - Create the Docker network `torstatus` using `docker network create torstatus`.
 - Run `docker compose build` from the root of your repository clone.
 - Run `docker compose up` to start everything.
@@ -35,6 +35,7 @@ Web application listing Tor nodes running at [https://torstatus.rueckgr.at/](htt
 
 - `REAL_SERVER_IP`: The public IPv4 or IPv6 address of the TorStatus instance. Used for determining whether a Tor exit node will allow connecting to this TorStatus instance.
 - `HIDDEN_SERVICE_URL`: Optional onion-service URL shown in the UI.
+- `TOR_CONTROL_PASSWORD`: Password for the Tor control port. When set, the tor container replaces the built-in development password at startup and the updater authenticates with it. Defaults to `torstatus` — set it for any non-local deployment.
 
 ### Cache backend
 

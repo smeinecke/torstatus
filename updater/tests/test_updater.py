@@ -60,8 +60,9 @@ def test_update_descriptors_indexed_minimal() -> None:
 
     count = _update_descriptors_indexed(tor, lines, cursor, "INSERT DESC", "INSERT BW", "INSERT OR")
     assert count == 1
-    # descriptor + bandwidth (no or-address in this minimal descriptor)
-    assert cursor.execute.call_count == 2
+    # one descriptor via execute, bandwidth row batched via executemany
+    assert cursor.execute.call_count == 1
+    cursor.executemany.assert_called_once_with("INSERT BW", [("ABCDABCDABCDABCDABCDABCDABCDABCDABCDABCD", "", "")])
 
 
 def test_update_descriptors_ipv6_or_address() -> None:
@@ -83,7 +84,8 @@ def test_update_descriptors_ipv6_or_address() -> None:
 
     _update_descriptors_indexed(tor, lines, cursor, "INSERT DESC", "INSERT BW", "INSERT OR")
 
-    assert cursor.execute.call_args_list[-1].args == ("INSERT OR", (42, "2001:db8::1", 9001))
+    # OR addresses are batched via executemany after the descriptor inserts
+    cursor.executemany.assert_any_call("INSERT OR", [(42, "2001:db8::1", 9001)])
 
 
 def test_update_network_status_minimal() -> None:
@@ -96,6 +98,8 @@ def test_update_network_status_minimal() -> None:
     tor.get_info_lines.return_value = lines
     db = MagicMock()
     cursor = MagicMock(spec=pymysql.cursors.Cursor)
+    cursor.__enter__ = MagicMock(return_value=cursor)
+    cursor.__exit__ = MagicMock(return_value=False)
     db.cursor.return_value = cursor
     ip_list = []
 

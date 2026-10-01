@@ -26,7 +26,7 @@
 		<ul class="ts-inline-list">
 {% for result in results %}
 			<li>
-				Server <a href="router_detail.php?FP={{ result.fingerprint|e }}">{{ result.name|e }}</a>
+				Server <a href="router_detail.php?FP={{ result.fingerprint|e('url') }}">{{ result.name|e }}</a>
 {% if has_destination and result.exit_allowed is same as(true) %}
 				<span class="ts-pill ts-pill-green">Exit allowed</span>
 {% elseif has_destination and result.exit_allowed is same as(false) %}

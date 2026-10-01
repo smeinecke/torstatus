@@ -24,7 +24,7 @@ def test_build_cache_prefers_redis_uri() -> None:
         mock_redis_cls.return_value = mock_client
         cache = build_cache(cfg)
         assert isinstance(cache, RedisCache)
-        mock_redis_cls.assert_called_once_with(host="my-redis", port=6380, decode_responses=True)
+        mock_redis_cls.assert_called_once_with(host="my-redis", port=6380, decode_responses=True, socket_connect_timeout=2, socket_timeout=5)
 
 
 def test_build_cache_falls_back_to_memcached() -> None:
@@ -32,7 +32,7 @@ def test_build_cache_falls_back_to_memcached() -> None:
     with patch("pymemcache.client.base.Client") as mock_client_cls:
         cache = build_cache(cfg)
         assert isinstance(cache, MemcachedCache)
-        mock_client_cls.assert_called_once_with(("mymemcache", 11211), encoding="utf-8")
+        mock_client_cls.assert_called_once_with(("mymemcache", 11211), connect_timeout=2, timeout=5, encoding="utf-8")
 
 
 def test_build_cache_memcached_default_host() -> None:
@@ -40,7 +40,7 @@ def test_build_cache_memcached_default_host() -> None:
     with patch("pymemcache.client.base.Client") as mock_client_cls:
         cache = build_cache(cfg)
         assert isinstance(cache, MemcachedCache)
-        mock_client_cls.assert_called_once_with(("memcached", 11211), encoding="utf-8")
+        mock_client_cls.assert_called_once_with(("memcached", 11211), connect_timeout=2, timeout=5, encoding="utf-8")
 
 
 def test_build_cache_memcached_default_when_nothing_configured() -> None:
@@ -48,7 +48,7 @@ def test_build_cache_memcached_default_when_nothing_configured() -> None:
     with patch("pymemcache.client.base.Client") as mock_client_cls:
         cache = build_cache(cfg)
         assert isinstance(cache, MemcachedCache)
-        mock_client_cls.assert_called_once_with(("memcached", 11211), encoding="utf-8")
+        mock_client_cls.assert_called_once_with(("memcached", 11211), connect_timeout=2, timeout=5, encoding="utf-8")
 
 
 def test_memcached_cache_get_set() -> None:

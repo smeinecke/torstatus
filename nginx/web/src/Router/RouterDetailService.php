@@ -40,7 +40,7 @@ final class RouterDetailService
                 $networkStatus.DirPort,
                 $descriptor.Platform,
                 $descriptor.Contact,
-                CAST(UNIX_TIMESTAMP() AS SIGNED) - CAST(UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) AS SIGNED) + ? + CAST($descriptor.Uptime AS SIGNED) as Uptime,
+                CAST(UNIX_TIMESTAMP() AS SIGNED) - (CAST(UNIX_TIMESTAMP($descriptor.LastDescriptorPublished) AS SIGNED) + ?) + CAST($descriptor.Uptime AS SIGNED) as Uptime,
                 $descriptor.BandwidthMAX,
                 $descriptor.BandwidthBURST,
                 $descriptor.BandwidthOBSERVED,

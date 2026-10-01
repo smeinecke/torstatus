@@ -12,6 +12,9 @@ final class ExitPolicyMatcher
     public function wouldAllowExit(array $exitPolicy, string $serverIp, string $serverPort): ?bool
     {
         $serverIp = IpAddress::normalize($serverIp) ?? $serverIp;
+        // Tor evaluates IPv4 targets against accept/reject and IPv6 targets
+        // against accept6/reject6 only; the families never mix.
+        $wantV6 = IpAddress::isIpv6($serverIp);
 
         foreach ($exitPolicy as $exitPolicyLine) {
             if (!is_string($exitPolicyLine) || trim($exitPolicyLine) === '') {
@@ -24,6 +27,11 @@ final class ExitPolicyMatcher
             }
 
             [$condition, $target] = $parts;
+            $isV6Rule = str_ends_with($condition, '6');
+            if ($isV6Rule !== $wantV6) {
+                continue;
+            }
+
             $target = trim($target);
             $separator = strrpos($target, ':');
             if ($separator === false) {
@@ -42,10 +50,10 @@ final class ExitPolicyMatcher
                     continue;
                 }
 
-                if ($condition === 'accept' || $condition === 'accept6') {
+                if (in_array($condition, ['accept', 'accept6'], true)) {
                     return true;
                 }
-                if ($condition === 'reject' || $condition === 'reject6') {
+                if (in_array($condition, ['reject', 'reject6'], true)) {
                     return false;
                 }
             }
@@ -61,6 +69,12 @@ final class ExitPolicyMatcher
 
         if ($subnet === '*') {
             return true;
+        }
+
+        // Tor's "private" address family: RFC1918, loopback, link-local, ULA, ...
+        if (strtolower($subnet) === 'private') {
+            return filter_var($ip, FILTER_VALIDATE_IP) !== false
+                && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
         }
 
         if (strpos($subnet, '/') === false) {

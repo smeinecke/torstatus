@@ -35,7 +35,7 @@ $SQL_Catalog = "torstatus";
 // ++++++++++ Paths ++++++++++ {{{
 if(isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.onion') === false)
 {
-	define("WHOISPath","https://https://client.rdap.org/");
+	define("WHOISPath","https://client.rdap.org/");
 }
 
 // }}}
