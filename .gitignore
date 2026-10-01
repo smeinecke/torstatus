@@ -19,3 +19,4 @@ htmlcov/
 nginx/node_modules/
 nginx/.vite/
 .pytest_cache/
+.phpunit.result.cache

@@ -38,7 +38,7 @@ final class ExitPolicyMatcher
                 continue;
             }
 
-            $subnet = trim(substr($target, 0, $separator), '[]');
+            $subnet = substr($target, 0, $separator);
             $portExpressions = explode(',', substr($target, $separator + 1));
 
             if (!$this->isIpInSubnet($serverIp, $subnet)) {
@@ -65,7 +65,15 @@ final class ExitPolicyMatcher
     public function isIpInSubnet(string $ip, string $subnet): bool
     {
         $ip = IpAddress::normalize($ip) ?? $ip;
-        $subnet = trim($subnet, '[]');
+
+        // Tor wraps IPv6 literals in brackets: [2001:db8::]/32 or [2001:db8::1].
+        if (str_starts_with($subnet, '[')) {
+            $close = strpos($subnet, ']');
+            if ($close !== false) {
+                $subnet = substr($subnet, 1, $close - 1) . substr($subnet, $close + 1);
+            }
+        }
+        $subnet = trim($subnet);
 
         if ($subnet === '*') {
             return true;

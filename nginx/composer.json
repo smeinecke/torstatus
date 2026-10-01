@@ -7,12 +7,21 @@
         "twig/twig": "^3.0"
     },
     "require-dev": {
-        "phpstan/phpstan": "^2.0"
+        "phpstan/phpstan": "^2.0",
+        "phpunit/phpunit": "^12.0"
     },
     "autoload": {
+        "psr-4": {
+            "TorStatus\\": "web/src/"
+        },
         "classmap": [
             "web/iputils/"
         ]
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "TorStatus\\Tests\\": "tests/"
+        }
     },
     "scripts": {
         "phpstan": "phpstan analyse --configuration=../phpstan.neon.dist"

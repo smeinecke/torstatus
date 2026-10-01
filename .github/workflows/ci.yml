@@ -126,6 +126,10 @@ jobs:
       - name: Run PHPStan
         run: nginx/vendor/bin/phpstan analyse --no-progress --configuration=phpstan.neon.dist
 
+      - name: Run PHPUnit
+        working-directory: nginx
+        run: vendor/bin/phpunit --display-warnings --display-notices
+
   docker:
     name: Docker build & push
     runs-on: ubuntu-latest

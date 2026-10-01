@@ -12,10 +12,10 @@ services:
     ports:
       - 127.0.0.1:8765:80
     volumes:
-      - ./nginx/web:/var/www/html
-      - ./nginx/web/config_docker.php:/var/www/html/config.php
+      - ./nginx/web:/var/www/app/web
+      - ./nginx/web/config_docker.php:/var/www/app/web/config.php
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
-      - ./nginx/vendor:/var/www/vendor
+      - ./nginx/vendor:/var/www/app/vendor
     networks:
       - torstatus
     logging:
@@ -37,9 +37,9 @@ services:
       - REAL_SERVER_IP=${REAL_SERVER_IP}
       - HIDDEN_SERVICE_URL=${HIDDEN_SERVICE_URL}
     volumes:
-      - ./nginx/web:/var/www/html
-      - ./nginx/web/config_docker.php:/var/www/html/config.php
-      - ./nginx/vendor:/var/www/vendor
+      - ./nginx/web:/var/www/app/web
+      - ./nginx/web/config_docker.php:/var/www/app/web/config.php
+      - ./nginx/vendor:/var/www/app/vendor
     networks:
       - torstatus
     logging:
