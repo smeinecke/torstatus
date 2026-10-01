@@ -1,8 +1,9 @@
+@import 'tailwindcss';
 @import '@tabler/icons-webfont/dist/tabler-icons.css';
 @import '@tabler/core/dist/css/tabler-flags.min.css';
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@plugin '@tailwindcss/forms';
+@source '../../templates/**/*.twig';
+@source '../../public/**/*.php';
 
 :root {
   --ts-bg: #f8fafc;
