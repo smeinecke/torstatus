@@ -28,35 +28,47 @@ final class RouterTablePresenter
         ];
     }
 
+    private const COLUMN_LABELS = [
+        'Fingerprint' => 'Fingerprint',
+        'Bandwidth' => 'Bandwidth (KB/s)',
+        'Uptime' => 'Uptime',
+        'LastDescriptorPublished' => 'Last Descriptor Published',
+        'Hostname' => 'Hostname',
+        'ORPort' => 'ORPort',
+        'DirPort' => 'DirPort',
+        'Contact' => 'Contact',
+        'IP' => 'IP Address',
+        'Platform' => 'Platform',
+        'CountryCode' => 'Country',
+        'Hibernating' => 'Hibernating',
+        'Authority' => 'Authority',
+        'Exit' => 'Exit',
+        'Fast' => 'Fast',
+        'Guard' => 'Guard',
+        'Named' => 'Named',
+        'Stable' => 'Stable',
+        'Running' => 'Running',
+        'Valid' => 'Valid',
+        'V2Dir' => 'V2Dir',
+        'HSDir' => 'HSDir',
+        'BadDir' => 'Bad Dir',
+        'BadExit' => 'Bad Exit',
+    ];
+
+    /** @return array<string, string> */
+    public static function columnLabels(): array
+    {
+        return self::COLUMN_LABELS;
+    }
+
     /** @return array<string, mixed> */
     private function header(string $column, IndexRequest $request, string $baseUrl): array
     {
-        $labels = [
-            'Fingerprint' => 'Fingerprint',
+        $htmlLabels = [
             'Bandwidth' => 'Bandwidth <span class="TRSM">(KB/s)</span>',
-            'Uptime' => 'Uptime',
             'LastDescriptorPublished' => 'Last Descriptor<br/><span class="TRSM">(GMT)</span>',
-            'Hostname' => 'Hostname',
-            'ORPort' => 'ORPort',
-            'DirPort' => 'DirPort',
-            'Contact' => 'Contact',
-            'IP' => 'IP Address',
-            'Platform' => 'Platform',
-            'CountryCode' => 'Country',
-            'Hibernating' => 'Hibernating',
-            'Authority' => 'Authority',
-            'Exit' => 'Exit',
-            'Fast' => 'Fast',
-            'Guard' => 'Guard',
-            'Named' => 'Named',
-            'Stable' => 'Stable',
-            'Running' => 'Running',
-            'Valid' => 'Valid',
-            'V2Dir' => 'V2Dir',
-            'HSDir' => 'HSDir',
-            'BadDir' => 'Bad Dir',
-            'BadExit' => 'Bad Exit',
         ];
+        $labels = array_merge(self::COLUMN_LABELS, $htmlLabels);
         $flagColumns = [
             'Hibernating', 'Authority', 'Exit', 'Fast', 'Guard', 'Named',
             'Stable', 'Running', 'Valid', 'V2Dir', 'HSDir', 'BadDir', 'BadExit',

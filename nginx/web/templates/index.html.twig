@@ -198,7 +198,7 @@
 			<h2>Visible columns</h2>
 			<select name="CR_ACTIVE" size="20" class="BOXCOLSEL">
 {% for value in ColumnList_ACTIVE %}
-				<option value="{{ value }}"{% if ((CR_Up is not null or CR_Down is not null) and CR_ACTIVE == value) or (CR_Add is not null and CR_INACTIVE == value) %} selected{% endif %}>{{ value }}</option>
+				<option value="{{ value }}"{% if ((CR_Up is not null or CR_Down is not null) and CR_ACTIVE == value) or (CR_Add is not null and CR_INACTIVE == value) %} selected{% endif %}>{{ column_labels[value]|default(value) }}</option>
 {% endfor %}
 			</select>
 			<div class="ts-form-actions ts-form-actions-left">
@@ -211,7 +211,7 @@
 			<h2>Available columns</h2>
 			<select name="CR_INACTIVE" size="20" class="BOXCOLSEL">
 {% for value in ColumnList_INACTIVE %}
-				<option value="{{ value }}"{% if CR_Remove is not null and CR_ACTIVE == value %} selected{% endif %}>{{ value }}</option>
+				<option value="{{ value }}"{% if CR_Remove is not null and CR_ACTIVE == value %} selected{% endif %}>{{ column_labels[value]|default(value) }}</option>
 {% endfor %}
 			</select>
 			<div class="ts-form-actions ts-form-actions-left">

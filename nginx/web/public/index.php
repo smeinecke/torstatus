@@ -23,6 +23,7 @@ $pageTitle = 'Tor Network Status';
 $Self = 'index.php';
 
 $columnDialogOpen = false;
+$columnActionContext = [];
 $method = strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
 if ($method === 'POST' && array_intersect(array_keys($_POST), ['CR_ACTIVE', 'CR_INACTIVE', 'Add', 'Remove', 'Up', 'Down']) !== []) {
     $columnDialogOpen = true;
@@ -31,7 +32,7 @@ if ($method === 'POST' && array_intersect(array_keys($_POST), ['CR_ACTIVE', 'CR_
         $ColumnList_INACTIVE_DEFAULT,
         $_SESSION
     );
-    $preferences->applyPost($_POST);
+    $columnActionContext = $preferences->applyPost($_POST)->toTemplateContext();
     $preferences->persist($_SESSION);
 }
 
@@ -74,6 +75,7 @@ $statsRows = $repository->buildStatsRows($aggregateStats, $routerCount, $current
 
 $context = array_merge(
     $request->toTemplateContext(),
+    $columnActionContext,
     $torUsage,
     [
         'pageTitle' => $pageTitle,
@@ -104,6 +106,7 @@ $context = array_merge(
         'page_generation_time' => round((microtime(true) - $TimeStart), 4),
         'ColumnList_ACTIVE' => $request->columnListActive,
         'ColumnList_INACTIVE' => $request->columnListInactive,
+        'column_labels' => RouterTablePresenter::columnLabels(),
         'column_dialog_open' => $columnDialogOpen,
     ]
 );
