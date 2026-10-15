@@ -123,6 +123,16 @@ def test_fetch_extra_info() -> None:
     assert current["WriteHistoryINC"] == 900
 
 
+def test_fetch_extra_info_not_in_cache() -> None:
+    import stem
+
+    tor = MagicMock()
+    tor.get_info_lines.side_effect = stem.InvalidArguments("GETINFO request contained unrecognized keywords: extra-info/digest/abcd")
+    current = {"Digest": "abcd extra"}
+    _fetch_extra_info(tor, current)
+    assert "read" not in current
+
+
 def test_update_hostnames() -> None:
     db = MagicMock()
     cursor = MagicMock(spec=pymysql.cursors.Cursor)
