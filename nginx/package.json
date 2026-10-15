@@ -12,7 +12,7 @@
     "chartjs-adapter-date-fns": "^3.0.0",
     "date-fns": "^4.4.0",
     "tailwindcss": "^4.3.3",
-    "vite": "^8.3.1"
+    "vite": "^8.3.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
