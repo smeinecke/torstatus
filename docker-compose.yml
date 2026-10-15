@@ -58,6 +58,7 @@ services:
     stop_grace_period: 30s
     environment:
       MARIADB_ROOT_PASSWORD: torstatus
+      MARIADB_DATABASE: torstatus
     volumes:
       - torstatus-mariadb:/var/lib/mysql
       - ./mariadb/sql:/docker-entrypoint-initdb.d/

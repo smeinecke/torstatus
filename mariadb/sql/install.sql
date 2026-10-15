@@ -22,7 +22,8 @@ SET time_zone = "+00:00";
 -- Datenbank: `torstatus`
 --
 
-USE `torstatus`;
+-- Select a database before importing (docker-compose sets MARIADB_DATABASE).
+-- USE `torstatus`;
 
 -- --------------------------------------------------------
 

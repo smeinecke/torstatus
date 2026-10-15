@@ -9,6 +9,7 @@ import re
 from datetime import UTC, datetime
 
 import pymysql.cursors
+import stem
 
 from . import db as db_mod
 from . import dns_lookup, geoip, serializer
@@ -363,6 +364,11 @@ def _fetch_extra_info(tor: TorClient, current: dict) -> None:
     digest = current["Digest"].split()[0]
     try:
         lines = tor.get_info_lines(f"extra-info/digest/{digest}")
+    except stem.InvalidArguments:
+        # Tor only caches extra-info docs it downloaded itself; a 552 just
+        # means this relay's doc is not in the local cache.
+        LOG.debug("Extra-info for %s not in tor cache", digest)
+        return
     except Exception as exc:
         LOG.warning("Failed to fetch extra-info for %s: %s", digest, exc)
         return
