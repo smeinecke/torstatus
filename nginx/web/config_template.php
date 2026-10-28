@@ -42,6 +42,9 @@ if(isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], '.onion') === f
 
 // ++++++++++ Interface ++++++++++ {{{
 
+// Set to 1 to add <meta name="robots" content="noindex"> to all pages
+$noindex = 0;
+
 $footerText = "<b>The software used for this page was initially taken from project.torstatus.kgprog.com. <br />The software running this site has been modified to ensure proper operation and is maintained at <a href='https://github.com/smeinecke/torstatus'>GitHub</a>.</b><br /><br />Site operator: <a href='mailto:paulchen@rueckgr.at'><strong>Paul Staroch</strong></a> &ndash; <a href='//rueckgr.at/'><strong>rueckgr.at</strong></a>";
 $ColumnList_ACTIVE_DEFAULT = array
 (
