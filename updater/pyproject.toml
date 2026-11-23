@@ -79,10 +79,9 @@ markers = [
 source = ["src/torstatus_updater"]
 
 [tool.mutmut]
-paths_to_mutate = "src/torstatus_updater"
-tests_dir = "tests"
-runner = "python -m pytest"
+source_paths = ["src/torstatus_updater"]
 pytest_add_cli_args = ["-x", "-q", "--no-cov", "-m", "not integration", "--timeout=60"]
+pytest_add_cli_args_test_selection = ["tests"]
 mutate_only_covered_lines = true
 
 [tool.pyright]
